@@ -1,0 +1,18 @@
+{
+  "samePixels": false,
+  "box": {
+    "x": 127,
+    "y": 182,
+    "width": 718,
+    "height": 403
+  },
+  "css": {
+    "atmosphereParent": "BODY",
+    "zIndex": "1",
+    "heading": "四角が流れる動画",
+    "color": "rgb(35, 33, 29)",
+    "background": "rgb(244, 251, 248)",
+    "time": 0.391307
+  },
+  "errors": []
+}

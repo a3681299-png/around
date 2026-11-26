@@ -1,0 +1,68 @@
+[
+  {
+    "label": "before",
+    "default": {
+      "rect": {
+        "x": 540.296875,
+        "y": 207.25,
+        "width": 300,
+        "height": 400,
+        "top": 207.25,
+        "right": 840.296875,
+        "bottom": 607.25,
+        "left": 540.296875
+      },
+      "renderer": "three",
+      "visibility": "visible",
+      "viewport": [1534, 905],
+      "scroll": [0, 0]
+    }
+  },
+  {
+    "label": "after",
+    "default": {
+      "rect": {
+        "x": 540.296875,
+        "y": 207.25,
+        "width": 300,
+        "height": 400,
+        "top": 207.25,
+        "right": 840.296875,
+        "bottom": 607.25,
+        "left": 540.296875
+      },
+      "renderer": "three",
+      "visibility": "visible",
+      "viewport": [1534, 905],
+      "scroll": [0, 0]
+    },
+    "idle": {
+      "rect": {
+        "x": 540.296875,
+        "y": 207.25,
+        "width": 300,
+        "height": 400,
+        "top": 207.25,
+        "right": 840.296875,
+        "bottom": 607.25,
+        "left": 540.296875
+      },
+      "frame": {
+        "clip": 0,
+        "timeMs": 2047.6000000059612,
+        "previousClip": null,
+        "previousTimeMs": 0,
+        "fadeElapsedMs": 250,
+        "fadeDurationMs": 250,
+        "yawDeg": 0,
+        "lookYaw": 0,
+        "lookPitch": 0,
+        "suspended": false,
+        "phase": "manual",
+        "id": "image-25ec0a1d-72ec-4e01-b129-a94ea2fca828",
+        "blend": 1,
+        "speedPx": 0
+      }
+    }
+  }
+]

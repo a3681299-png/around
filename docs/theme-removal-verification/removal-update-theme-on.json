@@ -1,0 +1,57 @@
+{
+  "scenario": {
+    "name": "theme-on",
+    "enabled": true,
+    "strength": 37,
+    "artwork": true,
+    "expected": true
+  },
+  "id": "ljeihjpffijgceejfgnecadomibobobl",
+  "before": {
+    "around.design.youtube": {
+      "baseThemeId": "retro",
+      "decorations": [],
+      "id": "upgrade-artwork",
+      "rules": [
+        {
+          "kind": "surface-style",
+          "style": {
+            "backgroundColor": "#ddeeff",
+            "borderRadiusPx": 18
+          },
+          "target": "video-card"
+        }
+      ],
+      "schemaVersion": 13,
+      "siteId": "youtube"
+    },
+    "around.enabled": true,
+    "around.strength": 37
+  },
+  "after": {
+    "around.design.youtube": {
+      "baseThemeId": "retro",
+      "decorations": [],
+      "id": "upgrade-artwork",
+      "rules": [
+        {
+          "kind": "surface-style",
+          "style": {
+            "backgroundColor": "#ddeeff",
+            "borderRadiusPx": 18
+          },
+          "target": "video-card"
+        }
+      ],
+      "schemaVersion": 13,
+      "siteId": "youtube"
+    },
+    "around.enabled": true,
+    "around.skinInk.v1": {
+      "febad9c3": {
+        "light": {}
+      }
+    },
+    "around.strength": 37
+  }
+}

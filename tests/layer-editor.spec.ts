@@ -1,21 +1,20 @@
 import { exposeEditorControls, withCanvas, clickCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
-const key = 'webWorldThemes.design.youtube';
-const overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube';
+const overlay = '#around-decorations';
 const images =
-  ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
+  ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]';
 const rows = '[data-layer-id]';
 
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const dialog = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(dialog).toBeVisible();
+  await showArtwork(popup);
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
+  const dialog = (await openEditor(popup, page)).panel;
   await exposeEditorControls(dialog);
   return dialog;
 }
@@ -91,7 +90,7 @@ async function drag(page: Page, node: Locator, dx: number, dy: number) {
 async function assetExists(popup: Page, id: string) {
   return popup.evaluate(
     async (assetId) =>
-      (await chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'get', id: assetId })).ok as boolean,
+      (await chrome.runtime.sendMessage({ type: 'around:assets', action: 'get', id: assetId })).ok as boolean,
     id,
   );
 }
@@ -211,8 +210,8 @@ test('32 layers combine hidden and locked selection without moving or deleting p
   await expect(dialog.getByRole('button', { name: '元に戻す', exact: true })).toBeInViewport();
   await expect(dialog.getByRole('button', { name: '保存', exact: true })).toBeInViewport();
   await youtube.screenshot({ path: '.work/verification/layer-editor-32.png' });
-  await dialog.locator('.layers-section > summary').click();
-  await expect(dialog.locator('.layers')).toBeHidden();
+  // UI0-d round 3: the floating editor's last step here folded its layer list; the editor page's list
+  // does not fold, so that step went with it (docs/ui0d-3.md).
 });
 
 test('optional snapping shows guides at screen/player/other layer bounds and Alt keeps free placement', async ({
@@ -252,9 +251,9 @@ test('optional snapping shows guides at screen/player/other layer bounds and Alt
   await dialog.getByLabel('画像のX位置', { exact: true }).fill('90');
   await youtube.locator('#navigate').evaluate((node: HTMLButtonElement) => node.click());
   await expect(youtube).toHaveURL(/\/watch\?/);
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await dialog.getByRole('checkbox', { name: 'スナップを有効にする' }).check();
-  const player = (await youtube.locator('[data-ww-surface~="player-window"]').boundingBox())!;
+  const player = (await youtube.locator('[data-around-surface~="player-window"]').boundingBox())!;
   const from = await point(first),
     target = { x: player.x + player.width / 2, y: player.y + player.height / 2 };
   await drag(youtube, first, target.x - from.x + 4, target.y - from.y - 3);
@@ -352,7 +351,7 @@ test('resize and rotation each undo as one gesture; save baseline and discard st
   expect(Number(await dialog.getByLabel('画像の角度', { exact: true }).inputValue())).toBe(0);
   await expect(dialog.locator('.dirty')).toHaveText('保存済み');
   await youtube.keyboard.press('Control+z');
-  await expect(dialog.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(dialog.locator('.dirty')).toHaveText('未保存');
   await dialog.getByRole('button', { name: '変更を破棄', exact: true }).click();
   expect(Number(await dialog.getByLabel('画像の幅', { exact: true }).inputValue())).toBe(resized.widthPx);
   await expect(dialog.getByRole('button', { name: '元に戻す', exact: true })).toBeDisabled();
@@ -499,7 +498,7 @@ test('mixed player/viewport selections share pixel movement and resizing cancels
 }) => {
   const dialog = await seed(popup, youtube, 2);
   await youtube.locator('#navigate').evaluate((node: HTMLButtonElement) => node.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await row(dialog, 0).locator('[data-action="select"]').click();
   await dialog.getByLabel('画像のX位置').fill('40');
   await dialog.getByLabel('画像のY位置').fill('40');

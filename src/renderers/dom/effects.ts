@@ -1,4 +1,5 @@
 import { createWorldSession, type WorldHostContext } from '../../host/world-session';
+import type { PageIdentity } from '../../host/page-identity';
 import { WORLD_MODE } from '../../host/world-options';
 import type { PlaybackSource } from '../../signals/types';
 import type { WorldEffectTarget } from '../../world/effects';
@@ -19,6 +20,9 @@ export function createEffectController(
   timeline?: TimelineHost,
   applyLayout?: (layout: WorldLayout) => void,
   applyModels?: (frame: WorldFrame) => void,
+  /** Runs before this frame writes any style: the place for reads its layout will need (c4). */
+  beforeWrites?: () => void,
+  page?: PageIdentity,
 ) {
   if (WORLD_MODE === 'legacy') {
     const legacy = createLegacyEffectController(doc, playback);
@@ -38,6 +42,7 @@ export function createEffectController(
     doc,
     playback,
     (frame) => {
+      beforeWrites?.();
       const byId = new Map(frame.effects.map((effect) => [effect.id, effect]));
       const evaluatedLayers = new Map(
         [...frame.layout.groups, ...frame.layout.layers].map((value) => [value.layer.id, value.layer]),
@@ -62,6 +67,7 @@ export function createEffectController(
       ? (scene, previous, input, result) => assertWorldParity(result, legacyWorld(scene, previous, input), 'world')
       : undefined,
     timeline,
+    page,
   );
   return {
     update(next: readonly EffectTarget[], context: WorldHostContext) {

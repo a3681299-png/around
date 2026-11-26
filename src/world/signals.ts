@@ -1,6 +1,6 @@
 import { SIGNAL_REGISTRY, type NumericSource, type SignalRegistry } from '../signals/registry';
 import type { WorldInput, WorldLayout } from './types';
-import { centre, type Point } from './geometry';
+import type { Point } from './geometry';
 import type { SpatialPoint } from './points';
 
 export interface PointerMemory {
@@ -21,10 +21,6 @@ export function pointerMemory(previous: PointerMemory | undefined, input: WorldI
     speed:
       dt > 0 ? Math.min(1e6, (Math.hypot(point.x - previous!.point.x, point.y - previous!.point.y) * 1000) / dt) : 0,
   };
-}
-export function signalContext(layout: WorldLayout, layerId: string) {
-  const entry = [...layout.groups, ...layout.layers].find((entry) => entry.layer.id === layerId);
-  return { frame: entry?.frame, target: entry?.frame ? centre(entry.layer.placement, entry.frame) : undefined };
 }
 /** Undefined signals leave the authored value intact; no stale anchor fallback. */
 export function signalValue(

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Only this site's own files run. Styles inline: the engine draws inside shadow roots.
+         blob: in connect-src: the glTF loader reads textures it unpacked into blob URLs itself. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'"
+    />
+    <link rel="icon" href="data:," />
+    <title>Playground — Around</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body data-around-surface="page">
+    <div id="watch-page">
+      <header class="bar">
+        <span class="brand">みるばこ</span>
+        <span class="hint">ふつうの動画サイト</span>
+        <input
+          id="search"
+          class="search"
+          type="search"
+          aria-label="動画を探す"
+          placeholder="動画を探す"
+          data-around-control="click"
+        />
+        <button id="apply" class="apply" type="button" data-around-control="click" aria-pressed="false" disabled
+          >Around を適用</button
+        >
+        <button id="open-desktop" type="button" data-around-control="click" hidden>デスクトップへ</button>
+      </header>
+      <main class="layout">
+        <section class="watch">
+          <div class="player" data-around-surface="player-window">
+            <video
+              data-around-video
+              data-around-control="gesture"
+              src="content/video-a.webm"
+              muted
+              loop
+              playsinline
+            ></video>
+          </div>
+          <div class="controls" aria-label="再生の操作">
+            <button id="play" type="button" data-around-control="click">再生</button>
+            <input
+              id="seek"
+              class="seek"
+              type="range"
+              min="0"
+              max="1000"
+              value="0"
+              aria-label="再生位置"
+              data-around-control="drag"
+            />
+            <label class="volume"
+              >音量 <input id="volume" type="range" min="0" max="100" value="60" data-around-control="drag"
+            /></label>
+          </div>
+          <h1 id="video-title" data-around-surface="primary-heading">四角が流れる動画</h1>
+          <p class="description">自作の試験用の動画です。プレーヤーもシークバーも、このサイトのものです。</p>
+          <p id="status" role="status"></p>
+        </section>
+        <aside class="list" data-around-list aria-label="次の動画">
+          <a
+            href="#a"
+            class="card"
+            data-around-surface="video-card"
+            data-around-control="click"
+            data-video="content/video-a.webm"
+            data-title="四角が流れる動画"
+            ><span class="thumb a"></span><span class="name">四角が流れる動画</span></a
+          >
+          <a
+            href="#b"
+            class="card"
+            data-around-surface="video-card"
+            data-around-control="click"
+            data-video="content/video-b.webm"
+            data-title="透ける四角の動画"
+            ><span class="thumb b"></span><span class="name">透ける四角の動画</span></a
+          >
+          <a
+            href="#c"
+            class="card"
+            data-around-surface="video-card"
+            data-around-control="click"
+            data-video="content/video-a.webm"
+            data-title="もう一度、四角"
+            ><span class="thumb c"></span><span class="name">もう一度、四角</span></a
+          >
+        </aside>
+      </main>
+      <footer class="foot">
+        <span>Around Playground</span>
+        <span id="mirdo-credits" hidden>
+          キャラクター
+          <a href="https://booth.pm/ja/items/6614116" data-around-control="click">ミルド／ragooou（らぐー）</a>
+          ・動作
+          <a href="https://quaternius.com/packs/universalanimationlibrary.html" data-around-control="click">
+            Quaternius Universal Animation Library（CC0）
+          </a>
+        </span>
+      </footer>
+    </div>
+    <div class="desktop-lite" aria-hidden="true" hidden>
+      <div class="desktop-lite-monitor"><canvas width="480" height="270"></canvas></div>
+    </div>
+    <footer id="desktop-bar" class="desktop-bar" aria-label="デスクトップ" hidden>
+      <div class="desktop-wordmark"
+        ><span aria-hidden="true"></span><strong>窓辺</strong><small>Around Playground</small></div
+      >
+      <button id="close-desktop" type="button" data-around-control="click">ブラウザーに戻る</button>
+    </footer>
+  </body>
+</html>

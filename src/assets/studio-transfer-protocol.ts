@@ -1,6 +1,6 @@
 import type { AssetMetadata } from './validation';
 
-export const STUDIO_ASSET_TRANSFER = 'web-world-themes:studio-assets-v1';
+export const STUDIO_ASSET_TRANSFER = 'around:studio-assets-v1';
 export const STUDIO_TRANSFER_AUTHORIZE = 'studio-transfer-authorize';
 export const STUDIO_TRANSFER_CONFIRM = 'studio-transfer-confirm';
 export const STUDIO_TRANSFER_STATUS = 'studio-transfer-status';

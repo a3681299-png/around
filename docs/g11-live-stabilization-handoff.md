@@ -16,13 +16,13 @@
    - vrm の右側の点：接近判定の距離より離れた点を動的に選ぶ（判定は緩めない）。→ **対応済み**（80px以上）。
    - live-youtube のコメント見出し、side-panel のブラウザー終了：分かる範囲で調べ、分からなければログを残す。→ **ログを残した**。side-panel の終了は、ドラッグ開始の確認（`editor-workspace.ts:78`）で起きていた同じ失敗だった。
 3. マージの基準：main（6721ce4）も同じ条件で3〜4回流し、テストごとの成功回数を比べる。**「mainでは安定して通るのにブランチでだけ落ちる」失敗が0件になったら、G1・G1.1をmainへマージしてよい**。比べた表を記録に残す。→ 表は記録済み（8回ずつ）。**0件にはなっていない**。
-4. 一時プロファイル（`%TEMP%\ww-*`）を、失敗・タイムアウトを含めテストの終わりに必ず消す。→ **対応済み**（`tests/temporary-profiles.ts`、globalTeardown）。
+4. 一時プロファイル（`%TEMP%\around-*`）を、失敗・タイムアウトを含めテストの終わりに必ず消す。→ **対応済み**（`tests/temporary-profiles.ts`、globalTeardown）。
 
 ## 守る制約（変えないこと）
 
 - main と通常の `dist` は、マージの基準を満たすまで変えない。
 - DesignDocument v1–v12 の互換を保つ。Chrome の権限を増やさない。
-- **私用VRM（`PochibyKT_Pochi*`）は絶対にコミットしない・コピーしない。** ユーザーのPC上のファイルを `WW_VRM_FILE` で指定するだけ（パスはユーザーに確認）。`.gitignore` に `PochibyKT_Pochi*` がある。
+- **私用VRM（`PochibyKT_Pochi*`）は絶対にコミットしない・コピーしない。** ユーザーのPC上のファイルを `AROUND_VRM_FILE` で指定するだけ（パスはユーザーに確認）。`.gitignore` に `PochibyKT_Pochi*` がある。
 - 作品からJSを実行しない。YouTube固有のDOMの扱いはアダプター（`src/sites/youtube-*.ts`）に閉じる。
 - 保護を弱めない：画面固定層の縦方向の除外、入力時の再取得・世代確認・ヒット確認、接近判定、安定待ち。テストを今の挙動に合わせて判定を緩めない（待ち方・狙う点・前提を人と同じにするのは可）。
 - コミットメッセージは英語で簡潔に。ユーザーへの報告は日本語で、全作業が終わってからまとめて1回。
@@ -35,7 +35,7 @@
 - ページ追従層・雰囲気層の作品が `update()` のたびに画面固定層へ移されて戻り、ドラッグのポインターキャプチャが外れていた不具合。
 - YouTube のミュート解除ボタン（`ytp-popup` クラス）を窓全体のメニューとして扱っていた不具合。
 
-テスト側：画面上の座標の読み方、姿勢比較の再試行、テイク選択の待ち、狙う点の選び方（`clearestPoint`・`visiblePart`）、宣伝ダイアログ・広告への対処、画面外実行（`WW_TEST_WINDOW_OFFSCREEN=1`）、失敗時の状況の記録、一時プロファイルの後片付け。
+テスト側：画面上の座標の読み方、姿勢比較の再試行、テイク選択の待ち、狙う点の選び方（`clearestPoint`・`visiblePart`）、宣伝ダイアログ・広告への対処、画面外実行（`AROUND_TEST_WINDOW_OFFSCREEN=1`）、失敗時の状況の記録、一時プロファイルの後片付け。
 
 コミット：4ee890b、ffb2d6e、53d8ac4、b2b5111、8f8970f、c057e4f（c057e4f は実サイトで未実行）。
 
@@ -52,26 +52,26 @@
 
 ```bash
 export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="C:/Users/sm787/AppData/Local/ms-playwright/chromium-1200/chrome-win64/chrome.exe"
-WW_BUILD_OUT=.work/g11-check-dist npm run build
-export WW_TEST_EXTENSION_PATH=.work/g11-check-dist WW_TEST_WINDOW_OFFSCREEN=1
+AROUND_BUILD_OUT=.work/g11-check-dist npm run build
+export AROUND_TEST_EXTENSION_PATH=.work/g11-check-dist AROUND_TEST_WINDOW_OFFSCREEN=1
 ```
 
 - フィクスチャー全件：`npm run lint && npm run typecheck && npm test`（約18分。直近は580件成功・28件スキップ）。
 - 実サイト全件（13件）：上に加えて次を設定し、1ワーカーで流す。
 
 ```bash
-export WW_LIVE_YOUTUBE=1 WW_LIVE_OPERATIONS=1 WW_LIVE_EDITOR_UX=1 WW_LIVE_MEDIA=1 WW_LIVE_3D=1 WW_LIVE_SIDE_PANEL=1 WW_LIVE_SIGNAL_MOTION=1 WW_LIVE_SIGNAL_TIMELINE=1 WW_LIVE_STUDIO=1 WW_LIVE_STUDIO_WORKSPACE=1 WW_LAYOUT_PILOT=1 WW_LIVE_VRM=1
-export WW_VRM_FILE="<ユーザーの私用VRMのパス>"
+export AROUND_LIVE_YOUTUBE=1 AROUND_LIVE_OPERATIONS=1 AROUND_LIVE_EDITOR_UX=1 AROUND_LIVE_MEDIA=1 AROUND_LIVE_3D=1 AROUND_LIVE_SIDE_PANEL=1 AROUND_LIVE_SIGNAL_MOTION=1 AROUND_LIVE_SIGNAL_TIMELINE=1 AROUND_LIVE_STUDIO=1 AROUND_LIVE_STUDIO_WORKSPACE=1 AROUND_LAYOUT_PILOT=1 AROUND_LIVE_VRM=1
+export AROUND_VRM_FILE="<ユーザーの私用VRMのパス>"
 npx playwright test $(ls tests/*live*.spec.ts) --project=e2e --workers=1 --reporter=list
 ```
 
 1回あたり約9分。**Playwright の実行は同時に1つだけ**にする（結果フォルダ `.work/test-results` を共有しており、別の実行が消してしまう）。
 
-- main との比較：`.work/main-base` に main（6721ce4）の作業ツリーがある（`git worktree`、detached、`node_modules` はジャンクション）。`tests/fixtures.ts` に画面外の起動オプションだけをコミットせずに当て、`.work/base-dist` にビルド済み。main 側の実サイトテストは12件（operation-live がない）。main 側は一時プロファイルを消さないので、実行後に `%TEMP%\ww-*` を手で消す。比較が終わったら `git worktree remove --force .work/main-base`。
+- main との比較：`.work/main-base` に main（6721ce4）の作業ツリーがある（`git worktree`、detached、`node_modules` はジャンクション）。`tests/fixtures.ts` に画面外の起動オプションだけをコミットせずに当て、`.work/base-dist` にビルド済み。main 側の実サイトテストは12件（operation-live がない）。main 側は一時プロファイルを消さないので、実行後に `%TEMP%\around-*` を手で消す。比較が終わったら `git worktree remove --force .work/main-base`。
 - 比較のログ：`.work/compare/{branch,main}-N.log`、`dark-*.log`（コミットしていない）。
 
 ## 注意
 
 - ヘッドレスの実サイトテスト（editor-ux、studio、studio-workspace、operation-live など）は自動再生されず、動画が再生前（大きな再生ボタン）や広告で始まることがある。保護はそれらを本物の操作部品として守るので、テストは人と同じ対処（つかむ点を選ぶ、広告を待つ）をする。
 - ディスク：以前、一時プロファイルが溜まって空きが約2GBまで減り、ENOSPC で失敗したことがある。
-- ウィンドウを最小化すると Chrome がページを非表示とみなして描画・再生を止めるので、画面外に置く（`WW_TEST_WINDOW_OFFSCREEN=1`）。テストが `bringToFront` で一瞬フォーカスを取ることはある。
+- ウィンドウを最小化すると Chrome がページを非表示とみなして描画・再生を止めるので、画面外に置く（`AROUND_TEST_WINDOW_OFFSCREEN=1`）。テストが `bringToFront` で一瞬フォーカスを取ることはある。

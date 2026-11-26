@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 import { compileDesign } from '../src/design/renderer';
 import { emptyDesign, parseDesign } from '../src/design/schema';
 import type { DesignDocument } from '../src/design/types';
-import { designKey, readDesign, saveDesign, watchDesign } from '../src/storage/designs';
+import { designKey } from '../src/storage/designs';
+import { readDesign, saveDesign, watchDesign } from '../src/browser/design-store';
 
 const targets = [{ id: 'video-card', surface: 'video-card', label: '動画カード' }];
 function sample(): DesignDocument {
@@ -35,7 +36,7 @@ test('versioned data is sparse, canonical, independent of retro, and copied with
 test('unsupported versions, executable fields, arbitrary CSS and invalid dimensions are rejected', () => {
   const input = sample();
   for (const value of [
-    { ...input, schemaVersion: 13 },
+    { ...input, schemaVersion: 19 },
     { ...input, script: 'alert(1)' },
     { ...input, rules: [{ kind: 'javascript', target: 'video-card', style: {} }] },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', selector: '*', style: {} }] },
@@ -60,7 +61,7 @@ test('unsupported versions, executable fields, arbitrary CSS and invalid dimensi
 test('renderer uses registered semantic targets, replaces gradients and hover bevels, and never changes geometry', () => {
   const design = { ...sample(), baseThemeId: null };
   const css = compileDesign(design, targets);
-  expect(css).toContain('[data-ww-surface~="video-card"]');
+  expect(css).toContain('[data-around-surface~="video-card"]');
   expect(css).toContain(':hover');
   expect(css).toContain('background:#abcdef !important');
   expect(css).toContain('box-shadow:inset 0 0 0 4px #443366');
@@ -105,7 +106,7 @@ test.afterEach(() => {
 });
 
 test('design storage leaves legacy settings untouched and notifies multiple subscribers', async () => {
-  const storage = fakeStorage({ 'webWorldThemes.enabled': true, 'webWorldThemes.strength': 37 });
+  const storage = fakeStorage({ 'around.enabled': true, 'around.strength': 37 });
   const a: Array<DesignDocument | undefined> = [];
   const b: Array<DesignDocument | undefined> = [];
   const errors: unknown[] = [];
@@ -124,8 +125,8 @@ test('design storage leaves legacy settings untouched and notifies multiple subs
   expect(a.at(-1)).toEqual(parseDesign(sample()));
   expect(b.at(-1)).toEqual(parseDesign(sample()));
   expect(await readDesign('youtube')).toEqual(parseDesign(sample()));
-  expect(storage.stored['webWorldThemes.strength']).toBe(37);
-  expect(storage.stored['webWorldThemes.enabled']).toBe(true);
+  expect(storage.stored['around.strength']).toBe(37);
+  expect(storage.stored['around.enabled']).toBe(true);
   expect(errors).toEqual([]);
   stopA();
   stopB();

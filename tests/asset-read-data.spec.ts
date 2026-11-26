@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { createAssetReadService } from '../src/background/asset-read';
 import { ASSET_READ_TTL_MS, AssetReadError } from '../src/assets/read-protocol';
 import { installAssetReadAdapter } from '../src/assets/read-adapter';
-import { clearAssetSources, loadAsset } from '../src/assets/client';
+import { clearAssetSources, loadAsset } from '../src/browser/asset-client';
 import { inspectAsset } from '../src/assets/inspect';
 import { parseVerifiedModelSource, verifiedModelBytes } from '../src/assets/verified-source';
 import { vrmFixture } from './helpers/vrm-fixture';

@@ -1,6 +1,7 @@
-import { watchSettings } from '../storage/settings';
-import { OPEN_SIDE_PANEL_TOOLS, PROBE_EDITOR_TARGET, PREPARE_SIDE_PANEL } from '../editor/messages';
-import { EMERGENCY_COMMAND, SAFETY_SHORTCUT, safetyShortcut, setEmergencyOff } from '../storage/safety';
+import { watchSettings } from './settings-store';
+import { PROBE_EDITOR_TARGET, PREPARE_SIDE_PANEL } from '../editor/messages';
+import { EMERGENCY_COMMAND, SAFETY_SHORTCUT } from '../storage/safety';
+import { safetyShortcut, setEmergencyOff } from './safety-store';
 
 export const EDITOR_COMMAND = 'open-editor';
 /** action/commands callbacks retain their user gesture: no storage read precedes open(). */
@@ -52,14 +53,9 @@ export function installEditorEntry() {
     const operation =
       id === undefined
         ? standalone()
-        : chrome.sidePanel
-            .open({ tabId: id })
-            .then(async () => {
-              // Keep Studio visible when the theme is OFF; its settings entry remains usable.
-              await chrome.tabs.sendMessage(id, { type: OPEN_SIDE_PANEL_TOOLS }).catch(() => undefined);
-            })
-            .catch(() => standalone(id));
-    void operation.catch((error: unknown) => console.error('[Web World Themes] エディターを開けませんでした。', error));
+        : // The panel's page connects to the tab; with the theme OFF it explains so and offers settings.
+          chrome.sidePanel.open({ tabId: id }).catch(() => standalone(id));
+    void operation.catch((error: unknown) => console.error('[Around] エディターを開けませんでした。', error));
   };
   chrome.action.onClicked.addListener(open);
   const onCommand = (command: string, tab?: chrome.tabs.Tab) => {
@@ -99,10 +95,10 @@ export function installEditorEntry() {
       if (settings.creatorMode === last) return;
       last = settings.creatorMode;
       void chrome.action.setPopup({ popup: settings.creatorMode ? '' : 'popup/index.html' }).catch((error: unknown) => {
-        console.error('[Web World Themes] 起動先を変更できませんでした。', error);
+        console.error('[Around] 起動先を変更できませんでした。', error);
       });
     },
-    (error) => console.error('[Web World Themes] 起動設定を読み込めませんでした。', error),
+    (error) => console.error('[Around] 起動設定を読み込めませんでした。', error),
   );
   return () => {
     unwatch();

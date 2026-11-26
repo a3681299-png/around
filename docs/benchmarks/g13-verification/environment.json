@@ -1,0 +1,13 @@
+{
+  "OS": null,
+  "Version": null,
+  "Cpu": null,
+  "LogicalProcessors": null,
+  "Node": "v24.16.0",
+  "BrowserFileVersion": "143.0.7499.4",
+  "platform": "win32",
+  "release": "10.0.26300",
+  "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+  "logicalProcessors": 20,
+  "totalMemory": 16873545728
+}

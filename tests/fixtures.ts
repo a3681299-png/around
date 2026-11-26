@@ -3,20 +3,46 @@ import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { renderDiagnostics } from './helpers/render-diagnostics';
+import { DEFAULT_LAYERING, layeringBuild } from './helpers/layering-build';
 
-const defaultExtensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
+const defaultExtensionPath = path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? 'dist');
+
+/**
+ * Screenshots keep the text caret as it is. Playwright's default (`caret: 'hide'`) restyles the
+ * page's inputs for the shot, a native look change the operation guard answers by holding the
+ * artwork for a moment, so the shot missed what a person sees (Codex's investigation, 2026-11-07).
+ * Set once on the shared Page and Locator prototypes; an explicit `caret` still wins.
+ */
+function keepCaretInScreenshots(page: Page) {
+  for (const proto of [Object.getPrototypeOf(page), Object.getPrototypeOf(page.locator('html'))]) {
+    if (proto.aroundKeepCaret) continue;
+    const screenshot = proto.screenshot as (options?: object) => Promise<Buffer>;
+    proto.screenshot = function (this: unknown, options?: object) {
+      return screenshot.call(this, { caret: 'initial', ...options });
+    };
+    proto.aroundKeepCaret = true;
+  }
+}
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
 
 export async function launchExtension(
   profile: string,
   useFixture = true,
-  options: { headed?: boolean; width?: number; height?: number; extensionPath?: string } = {},
+  options: {
+    headed?: boolean;
+    width?: number;
+    height?: number;
+    extensionPath?: string;
+    /** Record every page of the context to a video in this folder (for a person to watch). */
+    videoDir?: string;
+  } = {},
 ): Promise<BrowserContext> {
   const extensionPath = path.resolve(options.extensionPath ?? defaultExtensionPath);
   const context = await chromium.launchPersistentContext(profile, {
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
       : { channel: 'chromium' }),
+    ...(options.videoDir ? { recordVideo: { dir: options.videoDir, size: { width: 1280, height: 800 } } } : {}),
     headless: !options.headed,
     viewport: options.headed ? null : { width: 1100, height: 760 },
     args: [
@@ -29,7 +55,7 @@ export async function launchExtension(
       // visible (not occluded), or it stops rendering and media like a minimized window. An
       // off-screen window also loses audible autoplay, so YouTube would start muted and show its
       // central unmute button; keep the on-screen playback state instead.
-      ...(options.headed && process.env.WW_TEST_WINDOW_OFFSCREEN === '1'
+      ...(options.headed && process.env.AROUND_TEST_WINDOW_OFFSCREEN === '1'
         ? [
             '--window-position=-4000,0',
             '--disable-backgrounding-occluded-windows',
@@ -39,6 +65,9 @@ export async function launchExtension(
         : []),
     ],
   });
+  const first = context.pages()[0];
+  if (first) keepCaretInScreenshots(first);
+  else context.once('page', keepCaretInScreenshots);
   // Bound Windows Chromium shutdown; only the test's headless profile and
   // extension path may be terminated when normal close stops responding.
   if (process.platform === 'win32' && !options.headed) {
@@ -102,9 +131,31 @@ export async function launchExtension(
   return context;
 }
 
-export const test = base.extend<{ profile: string; extensionId: string; popup: Page; youtube: Page }>({
+export const test = base.extend<
+  {
+    profile: string;
+    extensionId: string;
+    popup: Page;
+    youtube: Page;
+    /** Whether the extension under test puts the player's character under its controls. */
+    layeringOn: boolean;
+  },
+  {
+    /** Which way the player's character is kept clear of the controls (docs/layering-plan.md):
+     * undefined is the build under test (dist, or AROUND_TEST_EXTENSION_PATH); true or false is a
+     * development build with AROUND_LAYERING set so, for a project that runs the G1 specs the other way. */
+    layering: boolean | undefined;
+    extensionPath: string;
+  }
+>({
+  layering: [undefined, { scope: 'worker', option: true }],
+  extensionPath: [
+    async ({ layering }, use) => use(layering === undefined ? defaultExtensionPath : await layeringBuild(layering)),
+    { scope: 'worker' },
+  ],
+  layeringOn: async ({ layering }, use) => use(layering ?? DEFAULT_LAYERING),
   profile: async ({}, use, info) => {
-    const work = path.resolve(process.env.WW_TEST_PROFILE_ROOT ?? '.work');
+    const work = path.resolve(process.env.AROUND_TEST_PROFILE_ROOT ?? '.work');
     await mkdir(work, { recursive: true });
     // Chrome Storage's LevelDB can fail on Windows when test-title paths exceed MAX_PATH.
     const profile = await mkdtemp(path.join(work, 'p-'));
@@ -124,8 +175,8 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
       }
     }
   },
-  context: async ({ profile }, use, info) => {
-    const context = await launchExtension(profile);
+  context: async ({ profile, extensionPath }, use, info) => {
+    const context = await launchExtension(profile, true, { extensionPath });
     try {
       await use(context);
     } finally {
@@ -141,7 +192,7 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
     // No production background worker is needed just to expose an ID for testing.
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((element) => {
       const data = (element as HTMLElement & { data?: { id: string } }).data;
@@ -154,7 +205,7 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
   popup: async ({ context, extensionId }, use) => {
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${extensionId}/popup/index.html`);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).waitFor();
+    await popup.getByRole('switch', { name: '作品を表示する' }).waitFor();
     await use(popup);
   },
   youtube: async ({ context }, use) => {

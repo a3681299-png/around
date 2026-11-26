@@ -16,7 +16,7 @@ test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 
   await image(panel, youtube);
   await save(panel);
   await watch(youtube);
-  const key = 'webWorldThemes.design.youtube',
+  const key = 'around.design.youtube',
     original = await popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
   const decorations = Array.from({ length: 32 }, (_, i) => ({
     ...original.decorations[0]!,
@@ -62,7 +62,7 @@ test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 
     results: Record<string, { samples: number[]; opacity: string[] }> = {};
   try {
     for (const mode of ['before', 'coalesced']) {
-      await runtime.evaluate('globalThis.__wwSignalSamples = []');
+      await runtime.evaluate('globalThis.__aroundSignalSamples = []');
       const bundle = await build({
         entryPoints: ['src/content/index.ts'],
         bundle: true,
@@ -116,7 +116,7 @@ test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 
                 if (!contents.includes(expression)) throw new Error('Evaluation meter must be updated');
                 contents = contents.replace(
                   expression,
-                  `(() => { const start = performance.now(); const result = ${expression}; (globalThis as any).__wwSignalSamples.push(performance.now() - start); return result; })()`,
+                  `(() => { const start = performance.now(); const result = ${expression}; (globalThis as any).__aroundSignalSamples.push(performance.now() - start); return result; })()`,
                 );
                 return { contents, loader: 'ts' };
               });
@@ -129,13 +129,13 @@ test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 
       await expect(youtube.locator(media)).toHaveCount(32);
       await youtube.waitForTimeout(120);
       results[mode] = await runtime.evaluate(`(async () => {
-        globalThis.__wwSignalSamples = []; const opacity = [];
+        globalThis.__aroundSignalSamples = []; const opacity = [];
         for (let i = 1; i <= 120; i++) {
           const root = document.scrollingElement; scrollTo(0, Math.round((root.scrollHeight - root.clientHeight) * (i % 60) / 60));
           await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-          opacity.push(document.querySelector('#web-world-themes-decorations').shadowRoot.querySelector('.media').style.opacity);
+          opacity.push(document.querySelector('#around-decorations').shadowRoot.querySelector('.media').style.opacity);
         }
-        return { samples: globalThis.__wwSignalSamples, opacity };
+        return { samples: globalThis.__aroundSignalSamples, opacity };
       })()`);
     }
     const before = results['before']!,

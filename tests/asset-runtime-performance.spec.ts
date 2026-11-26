@@ -14,7 +14,7 @@ const quality = (page: Page) =>
   page.evaluate(() => {
     const videos = [...document.querySelectorAll('video')],
       v = videos.find((v) => !v.paused && v.readyState >= 2) ?? videos.find((v) => v.readyState >= 2) ?? videos[0]!;
-    const tracker = ((globalThis as any).__wwQualityTracker ??= { next: 0, entries: new WeakMap() });
+    const tracker = ((globalThis as any).__aroundQualityTracker ??= { next: 0, entries: new WeakMap() });
     let identity = tracker.entries.get(v);
     if (!identity) {
       identity = { id: ++tracker.next, revision: 0 };
@@ -40,7 +40,10 @@ const quality = (page: Page) =>
   });
 
 test('opt-in GPU preparation: texture init, compileAsync, residual render and second browser session', async () => {
-  test.skip(process.env.WW_ASSET_GPU_LIVE !== '1' || !process.env.WW_VRM_FILE, 'Explicit private-file benchmark');
+  test.skip(
+    process.env.AROUND_ASSET_GPU_LIVE !== '1' || !process.env.AROUND_VRM_FILE,
+    'Explicit private-file benchmark',
+  );
   test.setTimeout(900000);
   const report: Record<string, any> = {
     conditions: {},
@@ -48,7 +51,7 @@ test('opt-in GPU preparation: texture init, compileAsync, residual render and se
       'CPU API wall time; texture GPU elapsed query includes texture commands/mipmaps. Residual render includes geometry, morph and skin uploads. OS/driver caches are not flushed.',
   };
   for (const mode of ['none', 'textures', 'compile', 'both']) {
-    const profile = await mkdtemp(path.join(tmpdir(), 'ww-ar-shader-'));
+    const profile = await mkdtemp(path.join(tmpdir(), 'around-ar-shader-'));
     report.conditions[mode] = [];
     for (let session = 1; session <= 2; session++) {
       const context = await launchExtension(profile, false, { headed: true, width: 1920, height: 1000 });
@@ -56,14 +59,16 @@ test('opt-in GPU preparation: texture init, compileAsync, residual render and se
         report.browser = context.browser()?.version();
         const page = await context.newPage();
         await page.goto('chrome://extensions/');
-        const item = page.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+        const item = page.locator('extensions-item').filter({ hasText: 'Around' });
         await item.waitFor();
         const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
         await page.goto(`chrome-extension://${id}/diagnostics/asset-benchmark.html`);
-        await page.locator('#file').setInputFiles(process.env.WW_VRM_FILE!);
+        await page.locator('#file').setInputFiles(process.env.AROUND_VRM_FILE!);
         await page.bringToFront();
         for (let n = 0; n < 5; n++) {
-          const r = await page.evaluate(({ mode }) => (globalThis as any).wwAssetBench.run('direct', mode), { mode });
+          const r = await page.evaluate(({ mode }) => (globalThis as any).aroundAssetBench.run('direct', mode), {
+            mode,
+          });
           expect(r.alphaPixels).toBeGreaterThan(1000);
           report.conditions[mode].push({
             browserSession: session,
@@ -86,11 +91,11 @@ test('opt-in GPU preparation: texture init, compileAsync, residual render and se
 
 test('opt-in remaining scenarios: page reload, sequential different models and concurrent maintenance', async () => {
   test.skip(
-    process.env.WW_ASSET_SCENARIOS_LIVE !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_ASSET_SCENARIOS_LIVE !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit real-site/private-file benchmark',
   );
   test.setTimeout(600000);
-  const lab = await openAssetLab(true, process.env.WW_VRM_FILE),
+  const lab = await openAssetLab(true, process.env.AROUND_VRM_FILE),
     report: Record<string, any> = {
       browser: lab.context.browser()?.version(),
       reload: [],
@@ -102,15 +107,18 @@ test('opt-in remaining scenarios: page reload, sequential different models and c
     for (let n = 0; n < 5; n++) {
       const start = performance.now();
       await lab.page.reload({ waitUntil: 'domcontentloaded' });
-      await expect(lab.page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+      await expect(lab.page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
       await lab.page
         .locator('video')
         .first()
         .evaluate((v: HTMLVideoElement) => v.pause());
-      const { session } = await lab.control.evaluate(({ id, tab }) => (globalThis as any).wwAssetLab.open([id], tab), {
-        id: lab.asset.id,
-        tab: lab.tab,
-      });
+      const { session } = await lab.control.evaluate(
+        ({ id, tab }) => (globalThis as any).aroundAssetLab.open([id], tab),
+        {
+          id: lab.asset.id,
+          tab: lab.tab,
+        },
+      );
       const cdp = await lab.context.newCDPSession(lab.page);
       call = await isolatedLab(lab.page, cdp, lab.id);
       await call('start', session);
@@ -119,7 +127,7 @@ test('opt-in remaining scenarios: page reload, sequential different models and c
       await save('scenarios', report);
     }
     for (let n = 0; n < 5; n++) {
-      const work = lab.control.evaluate((id) => (globalThis as any).wwAssetLab.churn(id, 8), lab.asset.id);
+      const work = lab.control.evaluate((id) => (globalThis as any).aroundAssetLab.churn(id, 8), lab.asset.id);
       const [maintenance, loaded] = await Promise.all([work, call('show', 'chunks', lab.asset.id)]);
       report.maintenance.push({ trial: n + 1, ...maintenance, ...compactLabResult(loaded) });
       await save('scenarios', report);
@@ -133,12 +141,15 @@ test('opt-in remaining scenarios: page reload, sequential different models and c
         }),
       })),
     );
-    const other = await lab.control.evaluate(() => (globalThis as any).wwAssetLab.seedMany()),
+    const other = await lab.control.evaluate(() => (globalThis as any).aroundAssetLab.seedMany()),
       ids = [lab.asset.id, ...other.map((a: any) => a.id)];
-    const { session } = await lab.control.evaluate(({ ids, tab }) => (globalThis as any).wwAssetLab.open(ids, tab), {
-      ids,
-      tab: lab.tab,
-    });
+    const { session } = await lab.control.evaluate(
+      ({ ids, tab }) => (globalThis as any).aroundAssetLab.open(ids, tab),
+      {
+        ids,
+        tab: lab.tab,
+      },
+    );
     await call('start', session);
     await call('configure', { shared: true });
     for (let n = 0; n < 5; n++) {
@@ -159,11 +170,11 @@ test('opt-in remaining scenarios: page reload, sequential different models and c
 
 test('opt-in actual playing YouTube dropped-frame deltas versus idle and loading routes', async () => {
   test.skip(
-    process.env.WW_ASSET_QUALITY_LIVE !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_ASSET_QUALITY_LIVE !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit real-site/private-file benchmark',
   );
   test.setTimeout(900000);
-  const lab = await openAssetLab(true, process.env.WW_VRM_FILE),
+  const lab = await openAssetLab(true, process.env.AROUND_VRM_FILE),
     report: Record<string, any> = {
       browser: lab.context.browser()?.version(),
       idle: [],
@@ -175,11 +186,14 @@ test('opt-in actual playing YouTube dropped-frame deltas versus idle and loading
   try {
     const resetVideo = async (ids = [lab.asset.id]) => {
       await lab.page.reload({ waitUntil: 'domcontentloaded' });
-      await expect(lab.page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-      const { session } = await lab.control.evaluate(({ ids, tab }) => (globalThis as any).wwAssetLab.open(ids, tab), {
-        ids,
-        tab: lab.tab,
-      });
+      await expect(lab.page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
+      const { session } = await lab.control.evaluate(
+        ({ ids, tab }) => (globalThis as any).aroundAssetLab.open(ids, tab),
+        {
+          ids,
+          tab: lab.tab,
+        },
+      );
       call = await isolatedLab(lab.page, await lab.context.newCDPSession(lab.page), lab.id);
       await call('start', session);
       await lab.page.evaluate(async () => {
@@ -268,7 +282,7 @@ test('opt-in actual playing YouTube dropped-frame deltas versus idle and loading
         }),
       })),
     );
-    const other = await lab.control.evaluate(() => (globalThis as any).wwAssetLab.seedMany()),
+    const other = await lab.control.evaluate(() => (globalThis as any).aroundAssetLab.seedMany()),
       ids = [lab.asset.id, ...other.map((a: any) => a.id)];
     await resetVideo(ids);
     await call('configure', { shared: true });

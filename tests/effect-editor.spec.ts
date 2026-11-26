@@ -1,24 +1,24 @@
 import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { Page, Locator, CDPSession } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { test, expect, launchExtension } from './fixtures';
+import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { defaultCircleMask } from '../src/effects/types';
 import { isolate } from './helpers/world-host';
 
-const key = 'webWorldThemes.design.youtube',
-  overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube',
+  overlay = '#around-decorations';
 const layers =
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]',
   media = `${layers} .media`;
 async function open(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await showArtwork(popup);
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   return panel;
 }
@@ -38,7 +38,7 @@ async function setNumber(panel: Locator, label: string, value: number) {
 }
 async function watch(youtube: Page) {
   await youtube.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
 }
 async function nativeButton(youtube: Page, name: 'Play' | 'Pause') {
   await youtube.locator(`#movie_player [aria-label="${name}"]`).evaluate((button: HTMLButtonElement) => button.click());
@@ -169,7 +169,7 @@ test('effect edits survive undo, redo, discard, tab sync, reload and a persisten
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 12,
+    schemaVersion: 18,
     decorations: [{ effects: [{ kind: 'mask', radiusPx: 130, featherPx: 25, intensity: 0.65 }] }],
   });
   for (let i = 0; i < 8; i++) await youtube.mouse.move(200 + i * 20, 300);
@@ -476,13 +476,13 @@ test('32 masks share sources, stay idle, detach on background/OFF/zero and remai
   // A decoration covering a page control remains pointer-transparent outside edit mode.
   await expect(youtube.locator(`${overlay} .handle:visible`)).toHaveCount(0);
   await youtube.locator('#movie_player [aria-label="Mute"]').click();
-  for (const boundary of ['off', 'zero']) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+  for (const boundary of ['off', 'emergency']) {
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
     await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    if (boundary === 'off') await showArtwork(popup);
+    else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await expect(youtube.locator(media)).toHaveCount(32);
     // After reactivation instrumentation also sees G1's single Host guard.

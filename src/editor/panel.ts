@@ -1,9 +1,11 @@
+import tokens from './studio-tokens.css';
 import styles from './panel.css';
 import {
   IMAGE_LIMITS,
   STYLE_LIMITS,
   renderModeOf,
   type SurfaceStyle,
+  type SurfaceSkin,
   type ImagePatch,
   type DesignTarget,
 } from '../design/types';
@@ -11,16 +13,16 @@ import { ATMOSPHERE_ALPHA_CAP } from '../world/operations';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { ASSET_MESSAGES } from '../assets/limits';
 import type { Alignment, Distribution } from '../design/layout';
-import { createModelPanel } from './model-panel';
+import { createModelPanel, type MotionImportOptions } from './model-panel';
 import { createMotionPanel } from './motion-panel';
 import { createEffectsPanel } from './effects-panel';
 import { createLayerTree } from './layer-tree';
-import { createWorkspace } from './workspace';
 import { createStudioWorkbench } from '../studio/workbench';
-import { buttonIcon } from './icons';
+import { glyphButton } from './icons';
+import { arc, drawPen, svg } from './pen';
 import { mountNumberScrub } from './number-scrub';
-import type { EditorTool } from '../editor-core/types';
-import type { StudioHostLayout, StudioInsets } from '../studio/layout-types';
+import { createSkinPanel, SKIN_PANEL_STYLES, type SkinPageInfo, type SkinPanelOptions } from './skin-panel';
+import type { EditorTool, SkinPreview } from '../editor-core/types';
 import type { SignalRule } from '../signals/keyframes';
 import type { TimelinePort } from '../timeline/types';
 
@@ -30,19 +32,24 @@ import type { StudioPreferences } from '../studio/preferences';
 export interface PanelOptions {
   onSettings?(): void;
   preferences?: StudioPreferences;
-  fullPage?: boolean;
-  persistWorkspace?: boolean;
-  inPage?: boolean;
+  /** The side panel's arrangement (one column, tabs): chosen by width, not by where the page runs. */
   sidePanel?: boolean;
-  toolbarOnly?: boolean;
-  onSurface?(surface: 'sidepanel' | 'inpage' | 'window'): void;
+  /** Where this editor page runs, for the 「サイドパネルで開く」/「別ウィンドウで開く」 actions. */
+  surface?: 'sidepanel' | 'window';
+  onSurface?(surface: 'sidepanel' | 'window'): void;
   hostLabel?: string;
-  onLayout?(insets: StudioInsets): void;
   timeline?: TimelinePort | undefined;
+  /** UI skin editing; omitted where the panel has no native page parts to dress. */
+  skin?: SkinPanelOptions;
+  /** Character motions for a VRM layer; omitted where no connection can carry the files. */
+  motions?: MotionImportOptions;
 }
 
 export interface PanelActions {
   change(style: SurfaceStyle): void;
+  selectTarget(id: string): void;
+  skin(skin: SurfaceSkin | null): void;
+  skinPreview(value: SkinPreview): void;
   save(): void;
   discard(): void;
   reset(): void;
@@ -70,7 +77,8 @@ export interface PanelActions {
   thumbnail(id: string): Promise<string | undefined>;
 }
 
-/** This UI has no site selectors, theme CSS or persistence logic. */
+/** The editor page's panel (side panel or window). This UI has no site selectors, theme CSS or
+ * persistence logic. */
 export function createCreatorPanel(
   doc: Document,
   actions: PanelActions,
@@ -78,18 +86,18 @@ export function createCreatorPanel(
   options: PanelOptions = {},
 ) {
   const host = doc.createElement('aside');
-  host.id = 'web-world-themes-creator';
-  host.setAttribute('data-ww-signal-control', '');
+  host.id = 'around-creator';
+  host.setAttribute('data-around-signal-control', '');
   host.lang = 'ja';
-  host.toggleAttribute('data-studio', Boolean(options.fullPage));
   host.setAttribute('role', 'dialog');
   host.setAttribute('aria-label', 'デザインエディター');
   const shadow = host.attachShadow({ mode: 'open' });
   const sheet = doc.createElement('style');
-  sheet.textContent = styles;
+  // The Around Studio system; the workbench adds its arrangement on top.
+  sheet.textContent = tokens + styles + (options.skin ? SKIN_PANEL_STYLES : '');
   const main = doc.createElement('main');
   main.innerHTML = `
-    <header><div><span class="eyebrow">WORLD CREATOR</span><h2>デザインを編集</h2></div><button class="dock" type="button" title="YouTubeの見たい場所に合わせて左右を切り替え">パネルを左へ</button><button class="minimize" type="button" aria-label="パネルを折りたたむ" title="プレビューを広く見る">−</button><button class="close" type="button" aria-label="編集を終了" title="未保存の変更を破棄して終了">×</button></header>
+    <header><div><span class="eyebrow">WORLD CREATOR</span><h2>デザインを編集</h2></div><button class="dock" type="button" title="YouTubeの見たい場所に合わせて左右を切り替え">パネルを左へ</button><button class="close" type="button" aria-label="編集を終了" title="未保存の変更を破棄して終了">×</button></header>
     <div class="toolbar"><button class="undo" type="button" title="Ctrl＋Z">元に戻す</button><button class="redo" type="button" title="Ctrl＋Shift＋Z / Ctrl＋Y">やり直す</button><span class="dirty" role="status"></span></div>
     <div class="editor-body">
     <section class="assets">
@@ -108,8 +116,8 @@ export function createCreatorPanel(
     <p class="selection" role="status">カードが選択されていません</p>
     <label class="snap-toggle"><input class="snap" type="checkbox">スナップを有効にする</label>
     <p class="hint">画面・プレイヤー・他レイヤーに吸着。Altを押している間は自由配置。</p>
-    <div class="selection-actions"><button class="group-layers" type="button" aria-describedby="ww-group-reason">選択をグループ化</button><button class="ungroup-layers" type="button" hidden>グループを解除</button><button class="duplicate-image" type="button" title="選択を複製（Ctrl＋D）">複製</button><button class="delete-image" type="button" title="選択を削除（Delete）" aria-label="画像を削除">削除</button><button class="inspect" type="button">プロパティを編集</button></div>
-    <p class="hint grouping-help" id="ww-group-reason"></p>
+    <div class="selection-actions"><button class="group-layers" type="button" aria-describedby="around-group-reason">選択をグループ化</button><button class="ungroup-layers" type="button" hidden>グループを解除</button><button class="duplicate-image" type="button" title="選択を複製（Ctrl＋D）">複製</button><button class="delete-image" type="button" title="選択を削除（Delete）" aria-label="画像を削除">削除</button><button class="inspect" type="button">プロパティを編集</button></div>
+    <p class="hint grouping-help" id="around-group-reason"></p>
     <fieldset class="layout-tools" aria-label="整列と配置" hidden>
       <div class="align-row"><button type="button" data-align="left">左揃え</button><button type="button" data-align="center-x">左右中央揃え</button><button type="button" data-align="right">右揃え</button></div>
       <div class="align-row"><button type="button" data-align="top">上揃え</button><button type="button" data-align="center-y">上下中央揃え</button><button type="button" data-align="bottom">下揃え</button></div>
@@ -156,7 +164,7 @@ export function createCreatorPanel(
         <p class="hint">再生予算を超えた素材は一時待機します。ほかの素材を非表示にすると再開できます。</p>
       </fieldset>
     </fieldset>
-    <p class="hint card-help">チェックを外した項目はテーマの見た目に戻ります。</p>
+    <p class="hint card-help">チェックを外した項目はサイト本来の見た目に戻ります。</p>
     <p class="hint multi-help" hidden>複数選択は一括移動に対応しています。拡縮・回転は1枚ずつ操作してください。</p>
     </details>
     </div>
@@ -167,8 +175,8 @@ export function createCreatorPanel(
   const displaySettings = doc.createElement('button');
   displaySettings.type = 'button';
   displaySettings.className = 'display-settings';
-  displaySettings.textContent = '表示設定';
-  displaySettings.title = 'テーマのON/OFFと強さを開く';
+  displaySettings.textContent = '設定';
+  displaySettings.title = '作品の表示のON/OFFと緊急OFFを開く';
   displaySettings.hidden = !options.onSettings;
   displaySettings.addEventListener('click', () => options.onSettings?.());
   main.querySelector('header')!.append(displaySettings);
@@ -180,15 +188,60 @@ export function createCreatorPanel(
     ['select', '選択・変形', 'V'],
     ['browse', 'サイト操作', 'H'],
     ['card', '動画カードを編集', 'C'],
+    ...(options.skin ? ([['skin', 'UIを着せ替え', 'U']] as const) : []),
   ] as const) {
     const button = doc.createElement('button');
     button.type = 'button';
     button.dataset.tool = tool;
-    buttonIcon(button, tool, label, key);
+    glyphButton(button, tool, label, key);
     button.addEventListener('click', () => actions.tool(tool));
     tools.append(button);
   }
   get('.toolbar').append(tools);
+  const saveState = doc.createElement('div'),
+    saveFailure = doc.createElement('div'),
+    retry = doc.createElement('button');
+  glyphButton(get('.undo'), 'undo', '元に戻す', 'Ctrl＋Z');
+  glyphButton(get('.redo'), 'redo', 'やり直す', 'Ctrl＋Shift＋Z / Ctrl＋Y');
+  // The one save chip. A failed save keeps its words in the chip, then one reason and the way out.
+  saveState.className = 'save-state';
+  saveFailure.className = 'save-failure';
+  saveFailure.hidden = true;
+  const reason = doc.createElement('p');
+  reason.className = 'save-reason';
+  reason.textContent = 'ブラウザの保存領域に書き込めませんでした。';
+  retry.type = 'button';
+  retry.className = 'retry-save';
+  retry.textContent = 'もう一度保存';
+  retry.addEventListener('click', actions.save);
+  saveFailure.append(reason, retry);
+  saveState.append(get('.dirty'), saveFailure);
+  get('.toolbar').append(saveState);
+  // around-rail: the chosen tool gets a G-pen circle, drawn round in 4 frames when it is chosen.
+  let ringTool: string | undefined;
+  const ringOn = (button: HTMLButtonElement | null) => {
+    if (ringTool === button?.dataset.tool) return;
+    tools.querySelector('.tool-ring')?.remove();
+    ringTool = button?.dataset.tool;
+    if (!button) return;
+    const ring = svg(doc, '0 0 44 44', 'tool-ring');
+    // An open ring from just right of the top, round, ending just left of it: thin at both ends.
+    drawPen(ring, arc(22, 22, 17, -Math.PI / 2 + 0.35, Math.PI * 1.5 - 0.35), { width: 2.4, frames: 4 });
+    button.append(ring);
+  };
+  const skinPanel = options.skin
+    ? createSkinPanel(
+        doc,
+        {
+          selectTarget: actions.selectTarget,
+          skin: actions.skin,
+          preview: actions.skinPreview,
+          begin: actions.beginEdit,
+          end: actions.endEdit,
+        },
+        options.skin,
+      )
+    : undefined;
   const backgroundToggle = get<HTMLInputElement>('[data-override="backgroundColor"]');
   const borderToggle = get<HTMLInputElement>('[data-override="border"]');
   const radiusToggle = get<HTMLInputElement>('[data-override="borderRadiusPx"]');
@@ -201,7 +254,7 @@ export function createCreatorPanel(
   const changeImage = (patch: ImagePatch) => actions.imageChange(patch, current?.image?.id);
   const effects = createEffectsPanel(doc, changeImage);
   const motion = createMotionPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
-  const model = createModelPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
+  const model = createModelPanel(doc, changeImage, actions.beginEdit, actions.endEdit, options.motions);
   imageProperties.append(model.fieldset, motion.fieldset, effects.fieldset);
   const modelInput = get<HTMLInputElement>('.model-file'),
     addModel = get<HTMLButtonElement>('.add-model');
@@ -214,9 +267,9 @@ export function createCreatorPanel(
   const addImage = get<HTMLButtonElement>('.add-image');
   const addAnimation = get<HTMLButtonElement>('.add-animation');
   const animationInput = get<HTMLInputElement>('.animation-file');
-  buttonIcon(addImage, 'image', '画像を追加');
-  buttonIcon(addAnimation, 'animation', 'アニメーションを追加');
-  buttonIcon(addModel, 'model3d', '3Dモデルを追加');
+  glyphButton(addImage, 'image', '画像を追加');
+  glyphButton(addAnimation, 'animation', 'アニメーションを追加');
+  glyphButton(addModel, 'model3d', '3Dモデルを追加');
   const layers = get<HTMLDivElement>('.layers');
   const anchorSelect = get<HTMLSelectElement>('[data-image-prop="anchor"]');
   for (const anchor of anchors) {
@@ -263,7 +316,7 @@ export function createCreatorPanel(
     actions.imageImport([...(fileInput.files ?? [])]);
     fileInput.value = '';
   });
-  let workspace: ReturnType<typeof createWorkspace> & { setHostLayout?(value: StudioHostLayout): void };
+  let workspace: ReturnType<typeof createStudioWorkbench>;
   const tree = createLayerTree(doc, layers, {
     select: actions.imageSelect,
     change: actions.layerChange,
@@ -276,10 +329,9 @@ export function createCreatorPanel(
       else pendingContext = { id, x, y };
     },
   });
-  workspace =
-    options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly
-      ? createStudioWorkbench(doc, host, main, tree, actions, options)
-      : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
+  workspace = createStudioWorkbench(doc, host, main, tree, actions, options);
+  // The workbench rebuilds the body, so the skin editor joins its inspector column.
+  if (skinPanel) get('.studio-inspectors').prepend(skinPanel.element);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
     const name = layerName.value.trim();
@@ -347,9 +399,7 @@ export function createCreatorPanel(
   discard.addEventListener('click', actions.discard);
   close.addEventListener('click', actions.close);
   dock.addEventListener('click', () => {
-    const left = host.dataset.wwDock !== 'left';
-    host.dataset.wwDock = left ? 'left' : 'right';
-    dock.textContent = options.fullPage ? '左右を入れ替える' : left ? 'パネルを右へ' : 'パネルを左へ';
+    host.dataset.aroundDock = host.dataset.aroundDock !== 'left' ? 'left' : 'right';
     workspace.layoutChanged();
   });
   get<HTMLButtonElement>('.reset').addEventListener('click', actions.reset);
@@ -362,18 +412,14 @@ export function createCreatorPanel(
   const stopScrub = mountNumberScrub(doc, host, main, actions.beginEdit, actions.endEdit);
   return {
     host,
-    setHostLayout(value: StudioHostLayout) {
-      workspace.setHostLayout?.(value);
-    },
     focus() {
-      if (options.inPage || options.fullPage) get<HTMLButtonElement>('[data-tool="select"]').focus();
-      else close.focus();
+      get<HTMLButtonElement>('[data-tool="select"]').focus();
     },
     render(state: PanelState) {
       current = state;
-      imageProperties.hidden =
-        (!state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly)) ||
-        state.selected;
+      main.toggleAttribute('data-skin-tool', Boolean(skinPanel) && state.tool === 'skin');
+      skinPanel?.render(state);
+      imageProperties.hidden = state.selected;
       imageProperties.disabled = !state.image || state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
       imageProperties.toggleAttribute('data-empty', !state.image);
       const opacityDriven = Boolean(
@@ -386,6 +432,7 @@ export function createCreatorPanel(
       tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => {
         button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select')));
       });
+      ringOn(tools.querySelector<HTMLButtonElement>('[data-tool][aria-pressed="true"]'));
       const isGroup = state.image?.kind === 'group';
       imageProperties.setAttribute('aria-label', isGroup ? 'グループのプロパティ' : '画像のプロパティ');
       get<HTMLElement>('.group-help').hidden = !isGroup;
@@ -441,19 +488,24 @@ export function createCreatorPanel(
           : state.canAlign;
         button.disabled = state.saving || !availability.allowed;
       });
+      const saveFailed = state.error && state.status.startsWith('保存でき');
+      // The chip carries the save state only, in the README's words; other errors are told in the
+      // footer.
       setText(
         get<HTMLElement>('.dirty'),
-        state.error
-          ? state.status.startsWith('保存でき')
-            ? '保存失敗'
-            : '操作失敗・要確認'
-          : state.saving
-            ? '処理中…'
-            : state.dirty
-              ? '未保存の変更'
-              : '保存済み',
+        saveFailed ? '保存できませんでした' : state.saving ? '処理中…' : state.dirty ? '未保存' : '保存済み',
       );
       get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
+      get<HTMLElement>('.dirty').dataset.state = saveFailed
+        ? 'failed'
+        : state.saving
+          ? 'saving'
+          : state.dirty
+            ? 'dirty'
+            : 'saved';
+      saveFailure.hidden = !saveFailed;
+      saveState.toggleAttribute('data-failed', Boolean(saveFailed));
+      retry.disabled = state.saving;
       setText(
         get<HTMLElement>('.layer-count'),
         `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`,
@@ -495,7 +547,7 @@ export function createCreatorPanel(
         get<HTMLSelectElement>('[data-image-prop="renderMode"]').value = renderModeOf(image);
         get<HTMLElement>('.render-mode-help').hidden = renderModeOf(image) !== 'atmosphere';
         setText(get<HTMLOutputElement>('.opacity-value'), `${Math.round(image.opacity * 100)}%`);
-      } else if (options.fullPage || options.inPage) {
+      } else {
         imageProperties
           .querySelectorAll<HTMLInputElement>('input[type="text"],input[type="number"]')
           .forEach((input) => {
@@ -534,18 +586,25 @@ export function createCreatorPanel(
           : state.selectedIds.length > 1
             ? `${state.selectedIds.length}レイヤーを選択中`
             : state.selected
-              ? '動画カードを選択中'
+              ? `${options.skin?.targets.find((target) => target.id === state.target)?.label ?? '動画カード'}を選択中`
               : 'カードまたは画像を選択してください',
       );
       setText(status, state.status);
       status.dataset.error = String(state.error);
+      // The save state shows in the header chip alone. Save messages still reach assistive technology
+      // through this live region, but are not drawn a second time in the footer.
+      status.toggleAttribute('data-save', state.status === '保存しました。' || Boolean(saveFailed));
       workspace.render(state);
       if (pendingContext && state.selectedIds.includes(pendingContext.id)) {
         workspace.context(pendingContext.x, pendingContext.y);
         pendingContext = undefined;
       }
     },
+    setSkinPage(info: readonly SkinPageInfo[]) {
+      skinPanel?.setPage(info);
+    },
     destroy() {
+      skinPanel?.destroy();
       stopScrub();
       workspace.destroy();
       tree.destroy();

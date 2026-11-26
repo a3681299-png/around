@@ -1,13 +1,15 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
+import { openEditor } from './helpers/editor';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { test, expect } from './fixtures';
 
-const overlay = '#web-world-themes-decorations',
+const overlay = '#around-decorations',
   layers =
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]';
 const cases = [
   { name: '10 GIF / native', file: 'medium.gif', count: 10, controlled: false, scroll: false },
   { name: '10 GIF / controlled', file: 'medium.gif', count: 10, controlled: true, scroll: false },
@@ -18,19 +20,14 @@ const cases = [
 
 for (const [index, scenario] of cases.entries())
   test(`media benchmark: ${scenario.name}`, async ({ popup, youtube, context }, info) => {
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await showArtwork(popup);
     await youtube.bringToFront();
-    await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-    const panel = youtube.getByRole('dialog', { name: 'デザインエディター' });
-    await expect(async () => {
-      if (!(await panel.isVisible()))
-        await popup.locator('#creator-editor-open').evaluate((n: HTMLButtonElement) => n.click());
-      await expect(panel).toBeVisible({ timeout: 1000 });
-    }).toPass({ timeout: 10_000 });
+    await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
+    const { panel } = await openEditor(popup, youtube);
     await exposeEditorControls(panel);
     if (scenario.scroll) {
       await youtube.locator('#navigate').evaluate((n: HTMLButtonElement) => n.click());
-      await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+      await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
     }
     for (let remaining = scenario.count; remaining > 0; remaining -= 8) {
       await panel
@@ -68,7 +65,7 @@ for (const [index, scenario] of cases.entries())
     await youtube.waitForTimeout(200);
     const before = await session.send('Performance.getMetrics'),
       processBefore = await root?.send('SystemInfo.getProcessInfo').catch(() => undefined);
-    const collectGpu = process.env.WW_GPU_METRICS === '1' && process.platform === 'win32' && processBefore;
+    const collectGpu = process.env.AROUND_GPU_METRICS === '1' && process.platform === 'win32' && processBefore;
     const osMetrics = collectGpu
       ? promisify(execFile)(
           path.join(process.env.SystemRoot ?? 'C:/Windows', 'System32/WindowsPowerShell/v1.0/powershell.exe'),
@@ -117,7 +114,7 @@ for (const [index, scenario] of cases.entries())
               ) * 1000,
           }))
         : undefined;
-    const stats = JSON.parse((await youtube.locator(overlay).getAttribute('data-ww-media-stats'))!) as {
+    const stats = JSON.parse((await youtube.locator(overlay).getAttribute('data-around-media-stats'))!) as {
       encodedBytes: number;
       decodedBytes: number;
       cacheBytes: number;

@@ -1,10 +1,12 @@
 import { modelPoseError } from './helpers/model-assertions';
+import { showArtwork } from './helpers/artwork';
 import { declinePromotion } from './helpers/youtube-live';
 import { test, expect } from '@playwright/test';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openSidePanelFromIcon } from './helpers/editor';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
 import { enterNativeTheater } from './helpers/youtube-theater';
 import { modelFixture } from './helpers/model-fixture';
@@ -13,9 +15,9 @@ import type { DesignDocument } from '../src/design/types';
 import type { ModelEvaluation } from '../src/world/models';
 
 test('real YouTube: official Studio places a rig, switches run/idle, replays model poses and preserves native video modes', async () => {
-  test.skip(process.env.WW_LIVE_3D !== '1', 'Explicit real YouTube 3D verification.');
+  test.skip(process.env.AROUND_LIVE_3D !== '1', 'Explicit real YouTube 3D verification.');
   test.setTimeout(180000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-3d-live-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-3d-live-')), false, {
     headed: true,
     width: 1920,
   });
@@ -32,7 +34,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     report.checks.browser = context.browser()?.version();
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -41,20 +43,18 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-    await popup.locator('#creator-studio-inpage').evaluate((b: HTMLButtonElement) => b.click());
-    const local = page.locator('#web-world-themes-creator');
-    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
+    await openSidePanelFromIcon(popup, page);
     const panel = await sidePanelDriver(context, page, id);
     await writeFile('.work/verification/live-rig.glb', modelFixture());
     await panel.files([path.resolve('.work/verification/live-rig.glb')], '.model-file');
     const media = page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .model-media',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) .model-media',
       ),
       image = page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .image',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) .image',
       );
     await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 25000 });
     stage('settings');
@@ -76,10 +76,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     await panel.click('.save');
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     const saved = await popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
     expect(saved.decorations[0]).toMatchObject({
       kind: 'model3d',
@@ -117,7 +114,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
           target,
           rig: await point(),
           pose: await pose(),
-          safety: await page.locator('#web-world-themes-decorations').getAttribute('data-ww-safety'),
+          safety: await page.locator('#around-decorations').getAttribute('data-around-safety'),
         };
         throw new Error(`${error.message}${String.fromCharCode(10)}Pursuit state: ${JSON.stringify(state)}`);
       });
@@ -127,7 +124,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     stage('take');
     await panel.click('.timeline-toggle');
     await panel.click('.take-record');
-    const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+    const ui = 'document.querySelector("#around-creator").shadowRoot';
     await expect
       .poll(() => panel.evaluate(`${ui}.querySelector('.signal-timeline').hasAttribute('data-recording')`))
       .toBe(true);
@@ -144,7 +141,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     await panel.click('.take-store');
     await expect.poll(() => panel.text('.take-saved')).toBe('テイク保存済み');
     const take = await panel.evaluate<SignalTake>(
-      'chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"list",siteId:"youtube"}).then(r=>chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"get",siteId:"youtube",id:r.value[0].id})).then(r=>r.value)',
+      'chrome.runtime.sendMessage({type:"around:signal-takes",action:"list",siteId:"youtube"}).then(r=>chrome.runtime.sendMessage({type:"around:signal-takes",action:"get",siteId:"youtube",id:r.value[0].id})).then(r=>r.value)',
     );
     const at = take.inputs[Math.floor(take.inputs.length / 2)]!.timeMs - take.inputs[0]!.timeMs,
       expected = createTakeSampler(saved, take).at(at).frame.models![0]!;
@@ -234,12 +231,12 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     expect(await page.evaluate(() => (globalThis as { testDocumentToken?: number }).testDocumentToken)).toBe(73);
     report.checks.spaDocumentPreserved = true;
     report.checks.modelStats = await page
-      .locator('#web-world-themes-decorations')
-      .evaluate((e: HTMLElement) => JSON.parse(e.dataset.wwModelStats!));
-    await popup.locator('#effect-strength').fill('0');
+      .locator('#around-decorations')
+      .evaluate((e: HTMLElement) => JSON.parse(e.dataset.aroundModelStats!));
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
       ),
     ).toHaveCount(0);
     report.checks.zeroCleanup = true;
@@ -249,7 +246,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
       const yt = context.pages().find((p) => p.url().startsWith('https://www.youtube.com'));
       report.checks.diag = await yt
         ?.evaluate(() => ({
-          safety: (document.querySelector('#web-world-themes-decorations') as HTMLElement | null)?.dataset.wwSafety,
+          safety: (document.querySelector('#around-decorations') as HTMLElement | null)?.dataset.aroundSafety,
           dialogs: [...document.querySelectorAll('tp-yt-paper-dialog, [role="dialog"]')]
             .filter((e) => e.getBoundingClientRect().height > 0)
             .map((e) => (e as HTMLElement).innerText.slice(0, 80)),
@@ -257,8 +254,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
             .flatMap((e) => (e.shadowRoot ? [...e.shadowRoot.querySelectorAll('.model-media')] : []))
             .map((m) => JSON.stringify((m as HTMLElement).dataset).slice(0, 300)),
           hidden: document.hidden,
-          safetyRecord: (document.querySelector('#web-world-themes-decorations') as HTMLElement | null)?.dataset
-            .wwSafety,
+          safetyRecord: (document.querySelector('#around-decorations') as HTMLElement | null)?.dataset.aroundSafety,
           menus: [
             ...document.querySelectorAll(
               '.ytp-popup, .ytp-settings-menu, ytd-menu-popup-renderer, tp-yt-paper-dialog, [role="menu"], [role="dialog"], [role="listbox"], select',
@@ -268,7 +264,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
               (e) =>
                 e.getBoundingClientRect().height > 0 &&
                 getComputedStyle(e).visibility !== 'hidden' &&
-                !e.closest('[id^="web-world-themes"]'),
+                !e.closest('[id^="around"]'),
             )
             .map(
               (e) =>

@@ -1,0 +1,150 @@
+{
+  "off": {
+    "elements": [
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "attributes": {
+          "data-around-settings-button": ""
+        },
+        "hidden": false
+      },
+      {
+        "tag": "DIV",
+        "id": "around-panel",
+        "attributes": {},
+        "hidden": true
+      },
+      {
+        "tag": "IFRAME",
+        "id": "",
+        "attributes": {
+          "data-around-asset-reader": ""
+        },
+        "hidden": true
+      }
+    ],
+    "rootVariables": "",
+    "listeners": [
+      {
+        "target": "document",
+        "type": "fullscreenchange",
+        "capture": false
+      },
+      {
+        "target": "document",
+        "type": "yt-navigate-start",
+        "capture": false
+      },
+      {
+        "target": "document",
+        "type": "yt-navigate-finish",
+        "capture": false
+      },
+      {
+        "target": "document",
+        "type": "yt-page-data-updated",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "popstate",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "pagehide",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "resize",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "pageshow",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "pageshow",
+        "capture": false
+      }
+    ]
+  },
+  "emergency": {
+    "elements": [
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "attributes": {
+          "data-around-settings-button": ""
+        },
+        "hidden": false
+      },
+      {
+        "tag": "DIV",
+        "id": "around-panel",
+        "attributes": {},
+        "hidden": true
+      },
+      {
+        "tag": "IFRAME",
+        "id": "",
+        "attributes": {
+          "data-around-asset-reader": ""
+        },
+        "hidden": true
+      }
+    ],
+    "rootVariables": "",
+    "listeners": [
+      {
+        "target": "document",
+        "type": "fullscreenchange",
+        "capture": false
+      },
+      {
+        "target": "document",
+        "type": "yt-navigate-start",
+        "capture": false
+      },
+      {
+        "target": "document",
+        "type": "yt-navigate-finish",
+        "capture": false
+      },
+      {
+        "target": "document",
+        "type": "yt-page-data-updated",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "popstate",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "pagehide",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "resize",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "pageshow",
+        "capture": false
+      },
+      {
+        "target": "window",
+        "type": "pageshow",
+        "capture": false
+      }
+    ]
+  }
+}

@@ -80,7 +80,7 @@ test('model state records/replays and backward seeks exactly; old runtimes migra
   expect(replayWorld(recording)).toEqual({ state, frames });
   expect(parseWorldState(state, scene)).toEqual(state);
   const take = parseSignalTake({
-    format: 'ww-signal-take',
+    format: 'around-signal-take',
     formatVersion: 1,
     runtimeVersion: state.runtimeVersion,
     id: 'rig-take',

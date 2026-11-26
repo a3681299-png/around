@@ -4,6 +4,7 @@ import type { PlaybackSource } from '../signals/types';
 import { effectActive, maskOf, neededSignals, wantsPointerFrame, type WorldEffectTarget } from '../world/effects';
 import { evaluatePreparedWorld, evaluateWorld, initialWorldState, layoutEffectTargets } from '../world/evaluate';
 import { evaluateLayout } from '../world/layout';
+import { startPage } from '../world/models';
 import type {
   WorldEvent,
   WorldFrame,
@@ -17,6 +18,7 @@ import type { TimelineHost } from './timeline';
 import { rebaseWorldClock } from '../world/clock';
 import { SIGNAL_REGISTRY } from '../signals/registry';
 import type { OperationGuardHost } from './operation-guard';
+import { createPageTracker, type PageIdentity } from './page-identity';
 
 export interface WorldHostContext {
   scene: WorldScene;
@@ -37,6 +39,8 @@ export function createWorldSession(
     result: ReturnType<typeof evaluateWorld>,
   ) => void,
   timeline?: TimelineHost,
+  /** The site adapter's page identity (SiteAdapter.signals.page); the address otherwise. */
+  page?: PageIdentity,
 ) {
   const view = doc.defaultView!,
     reduced = view.matchMedia('(prefers-reduced-motion: reduce)');
@@ -47,6 +51,7 @@ export function createWorldSession(
   let state = initialWorldState();
   let wasPreview = false;
   let lifecyclePending = false;
+  const newPage = createPageTracker(page);
   let lastFrame: WorldFrame | undefined, devtools: ReturnType<typeof createWorldDevtools>;
   let raf: number | undefined,
     listening = false;
@@ -64,6 +69,18 @@ export function createWorldSession(
           entry.renderable &&
           entry.layer.kind === 'model3d' &&
           (entry.layer.model.playing || entry.layer.model.look.enabled),
+      ),
+    );
+  /** A shown character's computed motion reads the common signals (src/world/body-motion.ts):
+   * the pointer (turning), the main video's play/pause (hop, look down) and scrolling (shiver). */
+  const bodyActive = () =>
+    Boolean(
+      prepared?.layers.some(
+        (entry) =>
+          entry.renderable &&
+          entry.layer.kind === 'model3d' &&
+          Boolean(entry.layer.character) &&
+          Boolean(entry.layer.source.vrm),
       ),
     );
   const lookActive = () =>
@@ -126,9 +143,10 @@ export function createWorldSession(
               Boolean(devtools?.active || authoring) ||
               rules.pointer ||
               motionActive() ||
-              lookActive()),
-          video: !doc.hidden && (masks.video || rules.video || Boolean(devtools?.active || authoring)),
-          scroll: !doc.hidden && (rules.scroll || Boolean(devtools?.active) || Boolean(authoring)),
+              lookActive() ||
+              bodyActive()),
+          video: !doc.hidden && (masks.video || rules.video || Boolean(devtools?.active || authoring) || bodyActive()),
+          scroll: !doc.hidden && (rules.scroll || Boolean(devtools?.active) || Boolean(authoring) || bodyActive()),
         };
     sources.recordClicks(Boolean(timeline?.recording && !doc.hidden));
     if (
@@ -143,7 +161,13 @@ export function createWorldSession(
   };
   const paint = (time: number) => {
     if (!context || !prepared) return;
-    const overridden = timeline?.preview(context.scene);
+    // A new page (the adapter's page identity, page-identity.ts) starts each character's autonomy
+    // again at home (startPage). One string comparison per frame; nothing in the page is searched.
+    // Document.location is null for a document without a browsing context: no address, no move.
+    if (newPage(doc.location?.href ?? '')) state = startPage(state);
+    // Host restrictions are sampled first: a preview or take mixes in the live approach (G1.2).
+    const safety = context.safety?.sample(time);
+    const overridden = timeline?.preview(context.scene, safety?.approach);
     if (wasPreview && !overridden) state = rebaseWorldClock(state, time);
     wasPreview = Boolean(overridden);
     if (sources.overflowed && timeline?.recording)
@@ -170,16 +194,15 @@ export function createWorldSession(
         ...(context.holdTransforms ? { holdTransforms: true } : {}),
       },
     };
-    if (context.safety) {
-      const safety = context.safety.sample(timeMs);
+    if (safety) {
       input.signals.samples = { ...input.signals.samples, 'user.idle.duration': safety.idleSeconds };
-      input.environment.safeInteraction = safety.approaching;
+      if (safety.approach) input.environment.approach = safety.approach;
     }
-    // User/Host restrictions also override a recorded or previewed frame.
-    const result =
-      input.environment.reducedMotion || input.environment.safeInteraction
-        ? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules)
-        : (overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules));
+    // Reduced motion overrides a recorded or previewed frame whole; an approach is already
+    // mixed into it, on the held roots only.
+    const result = input.environment.reducedMotion
+      ? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules)
+      : (overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules));
     if (!overridden) {
       if (
         !context.scene.signalRules?.length &&

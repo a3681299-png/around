@@ -1,14 +1,15 @@
 import { ungroupingReason } from './groups';
-import { oneOf } from '../validation';
 import type { PanelState, PanelOptions } from './panel';
 import { transientPreferences } from '../studio/preferences';
+import { drawPen, drawRule, goldenSpiral, line, arc, svg } from './pen';
 
 type Area = 'layers' | 'properties' | 'help';
 interface TreeView {
   setActive(active: boolean): void;
 }
 
-/** Workspace and onboarding preferences stay outside the artwork, history and Runtime. */
+/** The editor's panes, tabs, selection bar and menus, which the workbench arranges. Onboarding
+ * preferences stay outside the artwork, history and Runtime. */
 export function createWorkspace(
   doc: Document,
   host: HTMLElement,
@@ -19,53 +20,20 @@ export function createWorkspace(
   options: PanelOptions = {},
 ) {
   const preferences = options.preferences ?? transientPreferences;
-  const fullPage = Boolean(options.fullPage),
-    workspaceKey = 'webWorldThemes.studio.workspace.v1';
-  let touched = false,
-    preferencesReady = false,
-    preferenceTimer: ReturnType<typeof setTimeout> | undefined;
-  const remember = () => {
-    if (!options.persistWorkspace) return;
-    touched = true;
-    clearTimeout(preferenceTimer);
-    preferenceTimer = setTimeout(() => {
-      void preferences
-        .write(workspaceKey, {
-          width,
-          dock: host.dataset.wwDock ?? 'right',
-          split,
-          area,
-          minimized: host.hasAttribute('data-minimized'),
-          folds: [...main.querySelectorAll<HTMLDetailsElement>('.inspector-pane details')].map((item) => [
-            item.className,
-            item.open,
-          ]),
-        })
-        .catch(() => undefined);
-    }, 100);
-  };
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const body = get('.editor-body'),
     assets = get('.assets'),
     selection = get('.selection');
-  if (fullPage) {
-    get('h2').textContent = 'Web World Themes Studio';
-    get('.eyebrow').textContent = 'CREATOR WORKSPACE';
-    get('.dock').textContent = '左右を入れ替える';
-    get('.dock').title = 'レイヤーとプロパティの位置を入れ替える';
-    get('header').append(get('.toolbar'), get('.actions'));
-    host.toggleAttribute('data-split', true);
-  }
   const compact = doc.defaultView!.matchMedia('(max-width: 740px)');
   let area: Area = 'layers',
-    split = fullPage,
+    split = false,
     state: PanelState | undefined,
     lastCard = false;
   let alive = true;
   const nav = doc.createElement('nav');
   nav.className = 'workspace-nav';
   nav.setAttribute('aria-label', '編集する領域');
-  nav.innerHTML = `<div role="tablist" aria-label="作業領域"><button type="button" role="tab" id="ww-tab-layers" data-area="layers" aria-controls="ww-layers-pane">レイヤー</button><button type="button" role="tab" id="ww-tab-properties" data-area="properties" aria-controls="ww-properties-pane">プロパティ</button><button type="button" role="tab" id="ww-tab-help" data-area="help" aria-controls="ww-help-pane">使い方</button></div><button class="split" type="button" aria-pressed="false" title="一覧と設定を横に並べる">並べる</button>`;
+  nav.innerHTML = `<div role="tablist" aria-label="作業領域"><button type="button" role="tab" id="around-tab-layers" data-area="layers" aria-controls="around-layers-pane">レイヤー</button><button type="button" role="tab" id="around-tab-properties" data-area="properties" aria-controls="around-properties-pane">プロパティ</button><button type="button" role="tab" id="around-tab-help" data-area="help" aria-controls="around-help-pane">使い方</button></div><button class="split" type="button" aria-pressed="false" title="一覧と設定を横に並べる">並べる</button>`;
   const selected = doc.createElement('section');
   selected.className = 'selection-bar';
   selected.setAttribute('aria-label', '選択したレイヤーの操作');
@@ -86,13 +54,13 @@ export function createWorkspace(
 
   const layersPane = doc.createElement('section');
   layersPane.className = 'layers-pane';
-  layersPane.id = 'ww-layers-pane';
+  layersPane.id = 'around-layers-pane';
   layersPane.setAttribute('role', 'tabpanel');
-  layersPane.setAttribute('aria-labelledby', 'ww-tab-layers');
+  layersPane.setAttribute('aria-labelledby', 'around-tab-layers');
   const guide = doc.createElement('aside');
   guide.className = 'quick-guide';
   guide.innerHTML = `<button class="dismiss-guide" type="button" aria-label="操作ガイドを閉じる">×</button><strong>はじめての制作</strong><ol><li>画像やアニメーションを追加</li><li>一覧のチェックで2個以上選択</li><li>グループ化 → 光とマスク → 保存</li></ol>`;
-  const guideKey = 'webWorldThemes.creator.guideDismissed';
+  const guideKey = 'around.creator.guideDismissed';
   void preferences.read(guideKey).then(
     (value) => {
       if (alive && value === true) guide.hidden = true;
@@ -101,15 +69,60 @@ export function createWorkspace(
   );
   const empty = doc.createElement('div');
   empty.className = 'empty-layers';
-  empty.innerHTML = `<strong>最初の素材を置いてみましょう</strong><p>画像やアニメーションを追加すると、YouTubeの上でドラッグして動かせます。</p><button type="button">素材を選ぶ</button><p class="hint">このパネルへファイルをドロップしても追加できます。</p>`;
+  {
+    // around-empty: the golden rectangle and its spiral are constructed, then the words appear.
+    empty.classList.add('around-empty');
+    const drawing = svg(doc, '0 0 236 152', 'around-empty__drawing'),
+      g = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('transform', 'translate(8 8)');
+    drawing.append(g);
+    // Guides (ruler), then the main lines (G-pen, ink; the compass arc in pen-bone), then the accent.
+    [
+      'M-6 136H226',
+      'M0 0h136v136H0Z',
+      'M68 136 136 0',
+      'M136-4v144',
+      'M132 84h92',
+      'M168 80v60',
+      'M132 104h40',
+    ].forEach((d, i) => drawRule(g, d, i));
+    drawPen(g, arc(68, 136, 152, Math.atan2(-136, 68), 0), { width: 1.8, color: 'var(--pen-bone)', delay: 7 });
+    drawPen(g, line(-4, 0, 224, 0), { width: 3.4, color: 'var(--ink)', delay: 8 });
+    drawPen(g, line(220, -4, 220, 140), { width: 3.4, color: 'var(--ink)', delay: 9 });
+    drawPen(g, line(224, 136, -4, 136), { width: 3.4, color: 'var(--ink)', delay: 10 });
+    drawPen(g, line(0, 140, 0, -4), { width: 3.4, color: 'var(--ink)', delay: 11 });
+    // The spiral takes 8 frames; the words follow it (frames 20–22).
+    drawPen(g, goldenSpiral(0, 0, [136, 84, 52, 32, 20, 12]), {
+      width: 3.4,
+      color: 'var(--cobalt)',
+      delay: 12,
+      frames: 8,
+    });
+    const title = doc.createElement('strong'),
+      text = doc.createElement('p'),
+      actions = doc.createElement('div'),
+      add = doc.createElement('button');
+    title.className = 'around-empty__title around-appear';
+    title.textContent = 'まだレイヤーがありません';
+    text.className = 'around-empty__text around-appear';
+    text.textContent = '画像やアニメーションを置くと、YouTubeの上で動かせます。';
+    actions.className = 'around-empty__actions around-appear';
+    add.type = 'button';
+    add.textContent = '画像を追加';
+    actions.append(add);
+    [title, text, actions].forEach((node, i) =>
+      node.style.setProperty('--around-delay', `${Math.round((20 + i) * 83)}ms`),
+    );
+    empty.append(drawing, title, text, actions);
+  }
   const layerSection = get<HTMLDetailsElement>('.layers-section');
   layersPane.append(assets, guide, layerSection, empty);
   empty.querySelector('button')!.addEventListener('click', () => get<HTMLButtonElement>('.add-image').click());
   const propsPane = doc.createElement('section');
   propsPane.className = 'inspector-pane';
-  propsPane.id = 'ww-properties-pane';
+  propsPane.id = 'around-properties-pane';
   propsPane.setAttribute('role', 'tabpanel');
-  propsPane.setAttribute('aria-labelledby', 'ww-tab-properties');
+  propsPane.setAttribute('aria-labelledby', 'around-tab-properties');
   const propertySection = get<HTMLDetailsElement>('.properties-section');
   const snapHelp = get('.snap-toggle').nextElementSibling!;
   const layout = doc.createElement('details');
@@ -126,11 +139,11 @@ export function createWorkspace(
   const propsSummary = propertySection.querySelector('summary')!;
   propsSummary.textContent = '基本';
   const help = doc.createElement('section');
-  help.id = 'ww-help-pane';
+  help.id = 'around-help-pane';
   help.className = 'help-pane';
   help.setAttribute('role', 'tabpanel');
-  help.setAttribute('aria-labelledby', 'ww-tab-help');
-  help.innerHTML = `<h3>つくる手順</h3><ol><li>素材を追加してキャンバスで位置を決める</li><li>一覧のチェックで複数選択し、グループ化</li><li>「光とマスクを設定」で円形マスクを有効にする</li><li>「振る舞い」でマウス追従や動画との連動を設定</li><li>保存すると、ほかのタブにも反映されます</li></ol><h3>選択とグループ</h3><p>行をクリックすると1個選択。チェックなら選択を追加・解除できます。Ctrl／Shiftクリックも使えます。</p><p>グループ化には、同じ配置基準と連続した重なり順が必要です。理由はグループ化ボタンの下に表示します。グループの中の素材は一覧から個別に選べます。</p><p>名前は行をダブルクリック、またはプロパティで変更。右クリックと「…」からも共通操作ができます。</p><h3>ショートカット</h3><dl><dt>V / H / C</dt><dd>選択・変形 / サイト操作 / カード編集</dd><dt>数値ラベルを左右にドラッグ</dt><dd>値を調整（Shiftで細かく調整、Escで中止）</dd><dt>Ctrl / Shift ＋ クリック</dt><dd>複数選択</dd><dt>矢印 / Shift ＋ 矢印</dt><dd>1px / 10px移動</dd><dt>Ctrl ＋ D</dt><dd>複製</dd><dt>Delete</dt><dd>削除（ロック中は保護）</dd><dt>Esc</dt><dd>選択解除 / メニューを閉じる</dd><dt>Ctrl ＋ Z</dt><dd>元に戻す</dd><dt>Ctrl ＋ Shift ＋ Z / Ctrl ＋ Y</dt><dd>やり直す</dd><dt>Alt ＋ ドラッグ</dt><dd>スナップを一時解除</dd></dl><p class="hint">MacではCtrlの代わりに⌘。入力欄では文字の編集を優先します。終了すると未保存の変更を破棄します。</p><button type="button" class="show-guide">操作ガイドをもう一度表示</button>`;
+  help.setAttribute('aria-labelledby', 'around-tab-help');
+  help.innerHTML = `<h3>つくる手順</h3><ol><li>素材を追加してキャンバスで位置を決める</li><li>一覧のチェックで複数選択し、グループ化</li><li>「光とマスクを設定」で円形マスクを有効にする</li><li>「振る舞い」でマウス追従や動画との連動を設定</li><li>保存すると、ほかのタブにも反映されます</li></ol><h3>選択とグループ</h3><p>行をクリックすると1個選択。チェックなら選択を追加・解除できます。Ctrl／Shiftクリックも使えます。</p><p>グループ化には、同じ配置基準と連続した重なり順が必要です。理由はグループ化ボタンの下に表示します。グループの中の素材は一覧から個別に選べます。</p><p>名前は行をダブルクリック、またはプロパティで変更。右クリックと「…」からも共通操作ができます。</p><h3>ショートカット</h3><dl><dt>V / H / C / U</dt><dd>選択・変形 / サイト操作 / カード編集 / UIの着せ替え</dd><dt>数値ラベルを左右にドラッグ</dt><dd>値を調整（Shiftで細かく調整、Escで中止）</dd><dt>Ctrl / Shift ＋ クリック</dt><dd>複数選択</dd><dt>矢印 / Shift ＋ 矢印</dt><dd>1px / 10px移動</dd><dt>Ctrl ＋ D</dt><dd>複製</dd><dt>Delete</dt><dd>削除（ロック中は保護）</dd><dt>Esc</dt><dd>選択解除 / メニューを閉じる</dd><dt>Ctrl ＋ Z</dt><dd>元に戻す</dd><dt>Ctrl ＋ Shift ＋ Z / Ctrl ＋ Y</dt><dd>やり直す</dd><dt>Alt ＋ ドラッグ</dt><dd>スナップを一時解除</dd></dl><p class="hint">MacではCtrlの代わりに⌘。入力欄では文字の編集を優先します。終了すると未保存の変更を破棄します。</p><button type="button" class="show-guide">操作ガイドをもう一度表示</button>`;
   body.replaceChildren(layersPane, propsPane, help);
   // Effects and playback are sections of the inspector, not transform controls.
   const imageProps = get('.image-properties');
@@ -194,7 +207,18 @@ export function createWorkspace(
     if (!event.composedPath().includes(menu)) closeMenu();
   };
   doc.addEventListener('pointerdown', outside, true);
-  body.addEventListener('scroll', () => closeMenu(), true);
+  // A scroll event arrives a frame after the scroll. One that moved before the menu opened (the
+  // wheel just before a right-click, a row brought into view) must not close the new menu.
+  let scrollAtOpen = new WeakMap<EventTarget, string>();
+  const scrollKey = (node: Element) => `${node.scrollTop},${node.scrollLeft}`;
+  body.addEventListener(
+    'scroll',
+    (event) => {
+      const target = event.target as Element;
+      if (scrollAtOpen.get(target) !== scrollKey(target)) closeMenu();
+    },
+    true,
+  );
   // Menus/help own Escape before the editor's capture-phase selection shortcut.
   const menuKeys = (event: KeyboardEvent) => {
     if (menu.hidden || !event.composedPath().includes(host)) return;
@@ -242,18 +266,11 @@ export function createWorkspace(
     get('.group-layers').hidden =
       state?.image?.kind === 'group' || (next === 'properties' && (state?.selectedIds.length ?? 0) < 2);
     get('.grouping-help').hidden = get('.group-layers').hidden;
-    tree.setActive(
-      !layersPane.hidden &&
-        !(split && compact.matches && next === 'properties') &&
-        !host.hasAttribute('data-minimized'),
-    );
+    tree.setActive(!layersPane.hidden && !(split && compact.matches && next === 'properties'));
   }
   nav.addEventListener('click', (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]');
-    if (button) {
-      show(button.dataset.area as Area);
-      remember();
-    }
+    if (button) show(button.dataset.area as Area);
   });
   // Workbench owns its simultaneous panes; legacy tab adaptation must not hide
   // them after the Workbench's resize handler has already arranged the grid.
@@ -264,14 +281,19 @@ export function createWorkspace(
   nav.addEventListener('keydown', (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]');
     if (!button || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-    const tabs = [...nav.querySelectorAll<HTMLButtonElement>('[data-area]')],
-      index = tabs.indexOf(button);
+    // Only the tabs offered here: the side panel's column keeps 使い方 in its ヘルプ menu.
+    const tabs = [...nav.querySelectorAll<HTMLButtonElement>('[data-area]')].filter((tab) => !tab.hidden),
+      index = tabs.indexOf(button),
+      count = tabs.length;
     const next =
-      event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (index + (event.key === 'ArrowRight' ? 1 : -1) + 3) % 3;
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? count - 1
+          : (index + (event.key === 'ArrowRight' ? 1 : -1) + count) % count;
     show(tabs[next]!.dataset.area as Area);
     tabs[next]!.focus();
     event.preventDefault();
-    remember();
   });
   get('.inspect').addEventListener('click', () => show('properties'));
   maskShortcut.addEventListener('click', () => {
@@ -290,7 +312,6 @@ export function createWorkspace(
     splitButton.setAttribute('aria-pressed', String(split));
     splitButton.textContent = split ? '切り替え表示' : '並べる';
     show(area);
-    remember();
   });
   get('.clear-selection').addEventListener('click', clear);
   get('.select-all').addEventListener('click', selectAll);
@@ -303,99 +324,8 @@ export function createWorkspace(
     void preferences.write(guideKey, false).catch(() => undefined);
     show('layers');
   });
-  const minimize = get<HTMLButtonElement>('.minimize');
-  minimize.addEventListener('click', () => {
-    const value = !host.hasAttribute('data-minimized');
-    host.toggleAttribute('data-minimized', value);
-    minimize.textContent = value ? '+' : '−';
-    minimize.setAttribute('aria-label', value ? 'パネルを展開する' : 'パネルを折りたたむ');
-    show(area);
-    remember();
-  });
-  // Width adjustment also supports the keyboard. Bounds are enforced by CSS on small screens.
-  const resize = doc.createElement('div');
-  resize.className = 'panel-resize';
-  resize.tabIndex = 0;
-  resize.setAttribute('role', 'separator');
-  resize.setAttribute('aria-label', 'パネルの幅');
-  resize.setAttribute('aria-orientation', 'vertical');
-  resize.setAttribute('aria-valuemin', '320');
-  resize.setAttribute('aria-valuemax', '520');
-  let width = fullPage ? 300 : 360,
-    gesture: { x: number; width: number; id: number } | undefined;
-  const setWidth = (value: number) => {
-    width = Math.max(320, Math.min(520, value));
-    host.style.setProperty('--panel-width', `${width}px`);
-    resize.setAttribute('aria-valuenow', String(width));
-  };
-  setWidth(width);
-  (fullPage ? body : main).append(resize);
-  resize.addEventListener('pointerdown', (event) => {
-    if (event.button !== 0) return;
-    gesture = { x: event.clientX, width, id: event.pointerId };
-    resize.setPointerCapture(event.pointerId);
-    event.preventDefault();
-  });
-  resize.addEventListener('pointermove', (event) => {
-    if (gesture)
-      setWidth(
-        gesture.width +
-          (fullPage ? (host.dataset.wwDock === 'left' ? -1 : 1) : host.dataset.wwDock === 'left' ? 1 : -1) *
-            (event.clientX - gesture.x),
-      );
-  });
-  const endResize = () => {
-    if (gesture) remember();
-    gesture = undefined;
-  };
-  resize.addEventListener('pointerup', endResize);
-  resize.addEventListener('pointercancel', endResize);
-  resize.addEventListener('lostpointercapture', endResize);
-  resize.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      setWidth(width + (event.key === 'ArrowRight' ? 20 : -20));
-      event.preventDefault();
-      event.stopPropagation();
-      remember();
-    }
-  });
   show(area);
-  if (options.persistWorkspace) {
-    void preferences.read(workspaceKey).then(
-      (raw) => {
-        preferencesReady = true;
-        if (!alive || touched || !raw || typeof raw !== 'object') return;
-        const value = raw as Record<string, unknown>;
-        if (typeof value.width === 'number' && Number.isFinite(value.width)) setWidth(value.width);
-        if (value.dock === 'left' || value.dock === 'right') host.dataset.wwDock = value.dock;
-        if (typeof value.split === 'boolean') split = value.split;
-        host.toggleAttribute('data-split', split);
-        splitButton.setAttribute('aria-pressed', String(split));
-        splitButton.textContent = split ? '切り替え表示' : '並べる';
-        if (typeof value.minimized === 'boolean') host.toggleAttribute('data-minimized', value.minimized);
-        minimize.textContent = value.minimized ? '+' : '−';
-        minimize.setAttribute('aria-label', value.minimized ? 'パネルを展開する' : 'パネルを折りたたむ');
-        if (Array.isArray(value.folds))
-          for (const entry of value.folds) {
-            if (!Array.isArray(entry) || typeof entry[0] !== 'string' || typeof entry[1] !== 'boolean') continue;
-            [...main.querySelectorAll<HTMLDetailsElement>('.inspector-pane details')]
-              .find((item) => item.className === entry[0])
-              ?.toggleAttribute('open', entry[1]);
-          }
-        show(oneOf(value.area, ['layers', 'properties', 'help']) ? value.area : 'layers');
-      },
-      () => {
-        preferencesReady = true;
-      },
-    );
-    main.querySelectorAll('.inspector-pane details').forEach((item) =>
-      item.addEventListener('toggle', () => {
-        if (preferencesReady) remember();
-      }),
-    );
-  }
   return {
-    layoutChanged: remember,
     inspect() {
       show('properties');
     },
@@ -409,6 +339,9 @@ export function createWorkspace(
         target.hidden = source.hidden;
       });
       menu.hidden = false;
+      scrollAtOpen = new WeakMap();
+      for (const node of [body, ...body.querySelectorAll('.layers-pane, .layers, .inspector-pane, .help-pane')])
+        scrollAtOpen.set(node, scrollKey(node));
       const rect = host.getBoundingClientRect(),
         menuRect = menu.getBoundingClientRect();
       menu.style.left = `${Math.max(4, Math.min(rect.width - menuRect.width - 4, x - rect.left))}px`;
@@ -466,7 +399,6 @@ export function createWorkspace(
     },
     destroy() {
       alive = false;
-      clearTimeout(preferenceTimer);
       closeMenu();
       compact.removeEventListener('change', adapt);
       doc.removeEventListener('keydown', menuKeys, true);

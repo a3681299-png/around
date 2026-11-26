@@ -1,5 +1,5 @@
 import type { EditorView } from '../editor-core/types';
-import { icon } from '../editor/icons';
+import { glyph } from '../editor/icons';
 
 /** Source thumbnails reuse pixels already painted by the Host, never another player. */
 export function createAssetLibrary(
@@ -70,7 +70,7 @@ export function createAssetLibrary(
           img.alt = '';
           preview.append(img);
         } else
-          preview.innerHTML = icon(
+          preview.innerHTML = glyph(
             item.kind === 'model3d' ? 'model3d' : item.kind === 'animation' ? 'animation' : 'image',
           );
         const name = doc.createElement('span');

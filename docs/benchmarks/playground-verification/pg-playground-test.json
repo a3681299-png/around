@@ -1,0 +1,52 @@
+[
+  {
+    "case": "extra",
+    "rejected": "デザインの形式が不正です。"
+  },
+  {
+    "case": "css",
+    "rejected": "デザインの形式が不正です。"
+  },
+  {
+    "case": "url",
+    "rejected": "デザインの形式が不正です。"
+  },
+  {
+    "case": "version",
+    "rejected": "このデザインのバージョンには対応していません。"
+  },
+  {
+    "case": "changed",
+    "error": "Error: 素材の内容が ID と一致しません。"
+  },
+  {
+    "case": "matching-hash",
+    "error": "Error: 静止PNG・WebP画像を選択してください。"
+  },
+  {
+    "case": "truncated-glb",
+    "error": "Error: GLBが破損しているか、初版で未対応の構造です。"
+  },
+  {
+    "case": "controls",
+    "missing": []
+  },
+  {
+    "case": "overlap",
+    "box": {
+      "x": 126,
+      "y": 594,
+      "width": 88,
+      "height": 38
+    },
+    "bounds": {
+      "x": 39.96875,
+      "y": 488.59375,
+      "width": 260,
+      "height": 250
+    },
+    "green": 3092,
+    "pixelsEqual": true,
+    "clicks": true
+  }
+]

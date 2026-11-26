@@ -64,11 +64,11 @@ export async function sidePanelDriver(
       throw new Error(result.exceptionDetails.text + ': ' + result.exceptionDetails.exception?.description);
     return result.result.value as T;
   };
-  const panel = 'document.querySelector("#web-world-themes-creator")?.shadowRoot';
+  const panel = 'document.querySelector("#around-creator")?.shadowRoot';
   const query = (selector: string) => panel + '?.querySelector(' + JSON.stringify(selector) + ')';
   const settle = () =>
     expect
-      .poll(() => evaluate('document.querySelector("#web-world-themes-creator")?.getAttribute("aria-busy")'))
+      .poll(() => evaluate('document.querySelector("#around-creator")?.getAttribute("aria-busy")'))
       .not.toBe('true');
   // Like Playwright's own click, wait (in the panel, within the same Runtime call) for the control
   // to exist and be enabled; state such as the Timeline binding arrives asynchronously.
@@ -120,7 +120,7 @@ export async function sidePanelDriver(
       await expect
         .poll(() =>
           evaluate(
-            'document.querySelector(".connection-status")?.dataset.connected === "true" && document.querySelector("#web-world-themes-creator")?.shadowRoot.querySelector(".add-image")?.disabled === false',
+            'document.querySelector(".connection-status")?.dataset.connected === "true" && document.querySelector("#around-creator")?.shadowRoot.querySelector(".add-image")?.disabled === false',
           ),
         )
         .toBe(true);

@@ -1,0 +1,14 @@
+{
+  "node": "v24.16.0",
+  "os": "Windows_NT",
+  "release": "10.0.26300",
+  "arch": "x64",
+  "target": "20ffdc360df7d6a013cbfde595aa62cc138ca413",
+  "before": "af4fd0b75c7ab8b24cc8eabf6987d7f3891a46a1",
+  "ci": "5ef44cc176a14118328f1fd9ce9557e1c8423ea4",
+  "ciRun": 41761659925,
+  "sourceTree": "8b84daff97e67686769021bb1015fc4c5bb48b66",
+  "browser": "153.0.8010.12",
+  "browserMode": "headless",
+  "sourceEdits": false
+}

@@ -1,9 +1,9 @@
 import { parseBackupManifest, BACKUP_LIMITS, BACKUP_MESSAGES, type BackupManifest } from './schema';
 import { validateAssetBytes } from '../assets/validate-bytes';
-import { validateDesignAssets } from '../assets/design-assets';
+import { validateDocumentAssets } from '../assets/design-assets';
 import type { StoredAsset } from '../assets/repository';
 
-const magic = new TextEncoder().encode('WWT-BACKUP-0001\n');
+const magic = new TextEncoder().encode('AROUND-BACKUP-0001\n');
 export const BACKUP_HEADER_BYTES = magic.length + 4 + 32;
 export interface ValidatedBackup {
   manifest: BackupManifest;
@@ -26,7 +26,7 @@ async function validateOriginals(manifest: BackupManifest, blobs: readonly Blob[
     rows.push({ ...metadata, ...info, blob, leases: [] });
   }
   const assets = new Map(rows.map((row) => [row.id, row]));
-  for (const design of manifest.designs) validateDesignAssets(design.decorations, assets);
+  for (const design of manifest.designs) validateDocumentAssets(design, assets);
   return rows;
 }
 

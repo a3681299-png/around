@@ -7,30 +7,28 @@ import {
   type StudioRequest,
   type StudioTarget,
 } from '../studio/protocol';
-import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
+import type { EditCommand, EditorCheckpoint, EditorRevision, EditorSnapshot } from '../editor-core/types';
 import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
-import { releaseAssets } from '../assets/client';
-import { importStudioAssets } from '../assets/studio-upload';
+import { releaseAssets } from './asset-client';
+import { importStudioAssets } from './studio-upload';
 import type { SafetyStatus } from '../host/operation-guard';
+import type { SkinPageInfo } from '../editor/skin-status';
+import type { SkinSlot } from '../editor-core/skins';
+import type { MotionLabel } from '../characters/manifest';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
-import {
-  CLOSE_SIDE_PANEL,
-  OPEN_SIDE_PANEL,
-  OPEN_STUDIO_WINDOW,
-  OPEN_INPAGE_STUDIO,
-  type OpenEditorResponse,
-} from '../editor/messages';
+import { OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW } from '../editor/messages';
 import type { TimelinePort, TimelineCommand, TimelineUpdate } from '../timeline/types';
 export function createStudioClient(
   notify: (value: StudioConnectionState) => void,
-  checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined) => void,
+  checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined, origin: EditorRevision) => void,
   visibilityDocument?: Document,
 ): StudioConnection {
   const owner = `studio-${crypto.randomUUID()}`;
   const safetyListeners = new Set<(status: SafetyStatus) => void>();
+  const skinPageListeners = new Set<(info: readonly SkinPageInfo[]) => void>();
   let safetyStatus: SafetyStatus | undefined;
   let port: chrome.runtime.Port | undefined,
     tabId: number | undefined,
@@ -116,25 +114,25 @@ export function createStudioClient(
     if (state && next.sessionId === state.sessionId && next.revision < state.revision) return;
     state = next;
     if (!connected) return;
-    if (!next.active) {
-      backup = undefined;
-      if (tabId !== undefined) checkpointChanged(tabId, undefined);
-    } else {
-      if (checkpoint) backup = checkpoint;
-      if (backup) {
-        backup = {
-          ...backup,
-          draft: next.document,
-          ...(next.saved ? { saved: next.saved } : {}),
-          selectedIds: [...next.view.selectedIds],
-          tool: next.view.tool ?? 'select',
-          snapping: next.view.snapping,
-        };
-        if (!next.saved) delete backup.saved;
-        if (next.selectedTarget) backup.selectedTarget = next.selectedTarget;
-        else delete backup.selectedTarget;
-        if (tabId !== undefined) checkpointChanged(tabId, backup);
+    const origin = { sessionId: next.sessionId, revision: next.revision };
+    // During a choice the checkpoint is the offered draft, while the
+    // snapshot shows the saved artwork.
+    if (next.recoveryPending) {
+      if (next.active && checkpoint && checkpoint !== backup) {
+        backup = checkpoint;
+        if (tabId !== undefined) checkpointChanged(tabId, backup, backup.origin ?? origin);
       }
+      return;
+    }
+    if (!next.active) {
+      // The edit ended on the page (OFF, 緊急OFF or 編集を終了): an import still being read
+      // here can no longer land, so its reading stops and its decoded frames close now.
+      cancelImport();
+      backup = undefined;
+      if (tabId !== undefined) checkpointChanged(tabId, undefined, origin);
+    } else if (checkpoint && !next.view.saving) {
+      backup = checkpoint;
+      if (tabId !== undefined) checkpointChanged(tabId, backup, backup.origin ?? origin);
     }
   };
   const request = (value: Omit<StudioRequest, 'id'>): Promise<Extract<StudioMessage, { type: 'reply' }>> => {
@@ -198,7 +196,7 @@ export function createStudioClient(
         if (message.type === 'handoff') {
           stopped = true;
           disconnect();
-          emit('別のStudioへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。');
+          emit('別のエディターへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。');
           return;
         }
         if (message.type === 'safety') {
@@ -208,6 +206,10 @@ export function createStudioClient(
         }
         if (message.type === 'timeline') {
           useTimeline(message.update);
+          return;
+        }
+        if (message.type === 'skin-page') {
+          if (Array.isArray(message.info)) skinPageListeners.forEach((listener) => listener(message.info));
           return;
         }
         if (message.type !== 'state' && message.type !== 'reply') return;
@@ -230,7 +232,7 @@ export function createStudioClient(
               ? '接続中'
               : state?.enabled
                 ? '編集を終了しました。接続ボタンで再開できます。'
-                : 'テーマがOFFまたは強さ0%です。',
+                : '「作品を表示する」がOFFです。ONにしてから接続してください。',
           );
         } else if (message.type === 'reply') {
           const entry = pending.get(message.id);
@@ -246,12 +248,10 @@ export function createStudioClient(
         type: 'attach',
         owner,
         ...(backup ? { resume: packCheckpoint(backup) } : {}),
-        ...(visibilityDocument ? { visible: !visibilityDocument.hidden } : {}),
       } as Omit<StudioRequest, 'id'>);
       if (generation !== epoch) return;
       connected = true;
       retries = 0;
-      publishVisibility();
       if (observed) void timeline.dispatch({ type: 'observe', value: true });
       emit('接続中');
     } catch (error) {
@@ -302,17 +302,11 @@ export function createStudioClient(
     }
   };
   chrome.tabs.onRemoved.addListener(onTabRemoved);
-  // Browser-only UI visibility, independent of document revisions and history.
-  function publishVisibility() {
-    if (visibilityDocument && connected)
-      void request({ type: 'surface-visibility', visible: !visibilityDocument.hidden } as Omit<
-        StudioRequest,
-        'id'
-      >).catch(() => undefined);
-  }
-  visibilityDocument?.addEventListener('visibilitychange', publishVisibility);
-  function enqueue(action: () => Promise<unknown>) {
+  /** Runs in order. A failure is told in the connection line; `report` also rejects the caller's
+   * promise, so an import's reason can stand where the panel tells it. */
+  function enqueue(action: () => Promise<unknown>, report = false) {
     const generation = epoch;
+    let failure: unknown;
     commands = commands
       .catch(() => undefined)
       .then(async () => {
@@ -321,9 +315,14 @@ export function createStudioClient(
         emit('接続中');
       })
       .catch((error: unknown) => {
+        failure = error ?? new Error('操作に失敗しました。');
         if (generation === epoch) emit(error instanceof Error ? error.message : '操作に失敗しました。');
       });
-    return commands;
+    return report
+      ? commands.then(() => {
+          if (failure !== undefined) throw failure;
+        })
+      : commands;
   }
   const focusTarget = async () => {
     if (tabId === undefined) return;
@@ -332,6 +331,14 @@ export function createStudioClient(
   };
   return {
     timeline,
+    skinPage: {
+      subscribe(listener) {
+        skinPageListeners.add(listener);
+        return () => {
+          skinPageListeners.delete(listener);
+        };
+      },
+    },
     safety: {
       subscribe(listener) {
         safetyListeners.add(listener);
@@ -342,6 +349,9 @@ export function createStudioClient(
       },
       async overlay(value) {
         await request({ type: 'safety', overlay: value } as Omit<StudioRequest, 'id'>);
+      },
+      async resume() {
+        await request({ type: 'safety-resume' } as Omit<StudioRequest, 'id'>);
       },
     },
     async targets(): Promise<StudioTarget[]> {
@@ -402,7 +412,7 @@ export function createStudioClient(
         >);
       });
     },
-    import(files: readonly File[]) {
+    import(files: readonly File[], slot?: SkinSlot) {
       return enqueue(async () => {
         const generation = epoch;
         const large = files.some((f) => f.size > ASSET_LIMITS.fileBytes);
@@ -420,21 +430,64 @@ export function createStudioClient(
           const surface = visibilityDocument ? new URL(visibilityDocument.URL).searchParams.get('surface') : undefined;
           const ownerTab = surface === 'sidepanel' ? target : (await chrome.tabs.getCurrent())?.id;
           controller.signal.throwIfAborted();
-          if (ownerTab === undefined) throw new Error('Studioの保持先が見つかりません。');
+          if (ownerTab === undefined) throw new Error('エディターの保持先が見つかりません。');
           const assets = await importStudioAssets(files, lease, controller.signal, ownerTab);
           if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
           const current = state!;
+          // A skin slot takes one picture; Core refuses more with its own message in the panel.
           await request({
-            type: 'import-assets',
+            type: slot === undefined ? 'import-assets' : 'import-skin',
             session: current.sessionId,
             revision: current.revision,
             assets: assets.map((a) => a.id),
+            ...(slot === undefined ? {} : { slot }),
           } as Omit<StudioRequest, 'id'>);
         } finally {
           if (pendingImport?.controller === controller) pendingImport = undefined;
           await releaseAssets(lease).catch(() => undefined);
         }
-      });
+      }, true);
+    },
+    async importMotions(
+      files: readonly File[],
+      layer: string,
+      labels: readonly [string, MotionLabel][],
+      origin: 'standard' | 'character',
+    ) {
+      // A motion folder is larger than one import batch; send it in batches the shared limits allow.
+      for (let start = 0; start < files.length; start += ASSET_LIMITS.batchCount) {
+        const batch = files.slice(start, start + ASSET_LIMITS.batchCount);
+        await enqueue(async () => {
+          const generation = epoch;
+          if (batch.reduce((n, f) => n + f.size, 0) > ASSET_LIMITS.batchBytes) throw new Error(ASSET_MESSAGES.batch);
+          const lease = `studio-upload-${crypto.randomUUID()}`,
+            controller = new AbortController(),
+            target = tabId;
+          pendingImport = { controller, lease };
+          try {
+            const surface = visibilityDocument
+              ? new URL(visibilityDocument.URL).searchParams.get('surface')
+              : undefined;
+            const ownerTab = surface === 'sidepanel' ? target : (await chrome.tabs.getCurrent())?.id;
+            if (ownerTab === undefined) throw new Error('エディターの保持先が見つかりません。');
+            const assets = await importStudioAssets(batch, lease, controller.signal, ownerTab);
+            if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
+            const current = state!;
+            await request({
+              type: 'import-motions',
+              session: current.sessionId,
+              revision: current.revision,
+              assets: assets.map((a) => a.id),
+              layer,
+              labels: [...labels],
+              origin,
+            } as Omit<StudioRequest, 'id'>);
+          } finally {
+            if (pendingImport?.controller === controller) pendingImport = undefined;
+            await releaseAssets(lease).catch(() => undefined);
+          }
+        }, true);
+      }
     },
     async thumbnail(id: string) {
       if (!connected) return;
@@ -445,18 +498,9 @@ export function createStudioClient(
       }
     },
     focusTarget,
-    async openWorkspace(surface = 'inpage') {
+    async openWorkspace(surface: 'sidepanel' | 'window') {
       if (tabId === undefined || !connected) throw new Error('先に編集対象へ接続してください。');
-      if (surface === 'sidepanel' || surface === 'window') {
-        await requestStudioSurface(surface === 'sidepanel' ? OPEN_SIDE_PANEL : OPEN_STUDIO_WINDOW, tabId);
-        return;
-      }
-      const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tabId, {
-        type: OPEN_INPAGE_STUDIO,
-      });
-      await chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL, tabId });
-      if (!response?.ok) throw new Error(response?.error ?? '制作画面を開けませんでした。');
-      await focusTarget();
+      await requestStudioSurface(surface === 'sidepanel' ? OPEN_SIDE_PANEL : OPEN_STUDIO_WINDOW, tabId);
     },
     get state() {
       return state;
@@ -476,7 +520,6 @@ export function createStudioClient(
       stopped = true;
       disconnect();
       chrome.tabs.onRemoved.removeListener(onTabRemoved);
-      visibilityDocument?.removeEventListener('visibilitychange', publishVisibility);
     },
   };
 }

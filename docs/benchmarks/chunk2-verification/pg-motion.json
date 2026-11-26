@@ -1,0 +1,69 @@
+{
+  "seat": {
+    "bones": {
+      "chest": [0.237, 0.057, -0.043],
+      "spine": [0.101, 0.086, 0.107],
+      "leftUpperArm": [0, 0, -0.135],
+      "rightUpperArm": [0, 0, 0.135],
+      "head": [0, 0, 0],
+      "neck": [0, 0, 0],
+      "leftLowerLeg": [-4.204, 0, 0],
+      "rightLowerLeg": [4.204, 0, 0]
+    },
+    "hips": [0, 0, 0],
+    "blink": 0,
+    "yawDeg": 25,
+    "offset": {
+      "x": 0,
+      "y": 0
+    },
+    "opacity": 1,
+    "seat": true,
+    "plantFeet": false
+  },
+  "hop": {
+    "bones": {
+      "chest": [-0.547, -0.056, 0.042],
+      "spine": [-0.234, -0.085, -0.106],
+      "leftUpperArm": [0, 0, 0.313],
+      "rightUpperArm": [0, 0, -0.313],
+      "head": [0, 0, 0],
+      "neck": [0, 0, 0],
+      "leftLowerLeg": [-5.499, 0, 0],
+      "rightLowerLeg": [5.499, 0, 0]
+    },
+    "hips": [0, 0.082, 0],
+    "blink": 0.186,
+    "yawDeg": 25,
+    "offset": {
+      "x": 0,
+      "y": 0
+    },
+    "opacity": 1,
+    "seat": true,
+    "plantFeet": false
+  },
+  "look": {
+    "bones": {
+      "chest": [0.443, -0.149, 0.112],
+      "spine": [-0.437, -0.224, -0.28],
+      "leftUpperArm": [0, 0, 0.583],
+      "rightUpperArm": [0, 0, -0.583],
+      "head": [5.853, 0, 0],
+      "neck": [2.439, 0, 0],
+      "leftLowerLeg": [1.019, 0, 0],
+      "rightLowerLeg": [-1.019, 0, 0]
+    },
+    "hips": [0, 0.006, 0],
+    "blink": 0,
+    "yawDeg": 25,
+    "offset": {
+      "x": 0,
+      "y": 0
+    },
+    "opacity": 1,
+    "seat": true,
+    "plantFeet": false
+  },
+  "errors": []
+}

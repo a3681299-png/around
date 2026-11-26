@@ -8,6 +8,7 @@ import { createNativeImage } from './native-image';
 import { createNativeVideo } from './native-video';
 import { createMediaBudget, MediaBudgetUnavailable, MEDIA_BUDGET, type MediaBudget } from './budget';
 import { createResourceCache, type MediaResource, type ResourceEntry } from './resources';
+import type { AssetPort } from '../assets/port';
 import { rasterSize } from './raster-sampler';
 
 type Mode = 'image' | 'native' | 'controlled' | 'lottie' | 'video';
@@ -16,11 +17,12 @@ type Stats = ReturnType<MediaBudget['stats']>;
 /** Assets and samplers are shared; presentation, time and cancellation belong to a layer. */
 export function createMediaController(
   doc: Document,
+  loadAsset: AssetPort['load'],
   report: (message: string) => void,
   observe?: (stats: Stats) => void,
 ) {
   const budget = createMediaBudget(),
-    resources = createResourceCache(budget),
+    resources = createResourceCache(budget, loadAsset),
     instances = new Set<MediaClockInstance>();
   const clockHost = createMediaClockHost(doc, instances, ANIMATION_LIMITS.renderFps);
   let closed = false,

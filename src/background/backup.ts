@@ -3,7 +3,7 @@ import { BACKUP_PREFERENCE_KEYS, backupDesigns, type BackupManifest } from '../b
 import { backupObject, sameBackupData } from '../backup/data';
 import { encodeBackup, decodeBackup, sha256 } from '../backup/archive';
 import { planRestore } from '../backup/restore';
-import { readSettings } from '../storage/settings';
+import { readSettings } from '../browser/settings-store';
 import { changeAssets } from '../assets/repository';
 import { readStoredTakes, restoreTakes } from '../browser/take-repository';
 import { oneOf } from '../validation';
@@ -13,6 +13,7 @@ interface BackupPorts {
   pageURL: string;
   client(id: string): Promise<{ id: string; url: string; frameType: string } | undefined>;
   enqueue<T>(operation: () => Promise<T>): Promise<T>;
+  assetsChanged(ids: readonly string[]): void;
 }
 function summary(manifest: BackupManifest): BackupSummary {
   return {
@@ -38,7 +39,7 @@ export function createBackupService(ports: BackupPorts) {
       const settings = await readSettings();
       const rows = await changeAssets((rows) => ({ value: rows }));
       const manifest: BackupManifest = {
-        format: 'web-world-themes-backup',
+        format: 'around-backup',
         version: 1,
         createdAt: new Date().toISOString(),
         settings,
@@ -72,9 +73,10 @@ export function createBackupService(ports: BackupPorts) {
     if (!sameBackupData(local, await chrome.storage.local.get(null)))
       throw new Error('確認中に設定・作品が変わりました。編集画面を閉じてからもう一度確認してください。');
     // All format, integrity, collision and quota checks have completed before writes.
-    // These three stores cannot share a transaction. An I/O failure can leave new
-    // originals/takes; no existing record is replaced, and retry is idempotent.
-    await changeAssets(() => ({ value: undefined, put: plan.added }));
+    // These three stores cannot share a transaction. An I/O failure can leave new originals,
+    // takes or measured metadata; existing bytes/names/leases survive, and retry is idempotent.
+    await changeAssets(() => ({ value: undefined, put: [...plan.added, ...plan.refreshed] }));
+    ports.assetsChanged(plan.refreshed.map((row) => row.id));
     await restoreTakes(backup.manifest.takes);
     // Only settings explicitly selected in the UI can replace existing settings.
     await chrome.storage.local.set(plan.values);

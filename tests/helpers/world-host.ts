@@ -2,8 +2,9 @@ import { build } from 'esbuild';
 import path from 'node:path';
 import type { Page, Locator } from '@playwright/test';
 import { expect } from '../fixtures';
+import { openEditor } from './editor';
 
-export const overlay = '#web-world-themes-decorations',
+export const overlay = '#around-decorations',
   media = `${overlay} .media`;
 export async function isolate(page: Page, extensionId: string) {
   const session = await page.context().newCDPSession(page),
@@ -50,26 +51,28 @@ export async function reinject(
     target: 'chrome120',
     format: 'iife',
     loader: { '.css': 'text' },
-    define: { __WW_WORLD_MODE__: JSON.stringify(mode), __WW_WORLD_DEVTOOLS__: String(devtools) },
+    define: { __AROUND_WORLD_MODE__: JSON.stringify(mode), __AROUND_WORLD_DEVTOOLS__: String(devtools) },
     logLevel: 'silent',
   });
   await runtime.evaluate(bundle.outputFiles[0]!.text);
 }
 export async function open(popup: Page, page: Page): Promise<Locator> {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  // check() reads the state before it waits; wait for the loaded (enabled) switch first.
+  const showArtwork = popup.getByRole('switch', { name: '作品を表示する' });
+  await expect(showArtwork).toBeEnabled();
+  await showArtwork.check();
   await page.bringToFront();
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
-  return panel;
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
+  return (await openEditor(popup, page)).panel;
 }
 export async function image(panel: Locator, page: Page) {
   await panel
     .getByLabel('画像素材を追加', { exact: true })
     .setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(page.locator(media)).toHaveAttribute('data-playback', 'still');
-  await panel.getByRole('button', { name: 'プロパティを編集', exact: true }).click();
+  // The editor window shows the properties beside the layers; only a tabbed arrangement switches.
+  const inspect = panel.getByRole('button', { name: 'プロパティを編集', exact: true });
+  if (await inspect.isVisible()) await inspect.click();
 }
 export async function save(panel: Locator) {
   await panel.getByRole('button', { name: '保存', exact: true }).click();
@@ -78,5 +81,5 @@ export async function save(panel: Locator) {
 }
 export async function watch(page: Page) {
   await page.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible();
 }

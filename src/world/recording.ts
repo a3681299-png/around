@@ -20,7 +20,7 @@ export const RECORDING_LIMITS = Object.freeze({
   events: 64,
 });
 export interface WorldRecording {
-  format: 'ww-world-inputs';
+  format: 'around-world-inputs';
   formatVersion: 3;
   runtimeVersion: typeof WORLD_RUNTIME_VERSION;
   scene: WorldScene;
@@ -66,7 +66,18 @@ function events(value: unknown): WorldEvent[] {
   });
 }
 export function parseWorldInput(value: unknown, options?: { registry: SignalRegistry }): WorldInput {
-  const data = record(value, ['timeMs', 'deltaMs', 'viewport', 'anchors', 'signals', 'events', 'environment', 'seed']);
+  const data = record(value, [
+    'timeMs',
+    'deltaMs',
+    'viewport',
+    'anchors',
+    'reducedParts',
+    'seats',
+    'signals',
+    'events',
+    'environment',
+    'seed',
+  ]);
   const viewport = record(data['viewport'], ['width', 'height']),
     signals = record(data['signals'], ['pointer', 'pointerTimeMs', 'playing', 'scroll', 'samples']);
   const environment = record(data['environment'], ['hidden', 'reducedMotion', 'holdTransforms', 'safeInteraction']);
@@ -93,6 +104,51 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
       ];
     }),
   );
+  // Optional (recordings made before it read as before): the parts the adapter reported reduced,
+  // each with its base height, so playback evaluates the same layout as the live frame did.
+  const reduced = data['reducedParts'];
+  if (
+    reduced !== undefined &&
+    (!reduced ||
+      typeof reduced !== 'object' ||
+      Array.isArray(reduced) ||
+      Object.keys(reduced).length > RECORDING_LIMITS.anchors)
+  )
+    throw new Error('Invalid recording reduced parts.');
+  const reducedParts =
+    reduced === undefined
+      ? undefined
+      : Object.fromEntries(
+          Object.entries(reduced).map(([id, height]) => {
+            if (!isDesignId(id)) throw new Error('Invalid semantic anchor ID.');
+            return [id, number(height, 0.001, 1e6)];
+          }),
+        );
+  // Optional (older recordings have none): the edges each part's characters may sit on.
+  const seatData = data['seats'];
+  if (
+    seatData !== undefined &&
+    (!seatData ||
+      typeof seatData !== 'object' ||
+      Array.isArray(seatData) ||
+      Object.keys(seatData).length > RECORDING_LIMITS.anchors)
+  )
+    throw new Error('Invalid recording seats.');
+  const seats =
+    seatData === undefined
+      ? undefined
+      : Object.fromEntries(
+          Object.entries(seatData).map(([id, edges]) => {
+            if (
+              !isDesignId(id) ||
+              !Array.isArray(edges) ||
+              edges.length > 2 ||
+              edges.some((e) => e !== 'top' && e !== 'bottom')
+            )
+              throw new Error('Invalid recording seats.');
+            return [id, [...edges] as ('top' | 'bottom')[]];
+          }),
+        );
   const seed = data['seed'] === undefined ? undefined : number(data['seed'], 0, 0xffffffff);
   if (seed !== undefined && !Number.isInteger(seed)) throw new Error('Invalid World seed.');
   const scroll = signals['scroll'] === undefined ? undefined : record(signals['scroll'], ['x', 'y', 'maxX', 'maxY']);
@@ -101,6 +157,8 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
     deltaMs: number(data['deltaMs']),
     viewport: { width: number(viewport['width'], 0.001, 1e6), height: number(viewport['height'], 0.001, 1e6) },
     anchors: frames,
+    ...(reducedParts ? { reducedParts } : {}),
+    ...(seats ? { seats } : {}),
     signals: {
       pointer: signals['pointer'] === undefined ? undefined : point(signals['pointer']),
       playing: boolean(signals['playing']),
@@ -239,7 +297,7 @@ export function parseWorldRecording(value: unknown): WorldRecording {
   }
   const data = record(value, ['format', 'formatVersion', 'runtimeVersion', 'scene', 'initialState', 'inputs']);
   if (
-    data['format'] !== 'ww-world-inputs' ||
+    data['format'] !== 'around-world-inputs' ||
     ![1, 2, 3].includes(data['formatVersion'] as number) ||
     (data['runtimeVersion'] !== WORLD_RUNTIME_VERSION &&
       data['runtimeVersion'] !== '1.2.0' &&
@@ -259,7 +317,7 @@ export function parseWorldRecording(value: unknown): WorldRecording {
     time = input.timeMs;
   }
   const result: WorldRecording = {
-    format: 'ww-world-inputs',
+    format: 'around-world-inputs',
     formatVersion: 3,
     runtimeVersion: WORLD_RUNTIME_VERSION,
     scene,
@@ -296,7 +354,7 @@ export function createWorldRecorder(maxInputs: number = RECORDING_LIMITS.frames)
     start(scene: WorldScene, state: WorldState) {
       const parsed = parseWorldScene(scene);
       current = {
-        format: 'ww-world-inputs',
+        format: 'around-world-inputs',
         formatVersion: 3,
         runtimeVersion: WORLD_RUNTIME_VERSION,
         scene: parsed,

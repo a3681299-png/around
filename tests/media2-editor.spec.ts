@@ -1,22 +1,22 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import path from 'node:path';
 import { build } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import { test, expect, launchExtension } from './fixtures';
+import { openEditor } from './helpers/editor';
 import type { Page, Locator } from '@playwright/test';
 import type { DesignDocument } from '../src/design/types';
 
-const overlay = '#web-world-themes-decorations',
+const overlay = '#around-decorations',
   presentation =
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
   layers = `${presentation} [data-image-id]`;
 const file = (name: string) => path.resolve(`tests/fixtures/motion/${name}`);
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await showArtwork(popup);
   await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
   return panel;
 }
@@ -40,10 +40,7 @@ async function save(panel: Locator) {
 }
 async function stored(popup: Page): Promise<DesignDocument> {
   return popup.evaluate(
-    async () =>
-      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as DesignDocument,
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
   );
 }
 
@@ -129,14 +126,14 @@ test('4K APNG downscales explicitly when ImageDecoder ignores desired dimensions
   await expect(media.locator('canvas')).toHaveJSProperty('height', 1536);
   const first = await media.getAttribute('data-frame');
   await expect.poll(() => media.getAttribute('data-frame')).not.toBe(first);
-  const stats = JSON.parse((await youtube.locator(overlay).getAttribute('data-ww-media-stats'))!);
+  const stats = JSON.parse((await youtube.locator(overlay).getAttribute('data-around-media-stats'))!);
   expect(stats.peakDecodedBytes).toBeLessThanOrEqual(128 * 1024 * 1024);
   expect(stats.cacheBytes).toBeLessThanOrEqual(32 * 1024 * 1024);
   await save(panel);
   const id = (await stored(popup)).decorations[0]!.assetId;
   expect(
     await popup.evaluate(async (id) => {
-      const response = await chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'get', id });
+      const response = await chrome.runtime.sendMessage({ type: 'around:assets', action: 'get', id });
       const bytes = Uint8Array.from(atob(response.value.base64), (c) => c.charCodeAt(0)),
         hash = await crypto.subtle.digest('SHA-256', bytes);
       return {
@@ -201,7 +198,7 @@ test('1080p alpha WebM plays, transforms, pauses/rates/loops, saves and survives
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 12,
+    schemaVersion: 18,
     decorations: [
       { format: 'webm', placement: { rotationDeg: 25, widthPx: 320 }, playback: { speed: 1.5, loop: true } },
     ],
@@ -292,7 +289,7 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
 }) => {
   const panel = await open(popup, youtube);
   await youtube.locator('#navigate').evaluate((n: HTMLButtonElement) => n.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await panel
     .getByLabel('アニメーション素材を追加')
     .setInputFiles(['petal.apng', 'alpha1080.webm', 'petal.png'].map(file));
@@ -347,7 +344,7 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
   await youtube.locator(`${layers} video`).evaluate((node) => {
     (globalThis as unknown as { oldArtworkVideo: Element }).oldArtworkVideo = node;
   });
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+  await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   expect(
     await youtube.evaluate(() => {
@@ -355,10 +352,10 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
       return { paused: n.paused, src: n.getAttribute('src') };
     }),
   ).toEqual({ paused: true, src: null });
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
   await youtube.bringToFront();
   await ready(youtube, 3);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });
 
@@ -374,7 +371,7 @@ test('scene budget defers excess 1080p videos and resumes waiting layers after h
   await expect(youtube.locator(`${layers} .media[data-playback="waiting"]`)).toHaveCount(1);
   await expect(youtube.locator(`${layers} video`)).toHaveCount(5);
   const stats = async () =>
-    JSON.parse((await youtube.locator(overlay).getAttribute('data-ww-media-stats'))!) as {
+    JSON.parse((await youtube.locator(overlay).getAttribute('data-around-media-stats'))!) as {
       decodedBytes: number;
       encodedBytes: number;
       cacheBytes: number;
@@ -395,67 +392,45 @@ test('OFF aborts an unfinished import decoder and closes its late frame without 
   popup,
   youtube,
 }) => {
+  // UI0-d 3.1: the editor page reads and checks what it imports, so its decoder is the one held.
   const panel = await open(popup, youtube),
-    session = await youtube.context().newCDPSession(youtube);
-  const worlds: { id: number; auxData?: { type?: string } }[] = [];
-  session.on('Runtime.executionContextCreated', ({ context }) => worlds.push(context));
-  await session.send('Runtime.enable');
-  const id = worlds.find((world) => world.auxData?.type === 'isolated')!.id;
-  await session.send('Runtime.evaluate', {
-    contextId: id,
-    expression: `
-    globalThis.preflightCloses = 0; const Decoder = ImageDecoder;
+    editor = panel.page();
+  type Probe = typeof globalThis & {
+    preflightCloses: number;
+    releasePreflight?: () => void;
+    delayedFrame?: VideoFrame;
+  };
+  await editor.evaluate(() => {
+    const probe = globalThis as Probe,
+      Decoder = ImageDecoder;
+    probe.preflightCloses = 0;
     globalThis.ImageDecoder = class extends Decoder {
-      async decode(options) { const result = await super.decode(options); globalThis.delayedFrame = result.image;
-        await new Promise(resolve => { globalThis.releasePreflight = resolve; }); return result; }
-      close() { globalThis.preflightCloses++; super.close(); }
-    };`,
+      override async decode(options?: ImageDecodeOptions) {
+        const result = await super.decode(options);
+        probe.delayedFrame = result.image;
+        await new Promise<void>((resolve) => {
+          probe.releasePreflight = resolve;
+        });
+        return result;
+      }
+      override close() {
+        probe.preflightCloses++;
+        super.close();
+      }
+    };
   });
   await panel.getByLabel('アニメーション素材を追加').setInputFiles(file('petal.gif'));
-  await expect
-    .poll(
-      async () =>
-        (
-          await session.send('Runtime.evaluate', {
-            contextId: id,
-            expression: 'typeof globalThis.releasePreflight',
-            returnByValue: true,
-          })
-        ).result.value,
-    )
-    .toBe('function');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-  await expect(panel).toHaveCount(0);
+  await expect.poll(() => editor.evaluate(() => typeof (globalThis as Probe).releasePreflight)).toBe('function');
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+  // The editing on the page ends, as the floating editor closed.
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
   await expect(youtube.locator(overlay)).toHaveCount(0);
-  await expect
-    .poll(
-      async () =>
-        (
-          await session.send('Runtime.evaluate', {
-            contextId: id,
-            expression: 'globalThis.preflightCloses',
-            returnByValue: true,
-          })
-        ).result.value,
-    )
-    .toBe(1);
-  await session.send('Runtime.evaluate', { contextId: id, expression: 'globalThis.releasePreflight()' });
-  await expect
-    .poll(
-      async () =>
-        (
-          await session.send('Runtime.evaluate', {
-            contextId: id,
-            expression: 'globalThis.delayedFrame.codedWidth',
-            returnByValue: true,
-          })
-        ).result.value,
-    )
-    .toBe(0);
+  await expect.poll(() => editor.evaluate(() => (globalThis as Probe).preflightCloses)).toBe(1);
+  await editor.evaluate(() => (globalThis as Probe).releasePreflight!());
+  await expect.poll(() => editor.evaluate(() => (globalThis as Probe).delayedFrame!.codedWidth)).toBe(0);
   expect(
     await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     ),
   ).toBeUndefined();
-  await session.detach();
 });

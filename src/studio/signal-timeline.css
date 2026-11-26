@@ -1,29 +1,32 @@
+/* Signal Timeline in the Around Studio design system: ruled rows, numbers in mono, nothing below 12px.
+   Keys are squares (pen-bone, cobalt when chosen): the 45° diamond means 制限中 in this system. The
+   playhead and the curve are cobalt. */
 .signal-timeline {
   flex: none;
   pointer-events: auto;
-  border-top: 1px solid var(--ui-line);
-  background: var(--ui-base);
+  border-top: 1px solid var(--line);
+  background: var(--surface-sunk);
   min-width: 0;
 }
 .timeline-heading {
-  height: 28px;
+  height: var(--control);
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 4px;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
 }
 .timeline-heading button {
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 12px;
 }
 .timeline-connection {
-  color: #92c9bc;
-  font-size: 9px;
+  color: var(--ok-green);
+  font-size: 12px;
   white-space: nowrap;
 }
 .timeline-selection {
-  color: var(--ui-muted);
-  font-size: 10px;
+  color: var(--ink-muted);
+  font-size: 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -39,15 +42,15 @@
 .timeline-tools {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 2px 6px;
+  gap: var(--space-4);
+  padding: 2px var(--space-8);
   flex: none;
-  border-bottom: 1px solid var(--ui-line);
-  min-height: 27px;
+  border-bottom: 1px solid var(--line);
+  min-height: var(--control);
 }
 .timeline-source {
-  color: #92c9bc;
-  font-size: 10px;
+  color: var(--ok-green);
+  font-size: 12px;
 }
 .timeline-lane .timeline-remove {
   margin-left: auto;
@@ -56,24 +59,23 @@
 .timeline-range {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 6px;
+  gap: var(--space-8);
+  padding: 2px var(--space-8);
   flex: none;
-  border-bottom: 1px solid var(--ui-line);
-  min-height: 27px;
+  border-bottom: 1px solid var(--line);
+  min-height: var(--control);
 }
 .timeline-routing label {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-4);
   min-width: 0;
-  font-size: 10px;
+  font-size: 12px;
 }
 .timeline-routing label:last-child {
   flex: 1;
 }
 .timeline-routing select {
-  height: 24px;
   min-width: 0;
   max-width: 100%;
 }
@@ -83,20 +85,16 @@
 .timeline-range label {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 10px;
+  gap: var(--space-4);
+  font-size: 12px;
 }
 .timeline-range input {
   width: 68px;
   max-width: 68px;
-  height: 22px;
 }
 .timeline-connection {
   overflow: hidden;
   text-overflow: ellipsis;
-}
-:host([data-inpage]) .timeline-connection {
-  display: none;
 }
 @media (max-width: 680px) {
   .timeline-connection {
@@ -105,7 +103,7 @@
 }
 .timeline-tools label {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 12px;
 }
 .timeline-tools input[type='range'] {
   width: 86px;
@@ -129,70 +127,65 @@
   display: block;
 }
 .timeline-graph text {
-  font:
-    10px system-ui,
-    sans-serif;
-  fill: #a3a5ae;
+  font: 12px var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  fill: var(--ink-muted);
 }
 .timeline-grid {
-  stroke: #404148;
+  stroke: var(--line);
   stroke-width: 1;
 }
 .timeline-curve {
   fill: none;
-  stroke: #b6a4e5;
+  stroke: var(--cobalt);
   stroke-width: 2;
 }
 .timeline-cursor {
-  stroke: #e9bc70;
+  stroke: var(--cobalt);
   stroke-width: 1;
-  stroke-dasharray: 3 3;
 }
 .timeline-key {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  min-width: 10px;
-  min-height: 10px;
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
+  min-height: 12px;
   padding: 0 !important;
-  border: 1px solid #ded4fa !important;
+  border: 1px solid var(--ink-muted) !important;
   border-radius: 0;
-  background: #80709f;
-  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--pen-bone);
+  transform: translate(-50%, -50%);
   cursor: grab;
 }
 .timeline-key[data-selected] {
-  background: #d4bbff;
-  box-shadow:
-    0 0 0 2px #242329,
-    0 0 0 3px white;
+  border-color: var(--cobalt) !important;
+  background: var(--cobalt);
+  box-shadow: 0 0 0 1px var(--surface-sunk);
 }
 .timeline-key-properties {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 3px 6px;
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-8);
   flex: none;
-  border-top: 1px solid var(--ui-line);
+  border-top: 1px solid var(--line);
 }
 .timeline-key-properties label {
-  gap: 3px;
-  font-size: 10px;
+  gap: var(--space-4);
+  font-size: 12px;
 }
 .timeline-key-properties input[type='number'] {
-  width: 56px;
-  height: 22px;
+  width: 64px;
 }
 .timeline-key-properties select {
-  height: 22px;
-  max-width: 132px;
+  max-width: 136px;
 }
 .timeline-feedback {
-  color: var(--ui-muted);
-  padding: 3px 6px;
+  color: var(--ink-muted);
+  padding: var(--space-4) var(--space-8);
   margin: 0;
-  min-height: 22px;
-  font-size: 10px;
+  min-height: 20px;
+  font-size: 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -206,33 +199,19 @@
 }
 .signal-timeline[data-open] .timeline-resize {
   display: block;
-  background: var(--ui-line);
+  background: var(--line);
 }
 .timeline-resize:hover {
-  background: #8e7e9f !important;
+  background: var(--cobalt) !important;
 }
 @media (max-width: 480px) {
   .timeline-heading .timeline-selection {
     display: none;
   }
   .timeline-key-properties {
-    gap: 4px;
+    gap: var(--space-4);
   }
   .timeline-key-properties input[type='number'] {
-    width: 50px;
+    width: 52px;
   }
-}
-:host([data-inpage]) .signal-timeline {
-  position: absolute;
-  bottom: 24px;
-  right: 0;
-  width: var(--inspector-width, 320px);
-  z-index: 6;
-}
-:host([data-inpage]) .studio-inspectors {
-  margin-bottom: var(--timeline-inset, 28px);
-}
-:host([data-inpage][data-dock-flip]) .signal-timeline {
-  right: auto;
-  left: 0;
 }

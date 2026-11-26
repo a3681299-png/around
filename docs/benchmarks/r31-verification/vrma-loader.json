@@ -1,0 +1,68 @@
+[
+  {
+    "name": "valid",
+    "bytes": 1568,
+    "before": {
+      "accepted": false,
+      "error": "未対応のGLB拡張です。圧縮なしのGLBで書き出してください。"
+    },
+    "after": {
+      "accepted": true,
+      "restHipsHeight": "0.9"
+    },
+    "loader": {
+      "accepted": true,
+      "duration": 1,
+      "restHipsHeight": "0.9"
+    }
+  },
+  {
+    "name": "bad-scene-index",
+    "bytes": 1568,
+    "before": {
+      "accepted": false,
+      "error": "未対応のGLB拡張です。圧縮なしのGLBで書き出してください。"
+    },
+    "after": {
+      "accepted": true,
+      "restHipsHeight": "0.9"
+    },
+    "loader": {
+      "accepted": false,
+      "error": "Cannot read properties of undefined (reading 'updateWorldMatrix')"
+    }
+  },
+  {
+    "name": "bad-scene-root",
+    "bytes": 1568,
+    "before": {
+      "accepted": false,
+      "error": "未対応のGLB拡張です。圧縮なしのGLBで書き出してください。"
+    },
+    "after": {
+      "accepted": true,
+      "restHipsHeight": "0.9"
+    },
+    "loader": {
+      "accepted": false,
+      "error": "Cannot read properties of undefined (reading 'name')"
+    }
+  },
+  {
+    "name": "derived-hips-infinity",
+    "bytes": 3608,
+    "before": {
+      "accepted": false,
+      "error": "未対応のGLB拡張です。圧縮なしのGLBで書き出してください。"
+    },
+    "after": {
+      "accepted": true,
+      "restHipsHeight": "Infinity"
+    },
+    "loader": {
+      "accepted": true,
+      "duration": 1,
+      "restHipsHeight": "Infinity"
+    }
+  }
+]

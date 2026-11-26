@@ -1,0 +1,52 @@
+
+> around@0.1.0 test:e2e
+> node scripts/test.mjs --project=e2e tests/backup.spec.ts --grep backup refreshes an existing legacy VRM --output=.work/r31-fix-evidence/refresh-red-results
+
+
+Running 1 test using 1 worker
+
+(node:2432) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [e2e] › tests\backup.spec.ts:111:1 › backup refreshes an existing legacy VRM record and cached metadata before saving a measured source (1.8s)
+
+
+  1) [e2e] › tests\backup.spec.ts:111:1 › backup refreshes an existing legacy VRM record and cached metadata before saving a measured source
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    Expected: {"armLength": 0.29999999999999993, "armRatio": 0.27272727272727265, "headLength": 0.25, "headsTall": 4.4, "height": 1.1, "hipsHeight": 0.5, "hipsRatio": 0.45454545454545453, "legLength": 0.2618033988749895, "legRatio": 0.23800308988635407, "shoulderWidth": 0.3}
+    Received: undefined
+
+      151 |   await page.locator('#backup-restore').click();
+      152 |   await expect(page.locator('.backup-status')).toContainText('読み込みが完了');
+    > 153 |   expect((await metadata()).model.vrm.body).toEqual(measured.model!.vrm!.body);
+          |                                             ^
+      154 |   const restored = await readCounts(page);
+      155 |   expect(restored.assets).toBe(1);
+      156 |   expect(restored.local['around.design.youtube']).toEqual(expected);
+        at WORKTREE\tests\backup.spec.ts:153:45
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\r31-fix-evidence\refresh-red-results\backup-backup-refreshes-an-9ee86-re-saving-a-measured-source-e2e\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\r31-fix-evidence\refresh-red-results\backup-backup-refreshes-an-9ee86-re-saving-a-measured-source-e2e\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\r31-fix-evidence\refresh-red-results\backup-backup-refreshes-an-9ee86-re-saving-a-measured-source-e2e\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: .work\r31-fix-evidence\refresh-red-results\backup-backup-refreshes-an-9ee86-re-saving-a-measured-source-e2e\error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    .work\r31-fix-evidence\refresh-red-results\backup-backup-refreshes-an-9ee86-re-saving-a-measured-source-e2e\trace.zip
+    Usage:
+
+        npx playwright show-trace .work\r31-fix-evidence\refresh-red-results\backup-backup-refreshes-an-9ee86-re-saving-a-measured-source-e2e\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [e2e] › tests\backup.spec.ts:111:1 › backup refreshes an existing legacy VRM record and cached metadata before saving a measured source

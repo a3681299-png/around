@@ -1,0 +1,430 @@
+{
+  "author-fault-tests": {
+    "startTime": "2026-11-05T08:09:12.661Z",
+    "duration": 1428.333,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "world prioritizes the author's timed clip over the computed pose",
+        "file": "author.spec.ts",
+        "line": 8,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  31 |     expect(poses.every((pose) => pose && pose.hips.every((value) => value === 0) && pose.yawDeg === 0\n  32 |       && pose.offset.x === 0 && pose.offset.y === 0 && pose.opacity === 1\n> 33 |       && Object.keys(pose.bones).every((bone) => ['chest', 'leftUpperArm', 'rightUpperArm', 'spine'].includes(bone)))).toBe(true);\n     |                                                                                                                        ^\n  34 |     expect(new Set(poses.map((pose) => pose.bones.chest?.[0])).size).toBeGreaterThan(10);\n  35 |     expect(poses.some((pose) => pose.blink > 0)).toBe(true);\n  36 |     if (cause === 'timed clip') expect(previous![layer.id]!.timeMs).toBeGreaterThan(0);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\author.spec.ts:33:120"
+        ]
+      },
+      {
+        "title": "world prioritizes the author's moving path over the computed pose",
+        "file": "author.spec.ts",
+        "line": 8,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  31 |     expect(poses.every((pose) => pose && pose.hips.every((value) => value === 0) && pose.yawDeg === 0\n  32 |       && pose.offset.x === 0 && pose.offset.y === 0 && pose.opacity === 1\n> 33 |       && Object.keys(pose.bones).every((bone) => ['chest', 'leftUpperArm', 'rightUpperArm', 'spine'].includes(bone)))).toBe(true);\n     |                                                                                                                        ^\n  34 |     expect(new Set(poses.map((pose) => pose.bones.chest?.[0])).size).toBeGreaterThan(10);\n  35 |     expect(poses.some((pose) => pose.blink > 0)).toBe(true);\n  36 |     if (cause === 'timed clip') expect(previous![layer.id]!.timeMs).toBeGreaterThan(0);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\author.spec.ts:33:120"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "author-normal-tests": {
+    "startTime": "2026-11-05T08:09:07.810Z",
+    "duration": 475.353,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "first-perf-calibrate-tests": {
+    "startTime": "2026-11-05T08:16:47.067Z",
+    "duration": 32447.022,
+    "expected": 0,
+    "skipped": 1,
+    "unexpected": 2,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "g11 official probe resolves the 2 ms isolated-world rAF calibration",
+        "file": "perf.spec.ts",
+        "line": 348,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1.7\u001b[39m\nReceived:   \u001b[31m1.4499999997206032\u001b[39m\n\n  376 |     expect(delta('median')).toBeGreaterThan(1.7);\n  377 |     expect(delta('median')).toBeLessThan(2.4);\n> 378 |     expect(delta('p95')).toBeGreaterThan(1.7);\n      |                          ^\n  379 |     expect(delta('p95')).toBeLessThan(2.6);\n  380 |   } finally { await context.close(); }\n  381 | });\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\perf.spec.ts:378:26"
+        ]
+      },
+      {
+        "title": "ui1 full callback attribution detects 2 ms after an await",
+        "file": "perf.spec.ts",
+        "line": 383,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1.7\u001b[39m\nReceived:   \u001b[31m0.8000000002793968\u001b[39m\n\n  412 |     expect(delta('median')).toBeGreaterThan(1.7);\n  413 |     expect(delta('median')).toBeLessThan(2.4);\n> 414 |     expect(delta('p95')).toBeGreaterThan(1.7);\n      |                          ^\n  415 |     expect(delta('p95')).toBeLessThan(2.6);\n  416 |   } finally { await context.close(); }\n  417 | });\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\perf.spec.ts:414:26"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "first-pg-clip-tests": {
+    "startTime": "2026-11-05T09:07:51.409Z",
+    "duration": 2310.609,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "overlapping mannequin cannot change the play button pixels or consume its click",
+        "file": "playground.spec.ts",
+        "line": 108,
+        "status": "unexpected",
+        "errors": [
+          "Error: the actual play button pixels stay unchanged\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  128 |   await expect.poll(() => page.locator('video').evaluate((v: HTMLVideoElement) => v.paused)).toBe(false);\n  129 |   await writeFile(path.join(out, `pg-${mode}-overlap.json`), JSON.stringify({ box, resident, hit, samePixels: before.equals(after) }, null, 2));\n> 130 |   expect(before.equals(after), 'the actual play button pixels stay unchanged').toBe(true);\n      |                                                                                ^\n  131 | });\n  132 |\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\playground.spec.ts:130:80"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "first-pg-normal-tests": {
+    "startTime": "2026-11-05T09:07:42.143Z",
+    "duration": 5035.29,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "first-pg-underlay-tests": {
+    "startTime": "2026-11-05T09:07:48.560Z",
+    "duration": 2029.4450000000002,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "room-only underlay leaves every pixel of the paused picture intact",
+        "file": "playground.spec.ts",
+        "line": 49,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"\u001b[7m-\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"1\"\u001b[39m\n\n  77 |   await writeFile(path.join(out, `pg-${mode}-background.json`), JSON.stringify({ samePixels: before.equals(after), box, css, errors }, null, 2));\n  78 |   expect(before.equals(after), 'the room must not change any paused-picture pixel').toBe(true);\n> 79 |   expect(css.zIndex).toBe('-1');\n     |                      ^\n  80 |   expect(errors).toEqual([]);\n  81 | });\n  82 |\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\playground.spec.ts:79:22"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "g1-live-fix-retry-tests": {
+    "startTime": "2026-11-05T09:14:05.954Z",
+    "duration": 10841.819,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "g1-live-fix-tests": {
+    "startTime": "2026-11-05T09:08:41.353Z",
+    "duration": 7930.964,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "real YouTube mannequin clipping and native input, using the same design on both versions",
+        "file": "live-g1.spec.ts",
+        "line": 51,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m49\u001b[39m\n\n   95 |     await page.screenshot({ path: path.join(evidence, `youtube-${side}-edge.png`) });\n   96 |     expect(edge.topBand).toBeGreaterThan(0);\n>  97 |     expect(edge.topBandAllowed).toBe(0);\n      |                                 ^\n   98 |     expect(edge.pointerEvents).toBe('none');\n   99 |\n  100 |     const inside = { ...resident, placement: { ...resident.placement, y: 0.42 } };\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\live-g1.spec.ts:97:33"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "g1-live-head-retry-tests": {
+    "startTime": "2026-11-05T09:13:51.329Z",
+    "duration": 13706.427,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "g1-live-head-tests": {
+    "startTime": "2026-11-05T09:08:17.759Z",
+    "duration": 22602.920000000002,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "real YouTube mannequin clipping and native input, using the same design on both versions",
+        "file": "live-g1.spec.ts",
+        "line": 51,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m5\u001b[39m\nReceived:   \u001b[31m-7.426\u001b[39m\n\nCall Log:\n- Timeout 15000ms exceeded while waiting on the predicate\n\n  124 |     expect(await toggle()).toBe(true);\n  125 |     if (side === 'head') {\n> 126 |       await expect.poll(() => pose().then((p) => p?.bones.head?.[0] ?? 0), { intervals: [40] }).toBeGreaterThan(5);\n      |                                                                                                 ^\n  127 |       result.look = await pose();\n  128 |     }\n  129 |     await page.screenshot({ path: path.join(evidence, `youtube-${side}-inside.png`) });\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\live-g1.spec.ts:126:97"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "operation-live-fix-tests": {
+    "startTime": "2026-11-05T09:08:50.433Z",
+    "duration": 44156.568,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "operation-live-head-tests": {
+    "startTime": "2026-11-05T09:09:41.627Z",
+    "duration": 35144.196,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "operation-volume-fault-tests": {
+    "startTime": "2026-11-05T09:09:35.457Z",
+    "duration": 5248.894,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "optional real YouTube operation checks with and without authored paint",
+        "file": "volume-fault.spec.ts",
+        "line": 127,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 1\u001b[39m\n\n\u001b[2m  Object {\u001b[22m\n\u001b[2m    \"height\": 40,\u001b[22m\n\u001b[2m    \"width\": 52,\u001b[22m\n\u001b[2m    \"x\": 128,\u001b[22m\n\u001b[32m-   \"y\": 398,\u001b[39m\n\u001b[31m+   \"y\": 308,\u001b[39m\n\u001b[2m  }\u001b[22m\n\n   95 |   const press = events.find((event) => event.type === 'mousedown');\n   96 |   expect(press?.target, 'mousedown target').toMatch(/ytp-volume-slider/);\n>  97 |   expect(press?.slider).toEqual({ x: volume.x, y: volume.y, width: volume.width, height: volume.height });\n      |                         ^\n   98 |   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeGreaterThan(quieter);\n   99 |   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeLessThan(1);\n  100 |   await player.focus();\n    at nativeInputs (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\volume-fault.spec.ts:97:25)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\volume-fault.spec.ts:148:20"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "operation-volume-target-fault-tests": {
+    "startTime": "2026-11-05T09:14:17.628Z",
+    "duration": 6324.591,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "optional real YouTube operation checks with and without authored paint",
+        "file": "volume-fault.spec.ts",
+        "line": 136,
+        "status": "unexpected",
+        "errors": [
+          "Error: mousedown target\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/ytp-volume-slider/\u001b[39m\nReceived string:  \u001b[31m\"<div id=\\\"verification-nonvolume\\\" style=\\\"position: fixed; z-index: 2147483647; pointer-events: auto; width: 12px; height: 12px; left: 129.6px; top: 445.75px;\\\"></div>\"\u001b[39m\n\n  103 |   // The press reached the slider itself, at the box that was read (not a stale place).\n  104 |   const press = events.find((event) => event.type === 'mousedown');\n> 105 |   expect(press?.target, 'mousedown target').toMatch(/ytp-volume-slider/);\n      |                                             ^\n  106 |   expect(press?.slider).toEqual({ x: volume.x, y: volume.y, width: volume.width, height: volume.height });\n  107 |   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeGreaterThan(quieter);\n  108 |   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeLessThan(1);\n    at nativeInputs (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\volume-fault.spec.ts:105:45)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\volume-fault.spec.ts:157:20"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "perf-AA-tests": {
+    "startTime": "2026-11-05T08:19:00.936Z",
+    "duration": 584114.108,
+    "expected": 1,
+    "skipped": 2,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "perf-AB-tests": {
+    "startTime": "2026-11-05T08:28:46.201Z",
+    "duration": 545310.122,
+    "expected": 1,
+    "skipped": 2,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "perf-B-mannequin-tests": {
+    "startTime": "2026-11-05T08:50:28.911Z",
+    "duration": 454934.427,
+    "expected": 1,
+    "skipped": 2,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "perf-B-quiet-tests": {
+    "startTime": "2026-11-05T08:58:04.695Z",
+    "duration": 563209.458,
+    "expected": 1,
+    "skipped": 2,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "perf-B-trusie-tests": {
+    "startTime": "2026-11-05T08:42:39.971Z",
+    "duration": 468046.926,
+    "expected": 1,
+    "skipped": 2,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "perf-calibrate-tests": {
+    "startTime": "2026-11-05T08:18:13.754Z",
+    "duration": 46303.694,
+    "expected": 2,
+    "skipped": 1,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "pg-clip-tests": {
+    "startTime": "2026-11-05T09:13:47.778Z",
+    "duration": 2616.275,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "overlapping mannequin cannot change the play button pixels or consume its click",
+        "file": "playground.spec.ts",
+        "line": 109,
+        "status": "unexpected",
+        "errors": [
+          "Error: the actual play button pixels stay unchanged\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  129 |   await expect.poll(() => page.locator('video').evaluate((v: HTMLVideoElement) => v.paused)).toBe(false);\n  130 |   await writeFile(path.join(out, `pg-${mode}-overlap.json`), JSON.stringify({ box, resident, hit, samePixels: before.equals(after) }, null, 2));\n> 131 |   expect(before.equals(after), 'the actual play button pixels stay unchanged').toBe(true);\n      |                                                                                ^\n  132 | });\n  133 |\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\playground.spec.ts:131:80"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "pg-normal-tests": {
+    "startTime": "2026-11-05T09:13:35.530Z",
+    "duration": 7032.9839999999995,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "pg-underlay-tests": {
+    "startTime": "2026-11-05T09:13:43.668Z",
+    "duration": 3156.2690000000002,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "room-only underlay leaves every pixel of the paused picture intact",
+        "file": "playground.spec.ts",
+        "line": 49,
+        "status": "unexpected",
+        "errors": [
+          "Error: the room must not change any paused-picture pixel\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  77 |   await writeFile(path.join(out, `pg-${mode}-background.json`), JSON.stringify({ samePixels: before.equals(after), box, css, errors }, null, 2));\n  78 |   expect(css.time).toBe(time);\n> 79 |   expect(before.equals(after), 'the room must not change any paused-picture pixel').toBe(true);\n     |                                                                                     ^\n  80 |   expect(css.zIndex).toBe('-1');\n  81 |   expect(errors).toEqual([]);\n  82 | });\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\.work\\verify\\playground.spec.ts:79:85"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "r32-live-head-tests": {
+    "startTime": "2026-11-05T09:07:54.553Z",
+    "duration": 22233.391,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "real YouTube: the Playground artwork sits on the player edge and moves as in the Playground",
+        "file": "r32-live.spec.ts",
+        "line": 24,
+        "status": "unexpected",
+        "errors": [
+          "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m40\u001b[39m\nReceived:   \u001b[31m427\u001b[39m\n\n  150 |     const edgeBox = await show(resident);\n  151 |     const edgeDrawn = await drawnPixels(edgeBox, 'edge');\n> 152 |     expect(edgeDrawn).toBeLessThan(40);\n      |                       ^\n  153 |\n  154 |     // B. The same artwork with the character over the picture (which may be painted over):\n  155 |     // visible, and moving as in the Playground.\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-head\\tests\\r32-live.spec.ts:152:23"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "switch-drawer-fix-tests": {
+    "startTime": "2026-11-05T09:15:58.641Z",
+    "duration": 21352.949,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "switch-drawer-head-tests": {
+    "startTime": "2026-11-05T09:16:21.000Z",
+    "duration": 62052.200999999994,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "switch-fix-tests": {
+    "startTime": "2026-11-05T09:11:16.542Z",
+    "duration": 68437.87,
+    "expected": 16,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "title": "an opened 操作チェック stays open while the guard releases its first stop",
+        "file": "operation-controls.spec.ts",
+        "line": 252,
+        "status": "unexpected",
+        "errors": [
+          "Error: [{\"hidden\":true,\"open\":false,\"summary\":\"操作チェック\"},{\"hidden\":false,\"open\":false,\"summary\":\"1\"},{\"hidden\":false,\"open\":true,\"summary\":\"1\"}]\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 7\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"hidden\": true,\u001b[39m\n\u001b[31m+     \"open\": false,\u001b[39m\n\u001b[31m+     \"summary\": \"操作チェック\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  292 |     log.filter((entry) => entry.hidden),\n  293 |     JSON.stringify(log),\n> 294 |   ).toEqual([]);\n      |     ^\n  295 |   await expect(studio.locator('.around-editor-safety .safety-check')).toHaveJSProperty('open', true);\n  296 |   // The artwork is still on the page (restricted, not removed).\n  297 |   await expect(youtube.locator('#around-decorations')).toHaveCount(1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\verify-chunk2-fix\\tests\\operation-controls.spec.ts:294:5"
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "switch-head-tests": {
+    "startTime": "2026-11-05T09:10:17.731Z",
+    "duration": 57659.747,
+    "expected": 17,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "windows-all": {
+    "startTime": "2026-11-05T07:58:03.777Z",
+    "duration": 1111491.068,
+    "expected": 282,
+    "skipped": 64,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  }
+}

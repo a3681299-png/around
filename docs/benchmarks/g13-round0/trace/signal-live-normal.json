@@ -1,0 +1,336 @@
+{
+  "completed": false,
+  "checks": {
+    "stage": "wheel scroll",
+    "gifRuleEditedAndSaved": true,
+    "pointer": {
+      "point": {
+        "x": 36,
+        "y": 456.5
+      },
+      "gif": {
+        "x": 563.4375,
+        "y": 313.34375,
+        "width": 260,
+        "height": 195
+      },
+      "gifId": "image-bb53b54b-da2e-4163-a05e-06bc32418a15",
+      "under": [
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.25,
+          "hit": "div",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#contents",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.75,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "div#primary",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        }
+      ]
+    },
+    "scrollSpeedAndDirectionIndependent": true,
+    "wheel": {
+      "events": 24,
+      "frames": 168,
+      "hidden": 168,
+      "unexplained": 168,
+      "explainedSpans": [],
+      "traced": false,
+      "stops": [
+        "ページの操作部品が動いている間は、絵の表示を止めています。",
+        "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+      ],
+      "near": [
+        [[16, 354, 52, 43]],
+        [
+          [52, 376, 104, 40],
+          [16, 432, 36, 39],
+          [68, 432, 63, 20],
+          [60, 478, 32, 32]
+        ],
+        [
+          [16, 364, 36, 39],
+          [60, 410, 32, 32],
+          [16, 458, 36, 39],
+          [68, 458, 40, 20]
+        ],
+        [
+          [52, 376, 104, 40],
+          [16, 432, 36, 39],
+          [68, 432, 63, 20],
+          [60, 478, 32, 32]
+        ],
+        [[16, 354, 52, 43]],
+        []
+      ],
+      "samples": [
+        {
+          "t": 19382.2,
+          "scrollY": 90,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 19541.9,
+          "scrollY": 180,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 19736.3,
+          "scrollY": 360,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 19889.1,
+          "scrollY": 540,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20014.1,
+          "scrollY": 630,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20139,
+          "scrollY": 720,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20271,
+          "scrollY": 810,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20382,
+          "scrollY": 990,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20514,
+          "scrollY": 1080,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20625.1,
+          "scrollY": 990,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20736.3,
+          "scrollY": 900,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20854.3,
+          "scrollY": 810,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20993.2,
+          "scrollY": 630,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 21125.1,
+          "scrollY": 540,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 21236.1,
+          "scrollY": 450,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 21409.8,
+          "scrollY": 270,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 21555.8,
+          "scrollY": 180,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        }
+      ]
+    }
+  },
+  "browser": "143.0.7499.4"
+}

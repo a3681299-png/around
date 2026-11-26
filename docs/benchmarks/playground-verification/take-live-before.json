@@ -1,0 +1,16 @@
+{
+  "side": "before",
+  "recordedSamples": 45,
+  "reloaded": true,
+  "previewed": true,
+  "completed": true,
+  "samples": 45,
+  "expectedOpacity": 0.9994689325544344,
+  "backup": {
+    "bytes": 20602,
+    "designs": 1,
+    "takes": 1,
+    "assets": 1,
+    "restored": true
+  }
+}

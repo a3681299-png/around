@@ -31,10 +31,10 @@ npm run lint
 npm run build
 # buildには3構成のtypecheckを含む
 $env:PLAYWRIGHT_BROWSERS_PATH='C:/Users/sm787/GitHub-Projects/web-world-themes/.work/browsers'
-$env:WW_TEST_PROFILE_ROOT=Join-Path $env:TEMP 'ww-3d-test'
+$env:AROUND_TEST_PROFILE_ROOT=Join-Path $env:TEMP 'around-3d-test'
 npm test -- --workers=2 --reporter=line
 node scripts/benchmark-models.mjs
-$env:WW_LIVE_3D='1'
+$env:AROUND_LIVE_3D='1'
 npm test -- tests/model-live.spec.ts --workers=1 --reporter=line
 ```
 

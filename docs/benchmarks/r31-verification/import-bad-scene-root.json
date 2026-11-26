@@ -1,0 +1,475 @@
+{
+  "variant": "bad-scene-root",
+  "count": 1,
+  "status": "1個の動作を追加しました。",
+  "characterStatus": "1個の動作を読み込みます…",
+  "saved": {
+    "baseThemeId": null,
+    "decorations": [
+      {
+        "assetId": "asset-50e23ecd97d7cc20cfa556bbc9c762cf8e9aad5a102e24ce8ba46e162794c900",
+        "character": {
+          "motions": [
+            {
+              "assetId": "asset-abc5201a7d1c8377f03070235f4a7ab1bea12793dedbac33292c7cbad95367c7",
+              "id": "bad-scene-root",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "sit",
+                "restHipsHeight": 0.9
+              }
+            }
+          ],
+          "standardMotions": "auto"
+        },
+        "id": "image-0e02909e-336c-4c49-9302-65ab8101e727",
+        "kind": "model3d",
+        "locked": false,
+        "model": {
+          "clip": 0,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+            "enabled": false,
+            "faceMovement": true,
+            "forwardDeg": 0,
+            "idle": null,
+            "run": null,
+            "runSpeed": 220,
+            "walk": null,
+            "walkSpeed": 10
+          },
+          "look": {
+            "bone": 3,
+            "enabled": true,
+            "lagMs": 160,
+            "pitchLimit": 30,
+            "yawLimit": 50
+          },
+          "loop": true,
+          "playing": true,
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "speed": 1,
+          "vrm": {
+            "expressions": {},
+            "headFollow": true,
+            "lookAt": true,
+            "springBone": true
+          }
+        },
+        "name": "Original.vrm",
+        "opacity": 1,
+        "placement": {
+          "anchor": {
+            "kind": "viewport"
+          },
+          "heightPx": 200,
+          "rotationDeg": 0,
+          "widthPx": 200,
+          "x": 0.45,
+          "y": 0.45
+        },
+        "source": {
+          "bones": [
+            {
+              "name": "Hips",
+              "node": 2
+            },
+            {
+              "name": "Head",
+              "node": 3
+            },
+            {
+              "name": "spine",
+              "node": 4
+            },
+            {
+              "name": "leftUpperArm",
+              "node": 5
+            },
+            {
+              "name": "leftLowerArm",
+              "node": 6
+            },
+            {
+              "name": "leftHand",
+              "node": 7
+            },
+            {
+              "name": "leftUpperLeg",
+              "node": 8
+            },
+            {
+              "name": "leftLowerLeg",
+              "node": 9
+            },
+            {
+              "name": "leftFoot",
+              "node": 10
+            },
+            {
+              "name": "leftEye",
+              "node": 11
+            },
+            {
+              "name": "rightUpperArm",
+              "node": 12
+            },
+            {
+              "name": "rightLowerArm",
+              "node": 13
+            },
+            {
+              "name": "rightHand",
+              "node": 14
+            },
+            {
+              "name": "rightUpperLeg",
+              "node": 15
+            },
+            {
+              "name": "rightLowerLeg",
+              "node": 16
+            },
+            {
+              "name": "rightFoot",
+              "node": 17
+            },
+            {
+              "name": "rightEye",
+              "node": 18
+            }
+          ],
+          "clips": [
+            {
+              "duration": 2,
+              "name": "Rest / 待機"
+            },
+            {
+              "duration": 2,
+              "name": "Stride"
+            },
+            {
+              "duration": 2,
+              "name": "Sprint"
+            }
+          ],
+          "format": "vrm",
+          "textureBytes": 4,
+          "triangles": 12,
+          "vertices": 8,
+          "vrm": {
+            "body": {
+              "armLength": 0.29999999999999993,
+              "armRatio": 0.27272727272727265,
+              "headLength": 0.25,
+              "headsTall": 4.4,
+              "height": 1.1,
+              "hipsHeight": 0.5,
+              "hipsRatio": 0.45454545454545453,
+              "legLength": 0.2618033988749895,
+              "legRatio": 0.23800308988635407,
+              "shoulderWidth": 0.3
+            },
+            "expressions": ["happy", "blink"],
+            "humanoid": [
+              {
+                "bone": "hips",
+                "node": 2
+              },
+              {
+                "bone": "head",
+                "node": 3
+              },
+              {
+                "bone": "spine",
+                "node": 4
+              },
+              {
+                "bone": "leftUpperArm",
+                "node": 5
+              },
+              {
+                "bone": "leftLowerArm",
+                "node": 6
+              },
+              {
+                "bone": "leftHand",
+                "node": 7
+              },
+              {
+                "bone": "leftUpperLeg",
+                "node": 8
+              },
+              {
+                "bone": "leftLowerLeg",
+                "node": 9
+              },
+              {
+                "bone": "leftFoot",
+                "node": 10
+              },
+              {
+                "bone": "leftEye",
+                "node": 11
+              },
+              {
+                "bone": "rightUpperArm",
+                "node": 12
+              },
+              {
+                "bone": "rightLowerArm",
+                "node": 13
+              },
+              {
+                "bone": "rightHand",
+                "node": 14
+              },
+              {
+                "bone": "rightUpperLeg",
+                "node": 15
+              },
+              {
+                "bone": "rightLowerLeg",
+                "node": 16
+              },
+              {
+                "bone": "rightFoot",
+                "node": 17
+              },
+              {
+                "bone": "rightEye",
+                "node": 18
+              }
+            ],
+            "lookAt": true,
+            "mtoon": true,
+            "springBone": true,
+            "version": "1.0"
+          }
+        },
+        "visible": true,
+        "zIndex": 0
+      }
+    ],
+    "id": "youtube-custom",
+    "rules": [],
+    "schemaVersion": 14,
+    "siteId": "youtube"
+  },
+  "metadata": [
+    {
+      "mime": "model/gltf-binary",
+      "width": 256,
+      "height": 256,
+      "model": {
+        "format": "vrm",
+        "vrm": {
+          "version": "1.0",
+          "humanoid": [
+            {
+              "bone": "hips",
+              "node": 2
+            },
+            {
+              "bone": "head",
+              "node": 3
+            },
+            {
+              "bone": "spine",
+              "node": 4
+            },
+            {
+              "bone": "leftUpperArm",
+              "node": 5
+            },
+            {
+              "bone": "leftLowerArm",
+              "node": 6
+            },
+            {
+              "bone": "leftHand",
+              "node": 7
+            },
+            {
+              "bone": "leftUpperLeg",
+              "node": 8
+            },
+            {
+              "bone": "leftLowerLeg",
+              "node": 9
+            },
+            {
+              "bone": "leftFoot",
+              "node": 10
+            },
+            {
+              "bone": "leftEye",
+              "node": 11
+            },
+            {
+              "bone": "rightUpperArm",
+              "node": 12
+            },
+            {
+              "bone": "rightLowerArm",
+              "node": 13
+            },
+            {
+              "bone": "rightHand",
+              "node": 14
+            },
+            {
+              "bone": "rightUpperLeg",
+              "node": 15
+            },
+            {
+              "bone": "rightLowerLeg",
+              "node": 16
+            },
+            {
+              "bone": "rightFoot",
+              "node": 17
+            },
+            {
+              "bone": "rightEye",
+              "node": 18
+            }
+          ],
+          "expressions": ["happy", "blink"],
+          "lookAt": true,
+          "springBone": true,
+          "mtoon": true,
+          "body": {
+            "height": 1.1,
+            "headLength": 0.25,
+            "headsTall": 4.4,
+            "legLength": 0.2618033988749895,
+            "legRatio": 0.23800308988635407,
+            "armLength": 0.29999999999999993,
+            "armRatio": 0.27272727272727265,
+            "hipsHeight": 0.5,
+            "hipsRatio": 0.45454545454545453,
+            "shoulderWidth": 0.3
+          }
+        },
+        "clips": [
+          {
+            "name": "Rest / 待機",
+            "duration": 2
+          },
+          {
+            "name": "Stride",
+            "duration": 2
+          },
+          {
+            "name": "Sprint",
+            "duration": 2
+          }
+        ],
+        "bones": [
+          {
+            "node": 2,
+            "name": "Hips"
+          },
+          {
+            "node": 3,
+            "name": "Head"
+          },
+          {
+            "node": 4,
+            "name": "spine"
+          },
+          {
+            "node": 5,
+            "name": "leftUpperArm"
+          },
+          {
+            "node": 6,
+            "name": "leftLowerArm"
+          },
+          {
+            "node": 7,
+            "name": "leftHand"
+          },
+          {
+            "node": 8,
+            "name": "leftUpperLeg"
+          },
+          {
+            "node": 9,
+            "name": "leftLowerLeg"
+          },
+          {
+            "node": 10,
+            "name": "leftFoot"
+          },
+          {
+            "node": 11,
+            "name": "leftEye"
+          },
+          {
+            "node": 12,
+            "name": "rightUpperArm"
+          },
+          {
+            "node": 13,
+            "name": "rightLowerArm"
+          },
+          {
+            "node": 14,
+            "name": "rightHand"
+          },
+          {
+            "node": 15,
+            "name": "rightUpperLeg"
+          },
+          {
+            "node": 16,
+            "name": "rightLowerLeg"
+          },
+          {
+            "node": 17,
+            "name": "rightFoot"
+          },
+          {
+            "node": 18,
+            "name": "rightEye"
+          }
+        ],
+        "vertices": 8,
+        "triangles": 12,
+        "textureBytes": 4
+      },
+      "id": "asset-50e23ecd97d7cc20cfa556bbc9c762cf8e9aad5a102e24ce8ba46e162794c900",
+      "name": "Original.vrm",
+      "byteLength": 5708
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "sit",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-abc5201a7d1c8377f03070235f4a7ab1bea12793dedbac33292c7cbad95367c7",
+      "name": "bad-scene-root.vrma",
+      "byteLength": 1568
+    }
+  ]
+}

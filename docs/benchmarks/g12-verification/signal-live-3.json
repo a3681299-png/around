@@ -1,0 +1,357 @@
+{
+  "completed": true,
+  "checks": {
+    "stage": "record",
+    "gifRuleEditedAndSaved": true,
+    "pointer": {
+      "point": {
+        "x": 36,
+        "y": 456.5
+      },
+      "gif": {
+        "x": 563.4375,
+        "y": 313.34375,
+        "width": 260,
+        "height": 195
+      },
+      "gifId": "image-ebd50a1f-b820-4bfa-9a10-bcc556cadee5",
+      "under": [
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": [],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.25,
+          "hit": "div",
+          "control": null,
+          "approach": {
+            "near": [],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": {
+            "near": ["control.99", "control.103", "control.109"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.75,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": {
+            "near": ["control.99", "control.103", "control.109"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": {
+            "near": ["control.258", "control.262", "control.99", "control.103", "control.109"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": {
+            "near": ["control.258", "control.262", "control.99", "control.103", "control.109"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": ["control.258", "control.262", "control.99", "control.103", "control.109"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": ["control.258", "control.262"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div",
+          "control": null,
+          "approach": {
+            "near": [],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "ytd-continuation-item-renderer",
+          "control": null,
+          "approach": {
+            "near": ["control.227", "control.233"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div",
+          "control": null,
+          "approach": {
+            "near": ["control.227", "control.233"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": ["control.227", "control.233"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": ["control.227", "control.233"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": {
+            "near": ["control.227", "control.233"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "div#primary",
+          "control": null,
+          "approach": {
+            "near": ["control.354", "control.358"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": {
+            "near": ["control.354", "control.358"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": ["control.354", "control.358"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#contents",
+          "control": null,
+          "approach": {
+            "near": ["control.437", "control.441"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [314, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [987, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#contents",
+          "control": null,
+          "approach": {
+            "near": ["control.468", "control.469"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": {
+            "near": [
+              "control.349",
+              "control.351",
+              "control.481",
+              "control.485",
+              "control.489",
+              "control.468",
+              "control.469"
+            ],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [149, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [621, 913]
+          },
+          "nearGif": []
+        }
+      ]
+    },
+    "scrollSpeedAndDirectionIndependent": true,
+    "liveInputIsolated": true,
+    "ghostProjection": true,
+    "reverseWithoutPageActions": true,
+    "savedRuleAndTakeReload": true,
+    "offCleanup": true
+  },
+  "browser": "143.0.7499.4"
+}

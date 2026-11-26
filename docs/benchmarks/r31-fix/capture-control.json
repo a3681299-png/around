@@ -1,0 +1,10 @@
+{
+  "interrupted": true,
+  "reason": "User changed background CPU from a 5% rejection gate to reference data; capture stopped after enough complete pairs existed.",
+  "backgroundPolicy": "reference only",
+  "oldBackgroundThresholdPercent": 5,
+  "selection": "first four complete pairs in chronological order; never selected by CPU values",
+  "requestedPairs": 4,
+  "reviewedAt": "2026-11-04T14:42:16.165Z",
+  "captureScript": "capture-strict.spec.ts"
+}

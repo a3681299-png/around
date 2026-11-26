@@ -1,14 +1,20 @@
 import { test, expect } from './fixtures';
+import { showArtwork } from './helpers/artwork';
 import path from 'node:path';
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
+import { parseDesign } from '../src/design/schema';
+import { defaultFollowMotion } from '../src/signals/motion';
+import { pngPixels } from './helpers/png-pixels';
 
 test('native drag, text, keyboard and fullscreen controls remain usable with opaque artwork', async ({
   popup,
   youtube,
+  layeringOn,
 }, info) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await showArtwork(popup);
   await youtube.evaluate(() => {
     const player = document.querySelector<HTMLElement>('#movie_player')!;
     for (const [id, name, bottom, width] of [
@@ -73,21 +79,51 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   const baseline = await run();
   const protectedBefore = await youtube.locator('#g1-seek').screenshot();
   await info.attach('native-seek-before', { body: protectedBefore, contentType: 'image/png' });
+  // Layering (docs/layering-plan.md): the artwork may show through where the slider itself is
+  // transparent (around its track and thumb), as under YouTube's bars. What must not change is the
+  // slider's own paint: the pixels it changes over what is behind it, found before any artwork.
+  const slider = (await youtube.locator('#g1-seek').boundingBox())!;
+  let ownPaint: { mask: number[]; pixels: Uint8Array } | undefined;
+  if (layeringOn) {
+    const shot = pngPixels(await youtube.screenshot({ clip: slider })),
+      pixels = shot.rgba;
+    await youtube.locator('#g1-seek').evaluate((e) => (e.style.visibility = 'hidden'));
+    const without = pngPixels(await youtube.screenshot({ clip: slider })).rgba;
+    await youtube.locator('#g1-seek').evaluate((e) => (e.style.visibility = ''));
+    const mine = (x: number, y: number) => {
+      if (x < 0 || y < 0 || x >= shot.width || y >= shot.height) return false;
+      const i = (y * shot.width + x) * 4;
+      return Math.max(...[0, 1, 2].map((c) => Math.abs(pixels[i + c]! - without[i + c]!))) > 60;
+    };
+    // Only the inside of what it paints: its anti-aliased rim is partly see-through.
+    const mask: number[] = [];
+    for (let y = 0; y < shot.height; y++)
+      for (let x = 0; x < shot.width; x++)
+        if (mine(x, y) && mine(x - 1, y) && mine(x + 1, y) && mine(x, y - 1) && mine(x, y + 1))
+          mask.push((y * shot.width + x) * 4);
+    ownPaint = { mask, pixels };
+    expect(mask.length).toBeGreaterThan(200);
+  }
   const preserved = async (name: string) => {
     let picture = protectedBefore;
     try {
       await expect
         .poll(async () => {
-          picture = await youtube.locator('#g1-seek').screenshot();
-          return picture.equals(protectedBefore);
+          if (!ownPaint) {
+            picture = await youtube.locator('#g1-seek').screenshot();
+            return picture.equals(protectedBefore);
+          }
+          picture = await youtube.screenshot({ clip: slider });
+          const now = pngPixels(picture).rgba,
+            before = ownPaint.pixels;
+          return ownPaint.mask.filter((i) => [0, 1, 2].some((c) => Math.abs(now[i + c]! - before[i + c]!) > 24)).length;
         })
-        .toBe(true);
+        .toBe(ownPaint ? 0 : true);
     } finally {
       await info.attach(name, { body: picture, contentType: 'image/png' });
     }
   };
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  let { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const opaque = await youtube.evaluate(() => {
     const c = document.createElement('canvas');
@@ -109,25 +145,23 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   }
   await editor.locator('.save').click();
   await expect(editor.locator('.dirty')).toHaveText('保存済み');
-  await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+  await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
   await expect
     .poll(async () =>
       JSON.parse(
-        (await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}',
+        (await youtube.locator('#around-decorations').getAttribute('data-around-safety')) ?? '{}',
       ).issues?.some((i: any) => i.severity === 'enforced'),
     )
     .toBe(true);
   await expect
-    .poll(() => youtube.locator('#web-world-themes-decorations').evaluate((host) => getComputedStyle(host).clipPath))
+    .poll(() => youtube.locator('#around-decorations').evaluate((host) => getComputedStyle(host).clipPath))
     .not.toBe('none');
-  expect(await youtube.locator('#web-world-themes-decorations').evaluate((host) => getComputedStyle(host).zIndex)).toBe(
-    '1',
-  );
+  expect(await youtube.locator('#around-decorations').evaluate((host) => getComputedStyle(host).zIndex)).toBe('1');
   await preserved('native-seek-screen');
   expect(await run()).toEqual(baseline);
   // Repeat against the other production composition path: moving the original
   // opaque media into the player must never expose its reserved controls.
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+  ({ panel: editor } = await openEditor(popup, youtube));
   await exposeEditorControls(editor);
   await editor.locator('[data-layer-id] [data-action="select"]').click();
   await editor.getByLabel('配置の基準').selectOption('video-player');
@@ -137,20 +171,59 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   }
   await editor.locator('.save').click();
   await expect(editor.locator('.dirty')).toHaveText('保存済み');
-  await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
-  const playerPaint = youtube.locator('#web-world-themes-video-decorations');
+  await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
+  const playerPaint = youtube.locator('#around-video-decorations');
   await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
-  await expect(playerPaint).toHaveCSS('clip-path', 'inset(64px 0px 112px)');
+  // How the bands stay clear depends on the way (docs/layering-plan.md); that they do is checked
+  // by `preserved` below in both. Cut out: the plane clips the bands. Layering: the plane is whole
+  // and sits directly after the media, under the bars by stacking order.
+  if (layeringOn) {
+    await expect(playerPaint).toHaveCSS('clip-path', 'inset(0px)');
+    expect(await playerPaint.evaluate((host) => host.previousElementSibling?.className)).toBe('html5-video-container');
+  } else await expect(playerPaint).toHaveCSS('clip-path', 'inset(64px 0px 112px)');
   await preserved('native-seek-player');
+  expect(await run()).toEqual(baseline);
+  // G1.2: the same opaque layer, now moving (it follows the pointer). Only the roots over a near
+  // control are held; the controls stay usable while it moves everywhere else.
+  const key = 'around.design.youtube';
+  const saved = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
+  const moving: DesignDocument = {
+    ...saved,
+    decorations: saved.decorations.map((layer) => ({ ...layer, motion: defaultFollowMotion() })),
+  };
+  parseDesign(moving);
+  await popup.evaluate(async ({ k, design }) => chrome.storage.local.set({ [k]: design }), { k: key, design: moving });
+  await expect
+    .poll(
+      async () =>
+        JSON.parse((await youtube.locator('#around-decorations').getAttribute('data-around-safety')) ?? '{}').stopped,
+    )
+    .toBe('');
+  await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
+  // At the seek bar: cut out, the run below meets a moving layer that the approach holds. Under
+  // the bars by stacking order, it needs no hold (it cannot cover what the pointer aims at).
+  const seekBox = (await youtube.locator('#g1-seek').boundingBox())!;
+  await youtube.mouse.move(seekBox.x + 20, seekBox.y + seekBox.height / 2, { steps: 4 });
+  await expect
+    .poll(
+      async () =>
+        JSON.parse(
+          (await youtube.locator('#around-decorations').getAttribute('data-around-safety')) ?? '{}',
+        ).issues?.filter((i: any) => i.surfaceId === 'native.approach').length,
+    )
+    .toBe(layeringOn ? 0 : 1);
+  // Off the seek bar again (its own hover colour is not part of the comparison), as before.
+  const fullscreen = (await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).boundingBox())!;
+  await youtube.mouse.move(fullscreen.x + fullscreen.width / 2, fullscreen.y + fullscreen.height / 2, { steps: 4 });
+  await preserved('native-seek-moving');
   expect(await run()).toEqual(baseline);
   await youtube.screenshot({ path: info.outputPath('opaque-paint-native-controls.png') });
 });
 
 test('fullscreen keeps authored painting order across viewport and player anchors', async ({ popup, youtube }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  await showArtwork(popup);
+  const { panel: editor } = await openEditor(popup, youtube);
   const files = await youtube.evaluate(() =>
     ['red', 'blue'].map((color) => {
       const c = document.createElement('canvas');
@@ -170,12 +243,9 @@ test('fullscreen keeps authored painting order across viewport and player anchor
   );
   await editor.locator('.save').click();
   await expect(editor.locator('.dirty')).toHaveText('保存済み');
-  await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+  await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
   const design = await popup.evaluate(
-    async () =>
-      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as DesignDocument,
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
   );
   design.decorations.forEach((layer, i) => {
     layer.placement = {
@@ -189,7 +259,7 @@ test('fullscreen keeps authored painting order across viewport and player anchor
     layer.zIndex = i;
   });
   const store = () =>
-    popup.evaluate(async (design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }), design);
+    popup.evaluate(async (design) => chrome.storage.local.set({ 'around.design.youtube': design }), design);
   await store();
   await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).click();
   await expect.poll(() => youtube.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
@@ -214,28 +284,78 @@ test('fullscreen keeps authored painting order across viewport and player anchor
   await expect.poll(pixel).toEqual([255, 0, 0, 255]);
 });
 
+test('an opened 操作チェック stays open while the guard releases its first stop', async ({
+  popup,
+  youtube,
+  context,
+  extensionId,
+}) => {
+  await showArtwork(popup);
+  const studio = await context.newPage();
+  // Every hidden/open change of the fold, from before the editor mounts it.
+  await studio.addInitScript(() => {
+    const log: { hidden: boolean; open: boolean; summary: string }[] = ((window as any).__fold = []);
+    const watch = (): void => {
+      const check = document.querySelector<HTMLDetailsElement>('.around-editor-safety .safety-check');
+      if (!check) {
+        setTimeout(watch, 20);
+        return;
+      }
+      new MutationObserver(() => {
+        log.push({
+          hidden: check.hidden === true,
+          open: check.open,
+          summary: check.querySelector('summary')!.textContent ?? '',
+        });
+      }).observe(check, { attributes: true, attributeFilter: ['open', 'hidden'] });
+    };
+    addEventListener('DOMContentLoaded', watch);
+  });
+  await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
+  await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
+  const panel = studio.locator('#around-creator');
+  await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+  await panel.getByLabel('画像の幅', { exact: true }).fill('1600');
+  await panel.getByLabel('画像の幅', { exact: true }).press('Tab');
+  await studio.locator('.around-editor-safety li[data-issue-layer]').first().waitFor({ state: 'attached' });
+  await studio.locator('.around-editor-safety .safety-check > summary').click();
+  // The guard's first stop (the page's controls moved as the layer arrived) releases in this time.
+  await studio.waitForTimeout(1500);
+  const log = await studio.evaluate(() => (window as any).__fold as { hidden: boolean }[]);
+  // The layer stays restricted throughout, so the fold never hides (which would close it).
+  expect(
+    log.filter((entry) => entry.hidden),
+    JSON.stringify(log),
+  ).toEqual([]);
+  await expect(studio.locator('.around-editor-safety .safety-check')).toHaveJSProperty('open', true);
+  // The artwork is still on the page (restricted, not removed).
+  await expect(youtube.locator('#around-decorations')).toHaveCount(1);
+});
+
 test('Studio exposes protection overlays, per-layer restrictions and emergency OFF', async ({
   popup,
   youtube,
   context,
   extensionId,
 }, info) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await showArtwork(popup);
   const studio = await context.newPage();
   await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-  const panel = studio.locator('#web-world-themes-creator');
+  const panel = studio.locator('#around-creator');
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.getByLabel('画像の幅', { exact: true }).fill('1600');
   await panel.getByLabel('画像の幅', { exact: true }).press('Tab');
-  await expect(studio.locator('.ww-safety-controls li[data-layer-id]')).toContainText(['制限中']);
+  // UI0-d round 3: 操作チェック sits in the editor's header while a layer is restricted.
+  await expect(studio.locator('.around-editor-safety li[data-issue-layer]')).toContainText(['制限中']);
   await expect(panel.locator('.safety-limited-badge')).toHaveText('制限中');
-  await studio.locator('.ww-safety-controls summary').click();
+  await studio.locator('.around-editor-safety .safety-check > summary').click();
   await studio.getByLabel('操作面の保護範囲を表示').check();
-  await expect(youtube.locator('#web-world-themes-operation-check')).toHaveCount(1);
+  await expect(youtube.locator('#around-operation-check')).toHaveCount(1);
   await studio.screenshot({ path: info.outputPath('studio-operation-restriction.png') });
   await youtube.screenshot({ path: info.outputPath('operation-envelopes.png') });
   await studio.getByRole('button', { name: '緊急OFF', exact: true }).click();
-  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
-  await expect(panel.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(youtube.locator('#around-decorations')).toHaveCount(0);
+  // UI0-d: one save chip, in the design system's words (was 未保存の変更 in the Studio).
+  await expect(panel.locator('.dirty')).toHaveText('未保存');
 });

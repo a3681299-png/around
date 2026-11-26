@@ -1,4 +1,5 @@
 import type { Bounds, PlacementFrame, Point } from './geometry';
+import type { WorldApproach } from './types';
 
 /** Host-owned numbers. Artwork cannot supply or relax this contract. */
 export interface OperationSurface {
@@ -25,9 +26,19 @@ export interface OperationSurface {
    * can move anywhere inside it without the page moving, so a page-following plane
    * excludes the whole box instead of the current rectangle. */
   scrollBox?: PlacementFrame;
+  /** Chunk 4: the browser paints this surface over the beneath plane (stacking order,
+   * proven at the read), wherever either is on screen. */
+  aboveBeneath?: boolean;
+  /** An area kept for native controls whether or not one is shown there now (the player's bands):
+   * an editor gesture never takes it. */
+  reserved?: boolean;
 }
 export interface OperationSnapshot {
-  generation: { documentId: number; geometry: number };
+  /** geometry: changes whenever a surface moves on screen. layout (G1.3): changes only when a
+   * surface moves in document coordinates, so a uniform page scroll keeps it. */
+  generation: { documentId: number; geometry: number; layout?: number };
+  /** The page scroll offset the surfaces were read (or shifted) at (G1.3). */
+  scroll?: { x: number; y: number };
   viewport: { width: number; height: number };
   surfaces: readonly OperationSurface[];
   supported: boolean;
@@ -50,14 +61,23 @@ export interface PaintFootprint {
   animated?: boolean;
   clip?: PlacementFrame;
   id: string;
+  /** The layer's root (its group, or itself): an approach holds roots as units (G1.2). */
+  root?: string;
+  /** The layer's name as the creator sees it, for stop messages only (shown as text). */
+  name?: string;
   bounds: Bounds;
   opacity: number;
   pointerEvents: boolean;
   /** Includes filter/blur/shadow spread. Unknown spread is unsupported. */
   outset: number;
   /** overlay: screen-fixed plane. page: plane that scrolls with the document. atmosphere:
-   * translucent plane under ATMOSPHERE_ALPHA_CAP. native-underlay: player-local plane. */
-  composition: 'overlay' | 'page' | 'atmosphere' | 'native-underlay' | 'unsupported';
+   * translucent plane under ATMOSPHERE_ALPHA_CAP. native-underlay: player-local plane.
+   * native-beneath (chunk 4): player-local plane at the media's level, under every
+   * surface proven to paint over it; clip is the player's box. */
+  composition: 'overlay' | 'page' | 'atmosphere' | 'native-underlay' | 'native-beneath' | 'unsupported';
+  /** native-beneath only: every change pending since the read is covered by stacking order, so
+   * the guard's holds for a pending read (and the approach hold) do not apply to this paint. */
+  settled?: boolean;
 }
 /** Engine-held, never stored in artwork. Worst-case uniform tint at this alpha keeps
  * YouTube primary text at >= 4.5:1 and secondary text at >= 3:1 in light and dark themes. */
@@ -141,6 +161,45 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
       right: paint.bounds.right + paint.outset,
       bottom: paint.bounds.bottom + paint.outset,
     };
+    if (paint.composition === 'native-beneath') {
+      // The browser paints every proven surface over this plane, so only the others are checked,
+      // as the local plane checks them: a forbidden one under the paint stops it. While editing,
+      // its handles take input (editor-owned): every proven surface is over them too, so it gets
+      // its own clicks first; a press is claimed only where a fresh read finds no unproven surface
+      // and no reserved band under it (editorClaims). Input any other way is refused.
+      const clip = paint.clip;
+      if (!clip || !Object.values(clip).every(Number.isFinite) || (paint.pointerEvents && !paint.editorOwned)) {
+        issues.push({
+          layerId: paint.id,
+          surfaceId: 'player',
+          severity: 'enforced',
+          action: 'stop',
+          reason: '映像上の描画にはネイティブと一緒に動くクリップが必要です。',
+          remedy: 'プレイヤー基準の単独レイヤーへ戻してください。',
+        });
+        continue;
+      }
+      const inside = {
+        left: Math.max(bounds.left, clip.left),
+        right: Math.min(bounds.right, clip.left + clip.width),
+        top: Math.max(bounds.top, clip.top),
+        bottom: Math.min(bounds.bottom, clip.top + clip.height),
+      };
+      if (inside.left >= inside.right || inside.top >= inside.bottom) continue;
+      for (const { surface, envelope } of visible) {
+        if (surface.aboveBeneath || surface.policy.occlusion === 'allow' || !intersects(inside, envelope)) continue;
+        issues.push({
+          layerId: paint.id,
+          surfaceId: surface.id,
+          severity: 'enforced',
+          action: 'stop',
+          reason: '描く順番でキャラより手前と確かめられない操作面に重なるため、絵の表示を止めました。',
+          remedy: '操作面から離れた位置へ動かすか、大きさを小さくしてください。',
+        });
+        break;
+      }
+      continue;
+    }
     if (paint.composition === 'native-underlay') {
       if (!paint.clip || !Object.values(paint.clip).every(Number.isFinite)) {
         issues.push({
@@ -257,14 +316,21 @@ export function safePaintRegions(
   const merged = [...cutRegions(regions, editorRegion), ...centre];
   return merged.length > 1024 ? regions : merged;
 }
-/** True when a fresh snapshot shows no protected surface under an editor gesture's point. */
-export function editorClaims(snapshot: OperationSnapshot, point: Point): boolean {
+/**
+ * True when a fresh snapshot shows no protected surface under an editor gesture's point.
+ * `underStacking` (chunk 4): the press reached a handle on the beneath plane. A surface proven to
+ * paint over that plane is over the handle too, so the press would have gone to it had it been
+ * there: it is not in the way. A reserved band (the player's bars, also while they are hidden)
+ * stays native all the same, and so does every surface not proven.
+ */
+export function editorClaims(snapshot: OperationSnapshot, point: Point, underStacking = false): boolean {
   return (
     snapshot.supported &&
     !snapshot.surfaces.some(
       (surface) =>
         surface.availability.visible &&
         surface.policy.occlusion !== 'allow' &&
+        !(underStacking && surface.aboveBeneath && !surface.reserved) &&
         point.x >= surface.protectedEnvelope.left &&
         point.x <= surface.protectedEnvelope.left + surface.protectedEnvelope.width &&
         point.y >= surface.protectedEnvelope.top &&
@@ -390,21 +456,32 @@ export interface ProximityState {
 }
 export const initialProximity = (): ProximityState => ({ safe: true, clearSince: null });
 function segmentHits(a: Point, b: Point, rect: PlacementFrame, margin: number) {
+  return pathNear(a, b, rect.left, rect.top, rect.left + rect.width, rect.top + rect.height, margin);
+}
+/** Whether the path from a to b passes within margin of the box. Allocation free: it runs for
+ * every candidate (several hundred on YouTube) on every input and two or three times a frame. */
+function pathNear(a: Point, b: Point, left: number, top: number, right: number, bottom: number, margin: number) {
   let low = 0,
     high = 1;
-  for (const [start, delta, min, max] of [
-    [a.x, b.x - a.x, rect.left - margin, rect.left + rect.width + margin],
-    [a.y, b.y - a.y, rect.top - margin, rect.top + rect.height + margin],
-  ]) {
-    if (delta === 0) {
-      if (start! < min! || start! > max!) return false;
-    } else {
-      const x = (min! - start!) / delta!,
-        y = (max! - start!) / delta!;
-      low = Math.max(low, Math.min(x, y));
-      high = Math.min(high, Math.max(x, y));
-      if (low > high) return false;
-    }
+  const dx = b.x - a.x,
+    dy = b.y - a.y;
+  if (dx === 0) {
+    if (a.x < left - margin || a.x > right + margin) return false;
+  } else {
+    const s = (left - margin - a.x) / dx,
+      t = (right + margin - a.x) / dx;
+    low = Math.max(low, Math.min(s, t));
+    high = Math.min(high, Math.max(s, t));
+    if (low > high) return false;
+  }
+  if (dy === 0) {
+    if (a.y < top - margin || a.y > bottom + margin) return false;
+  } else {
+    const s = (top - margin - a.y) / dy,
+      t = (bottom + margin - a.y) / dy;
+    low = Math.max(low, Math.min(s, t));
+    high = Math.min(high, Math.max(s, t));
+    if (low > high) return false;
   }
   return true;
 }
@@ -442,4 +519,200 @@ export function stepProximity(
   if (near) return { safe: true, clearSince: null };
   const clearSince = previous.clearSince ?? input.timeMs;
   return { safe: previous.safe && input.timeMs - clearSince < 350, clearSince };
+}
+export const approachRectOf = (surface: OperationSurface) => approachRect(surface) ?? surface.shape;
+/** G1.2: one approached control, with its own hysteresis. */
+export interface NearSurface {
+  /** Where layers yield: the control, or (D11) its part within 72px of the pointer's path. */
+  rect: PlacementFrame;
+  /** D11: the pointer's path and 72px around it, when only the pointer made the control near. */
+  area?: PlacementFrame;
+  clearSince: number | null;
+}
+/** The overlap of two frames; empty (zero size) when they do not meet. */
+function overlapOf(a: PlacementFrame, b: PlacementFrame): PlacementFrame {
+  const left = Math.max(a.left, b.left),
+    top = Math.max(a.top, b.top),
+    right = Math.min(a.left + a.width, b.left + b.width),
+    bottom = Math.min(a.top + a.height, b.top + b.height);
+  return right > left && bottom > top
+    ? { left, top, width: right - left, height: bottom - top }
+    : { left, top, width: 0, height: 0 };
+}
+export interface ApproachState {
+  near: ReadonlyMap<string, NearSurface>;
+  /** Held root → the near controls holding it. A root is released only when they have all
+   * cleared, never because it moved off them (no flip-flop on its own motion). */
+  held: ReadonlyMap<string, readonly string[]>;
+}
+export const initialApproach = (): ApproachState => ({ near: new Map(), held: new Map() });
+const PRESSED = 'pointer.pressed';
+/** Height of one band of the approach index. */
+const BAND = 128;
+interface ApproachIndex {
+  surfaces: OperationSurface[];
+  /** Approach boxes (approachRect) as left, top, right, bottom, one per entry of `surfaces`. */
+  boxes: Float64Array;
+  /** Entries whose box meets the band from `top` to `bottom`, ascending, each once. */
+  within(top: number, bottom: number): number[];
+  byId: Map<string, OperationSurface>;
+  /** Near wherever the pointer is: a focused control that may not be covered, a drag, a capture. */
+  engaged: OperationSurface[];
+  focusedControl: boolean;
+  /** Visible areas that may be covered (the video itself): where page keys go. */
+  players: OperationSurface[];
+}
+/** Snapshots are immutable, so one index serves every input and frame until the next capture. */
+const approachIndexes = new WeakMap<OperationSnapshot, ApproachIndex>();
+function approachIndexOf(snapshot: OperationSnapshot): ApproachIndex {
+  let index = approachIndexes.get(snapshot);
+  if (index) return index;
+  const surfaces: OperationSurface[] = [],
+    corners: number[] = [],
+    bands = new Map<number, number[]>(),
+    tall: number[] = [],
+    byId = new Map<string, OperationSurface>(),
+    engaged: OperationSurface[] = [],
+    players: OperationSurface[] = [];
+  let focusedControl = false;
+  for (const surface of snapshot.surfaces) {
+    byId.set(surface.id, surface);
+    const forbid = surface.policy.occlusion !== 'allow',
+      { availability } = surface;
+    if (forbid && availability.focused) focusedControl = true;
+    if (availability.visible && !forbid) players.push(surface);
+    if ((forbid && availability.focused) || availability.dragging || availability.captured) {
+      engaged.push(surface);
+      continue;
+    }
+    const rect = availability.visible && forbid ? approachRect(surface) : undefined;
+    if (!rect) continue;
+    const entry = surfaces.length,
+      first = Math.floor(rect.top / BAND),
+      last = Math.floor((rect.top + rect.height) / BAND);
+    surfaces.push(surface);
+    corners.push(rect.left, rect.top, rect.left + rect.width, rect.top + rect.height);
+    // A box over many bands (a whole-window menu) is tested on every query instead.
+    if (last - first > 64) tall.push(entry);
+    else
+      for (let band = first; band <= last; band++) {
+        const list = bands.get(band);
+        if (list) list.push(entry);
+        else bands.set(band, [entry]);
+      }
+  }
+  const boxes = Float64Array.from(corners);
+  index = {
+    surfaces,
+    boxes,
+    within(top, bottom) {
+      const found = [...tall];
+      for (let band = Math.floor(top / BAND), end = Math.floor(bottom / BAND); band <= end; band++)
+        for (const entry of bands.get(band) ?? []) found.push(entry);
+      found.sort((a, b) => a - b);
+      return found.filter((entry, i) => entry !== found[i - 1]);
+    },
+    byId,
+    engaged,
+    focusedControl,
+    players,
+  };
+  approachIndexes.set(snapshot, index);
+  return index;
+}
+/** Which controls are near (each 40px to enter, 72px to stay, 350ms to clear), and which roots
+ * yield to them: the dynamic roots whose last painted bounds overlap a near control. */
+export function stepApproach(
+  previous: ApproachState,
+  snapshot: OperationSnapshot,
+  input: { timeMs: number; point?: Point; previousPoint?: Point; pressed?: Point; keyed: boolean },
+  paints: readonly PaintFootprint[],
+): ApproachState {
+  // Runs on every input and two or three times a frame: only the candidates in the bands the
+  // pointer's path can reach are tested (several hundred controls on YouTube otherwise).
+  const index = approachIndexOf(snapshot),
+    near = new Map<string, NearSurface>();
+  for (const surface of index.engaged) near.set(surface.id, { rect: approachRectOf(surface), clearSince: null });
+  if (input.point) {
+    const to = input.point,
+      from = input.previousPoint ?? to,
+      // D11: a control the pointer alone made near yields only within 72px of the pointer's path.
+      area = {
+        left: Math.min(from.x, to.x) - 72,
+        top: Math.min(from.y, to.y) - 72,
+        width: Math.abs(to.x - from.x) + 144,
+        height: Math.abs(to.y - from.y) + 144,
+      };
+    for (const box of index.within(area.top, area.top + area.height)) {
+      const surface = index.surfaces[box]!,
+        b = index.boxes;
+      if (near.has(surface.id)) continue;
+      const left = b[box * 4]!,
+        top = b[box * 4 + 1]!,
+        right = b[box * 4 + 2]!,
+        bottom = b[box * 4 + 3]!;
+      if (pathNear(from, to, left, top, right, bottom, previous.near.has(surface.id) ? 72 : 40))
+        near.set(surface.id, {
+          rect: overlapOf({ left, top, width: right - left, height: bottom - top }, area),
+          area,
+          clearSince: null,
+        });
+    }
+  }
+  // A press holds what is painted around it, whether or not a control is there.
+  if (input.pressed)
+    near.set(PRESSED, {
+      rect: { left: input.pressed.x - 40, top: input.pressed.y - 40, width: 80, height: 80 },
+      clearSince: null,
+    });
+  // D2: a key without a focused control (YouTube's k, j, l on the page) goes to the player.
+  if (input.keyed && !index.focusedControl)
+    for (const surface of index.players) near.set(surface.id, { rect: approachRectOf(surface), clearSince: null });
+  for (const [key, entry] of previous.near) {
+    if (near.has(key)) continue;
+    const clearSince = entry.clearSince ?? input.timeMs;
+    const surface = index.byId.get(key);
+    // A clearing control keeps following the page, inside the area where the pointer last was.
+    const rect = surface ? approachRectOf(surface) : entry.rect;
+    if (input.timeMs - clearSince < 350)
+      near.set(key, {
+        rect: entry.area ? overlapOf(rect, entry.area) : rect,
+        ...(entry.area ? { area: entry.area } : {}),
+        clearSince,
+      });
+  }
+  const held = new Map<string, string[]>();
+  for (const [root, keys] of previous.held) {
+    const kept = keys.filter((key) => near.has(key));
+    if (kept.length) held.set(root, kept);
+  }
+  if (!near.size) return { near, held };
+  const targets = [...near].filter(([, entry]) => entry.rect.width > 0 && entry.rect.height > 0);
+  for (const paint of paints) {
+    // Under the controls by stacking order (chunk 4): moving there cannot hide or take
+    // what the pointer is aiming at, so it is never held for an approach.
+    if (!paint.dynamic || paint.composition === 'native-beneath') continue;
+    const root = paint.root ?? paint.id,
+      { bounds, outset } = paint;
+    for (const [key, { rect }] of targets) {
+      if (
+        bounds.right + outset <= rect.left ||
+        bounds.left - outset >= rect.left + rect.width ||
+        bounds.bottom + outset <= rect.top ||
+        bounds.top - outset >= rect.top + rect.height
+      )
+        continue;
+      const keys = held.get(root);
+      if (!keys) held.set(root, [key]);
+      else if (!keys.includes(key)) keys.push(key);
+    }
+  }
+  return { near, held };
+}
+/** The world's view of an approach: held roots and their near controls' rectangles. */
+export function approachLayers(state: ApproachState): WorldApproach | undefined {
+  if (!state.held.size) return undefined;
+  const layers: Record<string, PlacementFrame[]> = {};
+  for (const [root, keys] of state.held) layers[root] = keys.map((key) => state.near.get(key)!.rect);
+  return { layers };
 }

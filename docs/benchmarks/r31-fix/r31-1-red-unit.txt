@@ -1,0 +1,60 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> around@0.1.0 test:unit
+> node scripts/test.mjs --project=unit tests/model-data.spec.ts --grep legacy VRM sources
+
+
+Running 1 test using 1 worker
+
+(node:44508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [unit] › tests\model-data.spec.ts:76:1 › legacy VRM sources omit only body: supplied body and every other model fact still match exactly (22ms)
+
+
+  1) [unit] › tests\model-data.spec.ts:76:1 › legacy VRM sources omit only body: supplied body and every other model fact still match exactly
+
+    Error: expect(received).not.toThrow()
+
+    Error name:    "Error"
+    Error message: "レイヤーと素材の形式が一致しません。"
+
+          14 |       (layer.kind === 'animation' && asset.animation?.format !== layer.format)
+          15 |     )
+        > 16 |       throw new Error('レイヤーと素材の形式が一致しません。');
+             |             ^
+          17 |     // A character's motions must be the very .vrma facts the worker measured at import.
+          18 |     if (layer.kind === 'model3d')
+          19 |       for (const motion of layer.character?.motions ?? []) {
+
+          at validateDesignAssets (file:/WORKTREE/src/assets/design-assets.ts:16:13)
+          at validate (file:/WORKTREE/tests/model-data.spec.ts:98:38)
+          at file:/WORKTREE/tests/model-data.spec.ts:99:16
+          at Object.<anonymous> (node_modules/playwright/lib/matchers/expect.js:11831:9)
+          at invokeMatcher (node_modules/playwright/lib/matchers/expect.js:13362:20)
+          at invoke (node_modules/playwright/lib/matchers/expect.js:13340:109)
+          at _Zone.run (node_modules/playwright-core/lib/coreBundle.js:10364:40)
+          at callMatcherAsStep (node_modules/playwright/lib/matchers/expect.js:13341:64)
+          at Object.toThrow (node_modules/playwright/lib/matchers/expect.js:13302:23)
+          at file:/WORKTREE/tests/model-data.spec.ts:99:40
+          at node_modules/playwright/lib/worker/workerProcessEntry.js:1655:15
+          at node_modules/playwright/lib/worker/workerProcessEntry.js:1135:17
+          at TimeoutManager.withRunnable (node_modules/playwright/lib/worker/workerProcessEntry.js:404:9)
+          at TestInfoImpl._runWithTimeout (node_modules/playwright/lib/worker/workerProcessEntry.js:1133:34)
+          at node_modules/playwright/lib/worker/workerProcessEntry.js:1653:22
+          at WorkerMain._runTest (node_modules/playwright/lib/worker/workerProcessEntry.js:1626:5)
+          at WorkerMain.runTestGroup (node_modules/playwright/lib/worker/workerProcessEntry.js:1521:9)
+          at process.<anonymous> (node_modules/playwright/lib/common/index.js:1941:25)
+
+       97 |   const stored = { ...info, id: assetId, name: 'Original.vrm', byteLength: bytes.length },
+       98 |     validate = (model: ModelInfo) => validateDesignAssets(doc.decorations, new Map([[assetId, { ...stored, model }]]));
+    >  99 |   expect(() => validate(measured)).not.toThrow();
+          |                                        ^
+      100 |   // Ignoring a missing historical body must not hide a change in any other fact.
+      101 |   for (const mutate of [
+      102 |     (m: ModelInfo) => (m.clips[0]!.duration += 1),
+        at WORKTREE\tests\model-data.spec.ts:99:40
+
+    Error Context: .work\test-results\unit\model-data-legacy-VRM-sour-92a35-el-fact-still-match-exactly-unit\error-context.md
+
+  1 failed
+    [unit] › tests\model-data.spec.ts:76:1 › legacy VRM sources omit only body: supplied body and every other model fact still match exactly

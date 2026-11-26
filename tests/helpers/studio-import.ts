@@ -36,7 +36,7 @@ export async function observeImports(studio: Page, holdStored = false) {
       chrome.runtime.sendMessage = function (...args: unknown[]) {
         const message = args[0] as Record<string, any>,
           result = Reflect.apply(send, chrome.runtime, args);
-        if (message?.type === 'web-world-themes:assets' && message.session?.startsWith('studio-upload-')) {
+        if (message?.type === 'around:assets' && message.session?.startsWith('studio-upload-')) {
           probe.uploads.push({ action: message.action, session: message.session });
           if (hold && (message.action === 'import' || message.action === 'upload-finish'))
             return Promise.resolve(result).then(async (response) => {
@@ -100,9 +100,9 @@ export async function assetRows(page: Page) {
 export async function readAssetRows(factory: Pick<IDBFactory, 'databases' | 'open'> = indexedDB) {
   // Invalid imports can be rejected before the production repository is opened.
   // Observing that state must not create an empty version-1 database without its store.
-  if (!(await factory.databases()).some((db) => db.name === 'web-world-themes-assets')) return [];
+  if (!(await factory.databases()).some((db) => db.name === 'around-assets')) return [];
   return new Promise<{ id: string; byteLength: number; leases: { session: string }[] }[]>((resolve, reject) => {
-    const open = factory.open('web-world-themes-assets', 1);
+    const open = factory.open('around-assets', 1);
     open.onerror = () => reject(open.error);
     open.onupgradeneeded = () => {
       open.transaction?.abort();

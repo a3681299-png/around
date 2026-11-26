@@ -1,6 +1,6 @@
 /** Opt-in, bounded development measurements. Never persisted with a work. */
-declare const __WW_ASSET_PROFILE__: boolean;
-export const ASSET_PROFILE = typeof __WW_ASSET_PROFILE__ !== 'undefined' && __WW_ASSET_PROFILE__;
+declare const __AROUND_ASSET_PROFILE__: boolean;
+export const ASSET_PROFILE = typeof __AROUND_ASSET_PROFILE__ !== 'undefined' && __AROUND_ASSET_PROFILE__;
 export const PROFILE_MESSAGE = 'ww.asset-profile.v1';
 export interface AssetSpan {
   id: string;

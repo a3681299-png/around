@@ -13,7 +13,7 @@ const expected = JSON.parse(readFileSync(fixtures + 'chain-expected.json', 'utf8
 };
 
 test('every historical layer stage rejects excess decorations before inspecting the first layer', () => {
-  for (let version = 2; version < 12; version++) {
+  for (let version = 2; version < 16; version++) {
     let reads = 0;
     const decorations = new Array<unknown>(IMAGE_LIMITS.count + 1);
     Object.defineProperty(decorations, 0, {
@@ -72,8 +72,35 @@ test('each old version rejects fields and capabilities introduced in a later ver
     { ...load('history-v10.json'), schemaVersion: 9 },
     { ...load('history-v11.json'), schemaVersion: 10 },
     doc(11, { decorations: [{ ...image, renderMode: 'atmosphere' }] }),
+    doc(12, {
+      rules: [
+        {
+          kind: 'surface-style',
+          target: 'video-card',
+          style: {},
+          skin: {
+            states: {
+              normal: {
+                assetId: image.assetId,
+                slices: { top: 1, right: 1, bottom: 1, left: 1 },
+                center: 'stretch',
+                scalePct: 100,
+              },
+            },
+          },
+        },
+      ],
+    }),
   ];
+  // v15: a motion's measured hips height arrived in v16.
+  const v15 = load('history-v15.json');
+  v15.decorations[0].character.motions[0].source.hipsHeight = 0.8;
+  forbidden.push(v15);
   for (const value of forbidden) expect(() => parseDesign(value)).toThrow();
+  expect(() => migrateDesign(v15)).toThrow('v16');
+  // The same document with the field set as a v16 document is accepted and keeps the value.
+  const v16 = parseDesign({ ...v15, schemaVersion: 16 }) as any;
+  expect(v16.decorations[0].character.motions[0].source.hipsHeight).toBe(0.8);
   for (const version of [4, 5, 6]) {
     const animation = load('v4.json').decorations[0];
     expect(() =>
@@ -95,7 +122,7 @@ test('every pure adjacent step advances one version without granting validation 
     let data = freezeTree(JSON.parse(readFileSync(fixtures + file, 'utf8')));
     const original = JSON.stringify(data);
     const version = data.schemaVersion as number;
-    for (let from = version; from < 12; from++) {
+    for (let from = version; from < 17; from++) {
       const migration = DESIGN_MIGRATIONS[from - 1]!;
       const before = JSON.stringify(data);
       const migrated = migration(data);
@@ -116,7 +143,7 @@ test('every pure adjacent step advances one version without granting validation 
     rules: [],
     decorations: [{ kind: 'image', opacity: Infinity }],
   });
-  expect(unvalidated['schemaVersion']).toBe(12);
+  expect(unvalidated['schemaVersion']).toBe(18);
   expect(() => parseDesign(unvalidated)).toThrow();
   expect(() => readDesign(freezeTree(unvalidated))).toThrow();
   expect(() => commitDesign(unvalidated as unknown as DesignDocument)).toThrow();
@@ -153,7 +180,7 @@ test('v12 renderMode keeps normal by omission, stores atmosphere, and keeps a gr
     b = { ...image, id: 'image-b' };
   // Every v11 document migrates with normal rendering and no new field.
   const migrated = parseDesign({ ...doc([a]), schemaVersion: 11 });
-  expect(migrated.schemaVersion).toBe(12);
+  expect(migrated.schemaVersion).toBe(18);
   expect(Object.hasOwn(migrated.decorations[0]!, 'renderMode')).toBe(false);
   expect(Object.hasOwn(parseDesign(doc([{ ...a, renderMode: 'normal' }])).decorations[0]!, 'renderMode')).toBe(false);
   const atmosphere = parseDesign(doc([{ ...a, renderMode: 'atmosphere' }]));

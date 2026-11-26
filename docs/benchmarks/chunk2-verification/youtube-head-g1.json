@@ -1,0 +1,100 @@
+{
+  "side": "head",
+  "edge": {
+    "opaque": 6430,
+    "topBand": 1492,
+    "topBandAllowed": 0,
+    "canvasAllowed": 0,
+    "plane": "around-video-decorations",
+    "clip": "inset(64px 0px 112px)",
+    "pointerEvents": "none",
+    "player": {
+      "x": 16,
+      "y": 68,
+      "width": 1112,
+      "height": 625.5,
+      "top": 68,
+      "right": 1128,
+      "bottom": 693.5,
+      "left": 16
+    },
+    "canvas": {
+      "x": 897.3125,
+      "y": -27,
+      "width": 150,
+      "height": 190,
+      "top": -27,
+      "right": 1047.3125,
+      "bottom": 163,
+      "left": 897.3125
+    }
+  },
+  "seat": {
+    "bones": {
+      "chest": [-0.224, 0.703, -0.594],
+      "spine": [-0.034, 1.188, 1.484],
+      "leftUpperArm": [0, 0, 0.045],
+      "rightUpperArm": [0, 0, -0.045],
+      "head": [-0.58, -0.325, 0],
+      "neck": [-0.242, -0.148, 0],
+      "leftLowerLeg": [2.694, 0, 0],
+      "rightLowerLeg": [-2.694, 0, 0]
+    },
+    "hips": [0, 0, 0],
+    "blink": 0,
+    "yawDeg": 25,
+    "offset": {
+      "x": 0,
+      "y": 0
+    },
+    "opacity": 1,
+    "seat": true,
+    "plantFeet": false
+  },
+  "nativePlayAndPause": true,
+  "look": {
+    "bones": {
+      "chest": [2.766, 0.208, -0.156],
+      "spine": [0.286, 0.312, 0.39],
+      "leftUpperArm": [0, 0, -0.382],
+      "rightUpperArm": [0, 0, 0.382],
+      "head": [8.391, 0, 0],
+      "neck": [3.496, 0, 0],
+      "leftLowerLeg": [1.387, 0, 0],
+      "rightLowerLeg": [-1.387, 0, 0]
+    },
+    "hips": [0, 0, 0],
+    "blink": 0.024,
+    "yawDeg": 25,
+    "offset": {
+      "x": 0,
+      "y": 0
+    },
+    "opacity": 1,
+    "seat": true,
+    "plantFeet": false
+  },
+  "hop": {
+    "bones": {
+      "chest": [1.779, -0.246, 0.185],
+      "spine": [-0.395, -0.37, -0.462],
+      "leftUpperArm": [0, 0, 0.526],
+      "rightUpperArm": [0, 0, -0.526],
+      "head": [10.8, 0, 0],
+      "neck": [4.5, 0, 0],
+      "leftLowerLeg": [-2.656, 0, 0],
+      "rightLowerLeg": [2.656, 0, 0]
+    },
+    "hips": [0, 0.088, 0],
+    "blink": 0,
+    "yawDeg": 25,
+    "offset": {
+      "x": 0,
+      "y": 0
+    },
+    "opacity": 1,
+    "seat": true,
+    "plantFeet": false
+  },
+  "completed": true
+}

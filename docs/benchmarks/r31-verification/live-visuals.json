@@ -1,0 +1,264 @@
+[
+  {
+    "label": "before",
+    "instrumented": false,
+    "defaultRect": {
+      "x": 767.09375,
+      "y": 316.75,
+      "width": 210,
+      "height": 280,
+      "top": 316.75,
+      "right": 977.09375,
+      "bottom": 596.75,
+      "left": 767.09375
+    },
+    "canvas": {
+      "width": 315,
+      "height": 420,
+      "painted": 27604
+    },
+    "viewport": {
+      "width": 1938,
+      "height": 1015,
+      "hidden": false,
+      "dpr": 1
+    },
+    "player": {
+      "rect": {
+        "x": 923.734375,
+        "y": 269.78125,
+        "width": 210,
+        "height": 280,
+        "top": 269.78125,
+        "right": 1133.734375,
+        "bottom": 549.78125,
+        "left": 923.734375
+      },
+      "pointerEvents": "none",
+      "playback": "paused",
+      "clip": null,
+      "timeMs": 0,
+      "suspended": false
+    },
+    "native": {
+      "rect": {
+        "x": 28,
+        "y": 779.546875,
+        "width": 40,
+        "height": 40,
+        "top": 779.546875,
+        "right": 68,
+        "bottom": 819.546875,
+        "left": 28
+      },
+      "hit": true
+    },
+    "overControl": {
+      "x": 226,
+      "y": 757.046875,
+      "width": 210,
+      "height": 280
+    },
+    "controlPixelsEqual": true,
+    "shortcut": "Alt+Shift+Q",
+    "offRemoved": true,
+    "browser": "153.0.8010.12"
+  },
+  {
+    "label": "after",
+    "instrumented": false,
+    "body": "身長 0.87m · 3.0頭身 · 足 39% → 標準の動作が崩れやすい体型です（頭が大きい・足が短い・腰が低い）。このキャラ専用の動作と、計算の動きを使います。",
+    "defaultRect": {
+      "x": 767.09375,
+      "y": 316.75,
+      "width": 210,
+      "height": 280,
+      "top": 316.75,
+      "right": 977.09375,
+      "bottom": 596.75,
+      "left": 767.09375
+    },
+    "canvas": {
+      "width": 315,
+      "height": 420,
+      "painted": 25895
+    },
+    "viewport": {
+      "width": 1938,
+      "height": 1015,
+      "hidden": false,
+      "dpr": 1
+    },
+    "player": {
+      "rect": {
+        "x": 923.734375,
+        "y": 269.78125,
+        "width": 210,
+        "height": 280,
+        "top": 269.78125,
+        "right": 1133.734375,
+        "bottom": 549.78125,
+        "left": 923.734375
+      },
+      "pointerEvents": "none",
+      "playback": "playing",
+      "clip": 0,
+      "timeMs": 1910.7000000000007,
+      "suspended": false
+    },
+    "native": {
+      "rect": {
+        "x": 28,
+        "y": 779.546875,
+        "width": 40,
+        "height": 40,
+        "top": 779.546875,
+        "right": 68,
+        "bottom": 819.546875,
+        "left": 28
+      },
+      "hit": true
+    },
+    "overControl": {
+      "x": 226,
+      "y": 757.046875,
+      "width": 210,
+      "height": 280
+    },
+    "controlPixelsEqual": true,
+    "shortcut": "Alt+Shift+Q",
+    "offRemoved": true,
+    "browser": "153.0.8010.12"
+  },
+  {
+    "label": "before",
+    "instrumented": true,
+    "defaultRect": {
+      "x": 767.09375,
+      "y": 316.75,
+      "width": 210,
+      "height": 280,
+      "top": 316.75,
+      "right": 977.09375,
+      "bottom": 596.75,
+      "left": 767.09375
+    },
+    "canvas": {
+      "width": 315,
+      "height": 420,
+      "painted": 27607
+    },
+    "viewport": {
+      "width": 1938,
+      "height": 1015,
+      "hidden": false,
+      "dpr": 1
+    },
+    "player": {
+      "rect": {
+        "x": 973.8125,
+        "y": 286.6875,
+        "width": 210,
+        "height": 280,
+        "top": 286.6875,
+        "right": 1183.8125,
+        "bottom": 566.6875,
+        "left": 973.8125
+      },
+      "pointerEvents": "none",
+      "playback": "paused",
+      "clip": null,
+      "timeMs": 0,
+      "suspended": false
+    },
+    "native": {
+      "rect": {
+        "x": 28,
+        "y": 817.109375,
+        "width": 40,
+        "height": 40,
+        "top": 817.109375,
+        "right": 68,
+        "bottom": 857.109375,
+        "left": 28
+      },
+      "hit": true
+    },
+    "overControl": {
+      "x": 226,
+      "y": 794.609375,
+      "width": 210,
+      "height": 280
+    },
+    "controlPixelsEqual": true,
+    "shortcut": "Alt+Shift+Q",
+    "offRemoved": true,
+    "browser": "153.0.8010.12"
+  },
+  {
+    "label": "after",
+    "instrumented": true,
+    "body": "身長 0.87m · 3.0頭身 · 足 39% → 標準の動作が崩れやすい体型です（頭が大きい・足が短い・腰が低い）。このキャラ専用の動作と、計算の動きを使います。",
+    "defaultRect": {
+      "x": 767.09375,
+      "y": 316.75,
+      "width": 210,
+      "height": 280,
+      "top": 316.75,
+      "right": 977.09375,
+      "bottom": 596.75,
+      "left": 767.09375
+    },
+    "canvas": {
+      "width": 315,
+      "height": 420,
+      "painted": 25681
+    },
+    "viewport": {
+      "width": 1938,
+      "height": 1015,
+      "hidden": false,
+      "dpr": 1
+    },
+    "player": {
+      "rect": {
+        "x": 923.734375,
+        "y": 269.78125,
+        "width": 210,
+        "height": 280,
+        "top": 269.78125,
+        "right": 1133.734375,
+        "bottom": 549.78125,
+        "left": 923.734375
+      },
+      "pointerEvents": "none",
+      "playback": "playing",
+      "clip": 0,
+      "timeMs": 1749.09999999106,
+      "suspended": false
+    },
+    "native": {
+      "rect": {
+        "x": 28,
+        "y": 779.546875,
+        "width": 40,
+        "height": 40,
+        "top": 779.546875,
+        "right": 68,
+        "bottom": 819.546875,
+        "left": 28
+      },
+      "hit": true
+    },
+    "overControl": {
+      "x": 226,
+      "y": 757.046875,
+      "width": 210,
+      "height": 280
+    },
+    "controlPixelsEqual": true,
+    "shortcut": "Alt+Shift+Q",
+    "offRemoved": true,
+    "browser": "153.0.8010.12"
+  }
+]

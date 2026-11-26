@@ -17,11 +17,13 @@ import {
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { createRigPlayer } from './rig-player';
-import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
+import { VRMLoaderPlugin, VRMUtils, type VRM } from '@pixiv/three-vrm';
+import type { AnimationClip } from 'three';
 import { createVrmPlayer, isVrm, disposeInstanceSkeletons } from './vrm-player';
+import { parseVrmAnimation, vrmAnimationClip } from './vrma-clip';
 import type { ModelEvaluation } from '../../world/models';
 import type { WorldFrame } from '../../world/types';
-import { loadAsset } from '../../assets/client';
+import type { AssetPort } from '../../assets/port';
 import { parseVerifiedModelSource, verifiedModelBytes } from '../../assets/verified-source';
 import { ASSET_MESSAGES, MODEL_RESOURCE_LIMITS } from '../../assets/limits';
 import { inspectGlb } from '../../assets/glb';
@@ -52,13 +54,16 @@ interface Resource {
   bytes: number;
   disposed: boolean;
   trace?: string;
+  /** The body height measured from the bytes at this load (re-inspected every time): artwork
+   * saved before body measures existed still gets a computed motion scaled to its body. */
+  bodyHeight?: number;
 }
 function dispose(gltf: GLTF, shared?: SharedModelLease) {
   const geometries = new Set<Mesh['geometry']>(),
     materials = new Set<Material>(),
     textures = new Set<Texture>(),
     skeletons = new Set<{ dispose(): void }>();
-  for (const texture of gltf.userData['wwTextures'] ?? []) if (texture instanceof Texture) textures.add(texture);
+  for (const texture of gltf.userData['aroundTextures'] ?? []) if (texture instanceof Texture) textures.add(texture);
   gltf.scenes.forEach((scene) =>
     scene.traverse((node) => {
       const mesh = node as Mesh & { skeleton?: { dispose(): void } };
@@ -105,7 +110,8 @@ export function createModelRenderer(
   report: (message: string) => void,
   observe: (stats: Record<string, unknown>) => void,
   parent: ShadowRoot,
-  readAsset: typeof loadAsset = loadAsset,
+  /** The page's AssetPort.load: renderers never pick an asset store themselves. */
+  readAsset: AssetPort['load'],
   labOptions?: ModelRendererLabOptions,
   onContextLost?: () => void,
 ) {
@@ -187,7 +193,7 @@ export function createModelRenderer(
       () => new WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power', premultipliedAlpha: true }),
     );
     renderer.domElement.hidden = true;
-    renderer.domElement.dataset.wwThreeBackend = '';
+    renderer.domElement.dataset.aroundThreeBackend = '';
     parent.append(renderer.domElement);
     const gl = renderer.getContext(),
       debug = gl.getExtension('WEBGL_debug_renderer_info');
@@ -251,6 +257,7 @@ export function createModelRenderer(
         if (trace) entry.trace = trace;
         profileEnd(trace, 'renderer.source-load', readStart);
         if (!metadata.model) throw new Error('GLB素材が見つかりません。');
+        if (metadata.model.vrm?.body) entry.bodyHeight = metadata.model.vrm.body.height;
         if (entry.disposed || closed) throw new Error('読み込みを中止しました。');
         const bytes = blob
           ? new Uint8Array(
@@ -291,12 +298,12 @@ export function createModelRenderer(
             return plugin;
           });
         loader.register((parser) => ({
-          name: 'WW_LOCAL_TEXTURE_GUARD',
+          name: 'AROUND_LOCAL_TEXTURE_GUARD',
           loadTexture(index: number) {
             return profileAsync(trace, 'parse.texture', () => parser.loadTexture(index), { count: 1 }).then(
               (texture) => {
                 if (!texture) throw new Error('GLB内のテクスチャを読み込めません。');
-                if (options?.shared) texture.userData['wwTextureIndex'] = index;
+                if (options?.shared) texture.userData['aroundTextureIndex'] = index;
                 textures.add(texture);
                 if (failed || entry.disposed || closed) releaseTexture(texture);
                 return texture;
@@ -314,7 +321,7 @@ export function createModelRenderer(
           textures.forEach(releaseTexture);
           throw error;
         }
-        gltf.userData['wwTextures'] = [...textures];
+        gltf.userData['aroundTextures'] = [...textures];
         if (entry.disposed || closed) {
           dispose(gltf);
           throw new Error('読み込みを中止しました。');
@@ -342,7 +349,7 @@ export function createModelRenderer(
         gltf.scenes.forEach((scene) =>
           scene.traverse((node) => {
             if (!node.name) {
-              node.name = `ww-node-${node.uuid}`;
+              node.name = `around-node-${node.uuid}`;
               names.set(node.uuid, node.name);
             }
           }),
@@ -380,6 +387,8 @@ export function createModelRenderer(
     scene: Scene;
     camera: OrthographicCamera;
     visual: Group;
+    /** The model's height in the scene's units (it is scaled to fit its box). */
+    seatScale: number;
     player?: ReturnType<typeof createRigPlayer>;
     vrmPlayer?: ReturnType<typeof createVrmPlayer>;
     inPlace?: boolean;
@@ -398,6 +407,38 @@ export function createModelRenderer(
     profiled?: boolean;
     preparing?: boolean;
     posePrepared?: boolean;
+    /** The character motion list the clips below belong to (asset IDs in order). */
+    motionKey?: string;
+    motionClips?: AnimationClip[] | undefined;
+    motionAbort?: AbortController;
+    playerMotions?: AnimationClip[] | undefined;
+  }
+  /** Reads each motion asset, validates it again and turns it into a clip on this VRM. */
+  function loadMotions(i: Instance, layer: ModelDecoration, avatar: VRM, key: string) {
+    i.motionAbort?.abort();
+    const abort = new AbortController();
+    i.motionAbort = abort;
+    i.motionKey = key;
+    i.motionClips = undefined;
+    void Promise.all(
+      layer.character!.motions.map(async (motion) => {
+        const { blob, metadata } = await readAsset(motion.assetId, abort.signal);
+        if (!blob || !metadata.vrmAnimation) throw new Error('キャラの動作の素材が見つかりません。');
+        const clip = vrmAnimationClip(await parseVrmAnimation(new Uint8Array(await blob.arrayBuffer())), avatar);
+        clip.name = motion.id;
+        return clip;
+      }),
+    )
+      .then((clips) => {
+        if (abort.signal.aborted || !i.alive || i.motionKey !== key) return;
+        i.motionClips = clips;
+        i.dirty = true;
+        schedule();
+      })
+      .catch((error: unknown) => {
+        if (abort.signal.aborted || !i.alive) return;
+        report(error instanceof Error ? error.message : 'キャラの動作を読み込めません。');
+      });
   }
   const cancel = () => {
     if (frame !== undefined) view.cancelAnimationFrame(frame);
@@ -428,6 +469,16 @@ export function createModelRenderer(
     for (const i of instances) {
       if (!i.alive || !i.visible || !i.root || !i.dirty || i.failed || i.preparing || !i.layer) continue;
       try {
+        const avatar = isVrm(i.source!);
+        const motionKey = avatar && i.layer.character ? i.layer.character.motions.map((x) => x.assetId).join() : '';
+        if (motionKey && i.motionKey !== motionKey) loadMotions(i, i.layer, avatar!, motionKey);
+        const motions = motionKey ? i.motionClips : undefined;
+        if (motionKey && (!motions || !i.evaluation)) {
+          // The first canvas stays empty until it can paint the authored pose. A motion-list
+          // replacement can leave the last posed frame in place while its clips load.
+          i.dirty = false;
+          continue;
+        }
         const trace = ASSET_PROFILE && !i.profiled ? i.entry?.trace : undefined;
         const firstStart = trace ? performance.now() : 0;
         const r = ensure(trace),
@@ -471,19 +522,29 @@ export function createModelRenderer(
         const m = i.layer.model;
         i.visual.rotation.set(
           (m.rotationX * Math.PI) / 180,
-          ((m.rotationY + (i.evaluation?.yawDeg ?? 0) + (m.locomotion.faceMovement ? m.locomotion.forwardDeg : 0)) *
+          ((m.rotationY +
+            (i.evaluation?.yawDeg ?? 0) +
+            (i.evaluation?.pose?.yawDeg ?? 0) +
+            (m.locomotion.faceMovement ? m.locomotion.forwardDeg : 0)) *
             Math.PI) /
             180,
           (m.rotationZ * Math.PI) / 180,
         );
-        const avatar = isVrm(i.source!);
         const playerStart = trace ? performance.now() : 0;
-        if (i.inPlace !== m.inPlace || (!i.player && !i.vrmPlayer)) {
+        if (i.inPlace !== m.inPlace || (!i.player && !i.vrmPlayer) || i.playerMotions !== motions) {
           i.player?.destroy();
           i.vrmPlayer?.destroy();
-          if (avatar) i.vrmPlayer = createVrmPlayer(i.source!, avatar, m.inPlace);
+          if (avatar)
+            i.vrmPlayer = createVrmPlayer(
+              i.source!,
+              avatar,
+              m.inPlace,
+              motions,
+              i.layer.source.vrm?.body?.height ?? i.entry?.bodyHeight ?? 1,
+            );
           else i.player = createRigPlayer(i.source!, i.root, m.inPlace);
           i.inPlace = m.inPlace;
+          i.playerMotions = motions;
         }
         if (ASSET_PROFILE && trace) profileEnd(trace, 'first.player-create', playerStart);
         if (i.evaluation) {
@@ -491,6 +552,27 @@ export function createModelRenderer(
             i.element.dataset.vrmPose = JSON.stringify(i.vrmPlayer.paint(i.evaluation, m, i.worldTime ?? 0));
           else i.player?.paint(i.evaluation, m);
         }
+        const pose = i.evaluation?.pose;
+        // Seat contact: a sitting character's hips go to the box centre, which the layout puts
+        // on the anchor point (the edge it sits on). Measured on the posed body every paint.
+        i.visual.position.set(0, 0, 0);
+        if (pose?.seat && avatar) {
+          const hips = avatar.humanoid.getRawBoneNode('hips');
+          if (hips) {
+            i.visual.updateWorldMatrix(true, true);
+            const at = hips.getWorldPosition(new Vector3());
+            // The seat is a little under the hips joint: the thickness of the thighs. The computed
+            // hips lift (a hop) is taken out first, or the contact would cancel it.
+            // While sitting down or standing up, only part of the way (pose.seatWeight).
+            i.visual.position.y = -(at.y - (pose.hips[1] + 0.04) * i.seatScale) * (pose.seatWeight ?? 1);
+          }
+        }
+        // Moving without walking: the drawn layer follows the hop arc or blinks out and in. The
+        // engine's protected regions clip the plane whatever this offset is.
+        const offset = pose && (pose.offset.x || pose.offset.y) ? `${pose.offset.x}px ${pose.offset.y}px` : '';
+        if (i.element.style.translate !== offset) i.element.style.translate = offset;
+        const opacity = pose && pose.opacity < 1 ? String(pose.opacity) : '';
+        if (i.element.style.opacity !== opacity) i.element.style.opacity = opacity;
         if (options?.warmupPhase === 'after-pose' && options.warmup && options.warmup !== 'none' && !i.posePrepared) {
           i.preparing = true;
           const generation = i.generation;
@@ -683,6 +765,7 @@ export function createModelRenderer(
         scene,
         camera,
         visual,
+        seatScale: 1,
         assetId: '',
         visible: false,
         dirty: false,
@@ -700,6 +783,10 @@ export function createModelRenderer(
         i.vrmPlayer?.destroy();
         delete i.player;
         delete i.vrmPlayer;
+        i.motionAbort?.abort();
+        delete i.motionKey;
+        delete i.motionClips;
+        delete i.playerMotions;
         if (i.root) {
           if (!i.source || !isVrm(i.source)) disposeInstanceSkeletons(i.root);
           i.visual.clear();
@@ -754,6 +841,7 @@ export function createModelRenderer(
                 normal.position.copy(center).multiplyScalar(-1 / edge);
                 normal.add(root);
                 i.visual.add(normal);
+                i.seatScale = size.y / edge;
                 if (
                   options?.warmupPhase !== 'after-pose' &&
                   ((options?.warmup && options.warmup !== 'none') || options?.shared)

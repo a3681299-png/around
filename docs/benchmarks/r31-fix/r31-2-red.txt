@@ -1,0 +1,246 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> around@0.1.0 test:unit
+> node scripts/test.mjs --project=unit tests/vrma-data.spec.ts tests/vrma-clip.spec.ts --grep scene|unused|overflow
+
+
+Running 12 tests using 4 workers
+
+(node:56188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:35508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:49692) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:52612) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x   1 [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene index out of range (8ms)
+  x   2 [unit] › tests\vrma-clip.spec.ts:64:1 › overflowing derived hips height is refused before the animation loader (16ms)
+  x   4 [unit] › tests\vrma-data.spec.ts:91:3 › rejects a negative scene index (7ms)
+  x   3 [unit] › tests\vrma-data.spec.ts:91:3 › rejects a fractional scene index (8ms)
+(node:50356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5792) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x   5 [unit] › tests\vrma-data.spec.ts:91:3 › rejects no scenes (9ms)
+  x   6 [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene root out of range (9ms)
+  x   7 [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene root that is not an index (9ms)
+  x   8 [unit] › tests\vrma-data.spec.ts:91:3 › rejects scene roots that are not an array (8ms)
+(node:33952) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x   9 [unit] › tests\vrma-data.spec.ts:91:3 › rejects an unused accessor reference out of range (8ms)
+  x  10 [unit] › tests\vrma-data.spec.ts:91:3 › rejects an unused sampler reference out of range (10ms)
+  ok 11 [unit] › tests\vrma-data.spec.ts:95:1 › valid nonzero scene and last-node references retain the same measured motion (7ms)
+  x  12 [unit] › tests\vrma-data.spec.ts:107:1 › finite inputs that overflow the derived hips height are refused at the import boundary (8ms)
+
+
+  1) [unit] › tests\vrma-clip.spec.ts:64:1 › overflowing derived hips height is refused before the animation loader
+
+    Error: expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {"duration": 1, "expressionTracks": {"custom": Map {}, "preset": Map {}}, "humanoidTracks": {"rotation": Map {"spine" => {"createInterpolant": [Function InterpolantFactoryMethodLinear], "name": "Spine.quaternion", "times": [0, 0.5, 1], "values": [NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, …]}}, "translation": Map {"hips" => {"createInterpolant": [Function InterpolantFactoryMethodLinear], "name": "Hips.position", "times": [0, 0.5, 1], "values": [0, Infinity, 0, 0, Infinity, Infinity, 0, Infinity, Infinity]}}}, "lookAtTrack": null, "restHipsPosition": {"x": 0, "y": Infinity, "z": 0}}
+
+      63 |
+      64 | test('overflowing derived hips height is refused before the animation loader', async () => {
+    > 65 |   await expect(parseVrmAnimation(new Uint8Array(overflowingHipsVrma()))).rejects.toThrow();
+         |                                                                                  ^
+      66 | });
+      67 |
+        at WORKTREE\tests\vrma-clip.spec.ts:65:82
+
+    Error Context: .work\test-results\unit\vrma-clip-overflowing-deri-d625e-before-the-animation-loader-unit\error-context.md
+
+  2) [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene index out of range ────────────────────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-a-scene-index-out-of-range-unit\error-context.md
+
+  3) [unit] › tests\vrma-data.spec.ts:91:3 › rejects a negative scene index ────────────────────────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-a-negative-scene-index-unit\error-context.md
+
+  4) [unit] › tests\vrma-data.spec.ts:91:3 › rejects a fractional scene index ──────────────────────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-a-fractional-scene-index-unit\error-context.md
+
+  5) [unit] › tests\vrma-data.spec.ts:91:3 › rejects no scenes ─────────────────────────────────────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-no-scenes-unit\error-context.md
+
+  6) [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene root out of range ─────────────────────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-a-scene-root-out-of-range-unit\error-context.md
+
+  7) [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene root that is not an index ─────────────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-a-scene-root-that-is-not-an-index-unit\error-context.md
+
+  8) [unit] › tests\vrma-data.spec.ts:91:3 › rejects scene roots that are not an array ─────────────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-scene-roots-that-are-not-an-array-unit\error-context.md
+
+  9) [unit] › tests\vrma-data.spec.ts:91:3 › rejects an unused accessor reference out of range ─────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-an-unused-accessor-reference-out-of-range-unit\error-context.md
+
+  10) [unit] › tests\vrma-data.spec.ts:91:3 › rejects an unused sampler reference out of range ─────
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      90 | for (const [name, mutate] of rejects)
+      91 |   test(`rejects ${name}`, () => {
+    > 92 |     expect(() => inspectVrma(bytes(vrmaFixture({}, mutate)))).toThrow();
+         |                                                               ^
+      93 |   });
+      94 |
+      95 | test('valid nonzero scene and last-node references retain the same measured motion', () => {
+        at WORKTREE\tests\vrma-data.spec.ts:92:63
+
+    Error Context: .work\test-results\unit\vrma-data-rejects-an-unused-sampler-reference-out-of-range-unit\error-context.md
+
+  11) [unit] › tests\vrma-data.spec.ts:107:1 › finite inputs that overflow the derived hips height are refused at the import boundary
+
+    Error: expect(received).toThrow()
+
+    Received function did not throw
+
+      107 | test('finite inputs that overflow the derived hips height are refused at the import boundary', () => {
+      108 |   const motion = bytes(overflowingHipsVrma());
+    > 109 |   expect(() => inspectVrma(motion)).toThrow();
+          |                                     ^
+      110 |   expect(() => inspectAsset(motion, 'model/gltf-binary')).toThrow();
+      111 | });
+      112 |
+        at WORKTREE\tests\vrma-data.spec.ts:109:37
+
+    Error Context: .work\test-results\unit\vrma-data-finite-inputs-th-2a2f7-used-at-the-import-boundary-unit\error-context.md
+
+  11 failed
+    [unit] › tests\vrma-clip.spec.ts:64:1 › overflowing derived hips height is refused before the animation loader
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene index out of range ─────────────────────
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects a negative scene index ─────────────────────────
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects a fractional scene index ───────────────────────
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects no scenes ──────────────────────────────────────
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene root out of range ──────────────────────
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects a scene root that is not an index ──────────────
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects scene roots that are not an array ──────────────
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects an unused accessor reference out of range ──────
+    [unit] › tests\vrma-data.spec.ts:91:3 › rejects an unused sampler reference out of range ───────
+    [unit] › tests\vrma-data.spec.ts:107:1 › finite inputs that overflow the derived hips height are refused at the import boundary
+  1 passed (2.0s)

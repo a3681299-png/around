@@ -109,7 +109,7 @@ modeの配列・文字列オブジェクト・変換用オブジェクトは、�
 
 `npm run lint`（Prettier・既存境界検査・typescript-eslint）、`npm run typecheck`、
 `npm run test:unit`は成功。unitは275件、初回はPlaywright表示6.2秒・コマンド全体7.1秒、下記修正後の再実行は9.0秒。
-`WW_BUILD_OUT=.work/e-final npm run build`も成功。通常版distは使わず、専用出力をe2eで検証する。
+`AROUND_BUILD_OUT=.work/e-final npm run build`も成功。通常版distは使わず、専用出力をe2eで検証する。
 
 ### Timeline表示の回帰と修正
 

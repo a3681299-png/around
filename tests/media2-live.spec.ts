@@ -1,19 +1,21 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from '@playwright/test';
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openEditor } from './helpers/editor';
 
 test('optional real YouTube: saved group, mask, anchors, signals, theater, fullscreen and SPA', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_MEDIA !== '1', 'Explicit signed-out real YouTube regression.');
+  test.skip(process.env.AROUND_LIVE_MEDIA !== '1', 'Explicit signed-out real YouTube regression.');
   test.setTimeout(120_000);
   await mkdir('.work/verification', { recursive: true });
   await writeFile(
     '.work/verification/media2-live-attempt.json',
     JSON.stringify({ startedAt: new Date().toISOString(), status: 'starting' }),
   );
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-real2-')), false);
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-real2-')), false);
   context.setDefaultTimeout(10_000);
   context.setDefaultNavigationTimeout(30_000);
   const checks: { name: string; status: string; detail?: string }[] = [];
@@ -28,7 +30,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate(
       (element) => (element as HTMLElement & { data?: { id: string } }).data?.id ?? element.id,
@@ -40,12 +42,11 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded', timeout: 30_000 });
     await expect(page.locator('#movie_player video').first()).toBeAttached({ timeout: 20_000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
-    await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
-    await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-    const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-    await expect(panel).toBeVisible();
+    await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible();
+    // UI0-d round 3: the editor window (as a tab); the checks stay on the YouTube page.
+    const { panel } = await openEditor(popup, page);
     await exposeEditorControls(panel);
     await panel
       .getByLabel('アニメーション素材を追加')
@@ -53,7 +54,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
         ['petal.gif', 'petal.apng', 'alpha1080.webm'].map((name) => path.resolve(`tests/fixtures/motion/${name}`)),
       );
     const presentation =
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
       media = page.locator(`${presentation} .media`);
     await expect(media).toHaveCount(3);
     await expect(panel.getByRole('button', { name: 'アニメーションを追加', exact: true })).toBeEnabled();
@@ -127,9 +128,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
     await check('native fullscreen relocates the overlay and restores it', async () => {
       await page.locator('#movie_player .ytp-fullscreen-button').click({ timeout: 5000 });
       await expect
-        .poll(() =>
-          page.evaluate(() => Boolean(document.fullscreenElement?.querySelector('#web-world-themes-decorations'))),
-        )
+        .poll(() => page.evaluate(() => Boolean(document.fullscreenElement?.querySelector('#around-decorations'))))
         .toBe(true);
       await page.locator('#movie_player .ytp-fullscreen-button').click({ timeout: 5000 });
       await expect.poll(() => page.evaluate(() => !document.fullscreenElement)).toBe(true);
@@ -144,12 +143,12 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
       expect(await page.evaluate(() => performance.timeOrigin)).toBe(origin);
       await expect(media).toHaveCount(3);
       await page.goBack();
-      await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+      await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible();
     });
     await check('reload restores the saved animation group', async () => {
       await page.reload({ waitUntil: 'domcontentloaded' });
       await expect(media).toHaveCount(3);
-      await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+      await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible();
       if (
         await page
           .locator('#movie_player video')
@@ -161,7 +160,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
       await expect(page.locator(`${presentation} .media video`)).toHaveJSProperty('paused', false);
     });
     await check('OFF removes artwork and editing handles', async () => {
-      await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+      await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
       await expect(page.locator(presentation)).toHaveCount(0);
     });
     await mkdir('.work/verification', { recursive: true });

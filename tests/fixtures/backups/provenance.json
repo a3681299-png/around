@@ -1,0 +1,11 @@
+{
+  "commit": "6ce22ce3ae5f851557ee4fa1f3016cbc65f72a56",
+  "tag": "retro-theme-final",
+  "browser": "143.0.7499.4",
+  "capturedBy": "tests/backup-fixture-capture.spec.ts",
+  "files": {
+    "pre-removal.aroundbackup": "Backup page export: one saved image artwork (baseThemeId retro), its original, every retro setting away from its default",
+    "pre-removal-storage.json": "chrome.storage.local at the same moment",
+    "strength-zero-storage.json": "The same storage with the effect strength at 0% (the switch still ON)"
+  }
+}

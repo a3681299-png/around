@@ -1,0 +1,60 @@
+<!-- @dsCard group="Inputs" height=260 subtitle="number scrub, text, pairs, segments" -->
+<div
+  class="ww"
+  style="
+    background: var(--ground);
+    padding: 20px;
+    min-height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+  "
+  ><div
+    style="
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 300px;
+      padding: 12px 20px 20px;
+      background: var(--surface);
+    "
+  >
+    <div class="around-field"
+      ><span class="around-field__label">名前</span><input class="around-input" value="雨粒"
+    /></div>
+    <div class="around-pair"
+      ><div class="around-field"
+        ><span class="around-field__label">位置</span
+        ><div class="around-scrub"
+          ><span class="around-scrub__axis">X</span><input class="around-scrub__value" value="212" /><span
+            class="around-scrub__unit"
+            >px</span
+          ></div
+        ></div
+      ><div class="around-field"
+        ><span class="around-field__label">&#8203;</span
+        ><div class="around-scrub around-scrub--active"
+          ><span class="around-scrub__axis">Y</span><input class="around-scrub__value" value="84" /><span
+            class="around-scrub__unit"
+            >px</span
+          ></div
+        ></div
+      ></div
+    >
+    <div class="around-field"
+      ><span class="around-field__label">不透明度</span
+      ><div class="around-scrub"
+        ><span class="around-scrub__axis">α</span><input class="around-scrub__value" value="0.80" /></div
+    ></div>
+    <div class="around-field"
+      ><span class="around-field__label">コマ打ち</span
+      ><div class="around-segs"
+        ><button class="around-seg" aria-pressed="false">1コマ</button
+        ><button class="around-seg" aria-pressed="true">2コマ</button
+        ><button class="around-seg" aria-pressed="false">3コマ</button></div
+      ></div
+    >
+  </div></div
+>
+<script></script>

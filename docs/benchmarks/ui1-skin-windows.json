@@ -1,0 +1,1028 @@
+{
+  "build3": {
+    "mode": "build",
+    "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+    "measuredAt": "2026-10-26T08:29:57.664Z",
+    "builds": {
+      "before": "29b8d5ba923c4a0a06db96678a4c27346893dd95",
+      "after": "dfd617685191984c99c174f49f72956ab3cb2d88"
+    },
+    "pairs": 6,
+    "orders": [
+      ["before", "after"],
+      ["after", "before"],
+      ["before", "after"],
+      ["after", "before"],
+      ["before", "after"],
+      ["after", "before"]
+    ],
+    "summary": {
+      "startup": {
+        "before": {
+          "extensionCpuPerFrameMs": {
+            "count": 1701,
+            "mean": 0.544679600243916,
+            "median": 0,
+            "p95": 2.900000002235174,
+            "max": 24
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 66.32452166456044,
+            "median": 62.616760950424094,
+            "p95": 94.75564404537208,
+            "max": 94.75564404537208
+          },
+          "fullFrameMs": {
+            "count": 1761,
+            "mean": 19.437063600227077,
+            "median": 6.98,
+            "p95": 77.902,
+            "max": 780.508
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [
+            2.899999998509884, 3.300000000745058, 1.5999999977648258, 5.300000000745058, 3.399999998509884,
+            1.8999999985098839
+          ]
+        },
+        "after": {
+          "extensionCpuPerFrameMs": {
+            "count": 2123,
+            "mean": 0.3672162035337131,
+            "median": 0,
+            "p95": 2.199999999254942,
+            "max": 24.099999997764826
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 55.59385824579226,
+            "median": 51.55361704492152,
+            "p95": 87.22544050918624,
+            "max": 87.22544050918624
+          },
+          "fullFrameMs": {
+            "count": 2180,
+            "mean": 15.6323894495413,
+            "median": 6.956,
+            "p95": 52.733,
+            "max": 699.543
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [
+            2, 6.00000000372529, 2.600000001490116, 1.2999999970197678, 1.1000000052154064, 1.6000000014901161
+          ]
+        },
+        "delta": {
+          "median": 0,
+          "p95": -0.7000000029802322,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      },
+      "steady": {
+        "before": {
+          "extensionCpuPerFrameMs": {
+            "count": 4333,
+            "mean": 0.07059773829237517,
+            "median": 0,
+            "p95": 0.6000000014901161,
+            "max": 3.100000001490116
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 8.242539339655517,
+            "median": 8.60447738281443,
+            "p95": 11.339888873316259,
+            "max": 11.339888873316259
+          },
+          "fullFrameMs": {
+            "count": 4339,
+            "mean": 16.09179004378883,
+            "median": 6.969,
+            "p95": 35.157,
+            "max": 494.688
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [0.5999999977648258, 0.5, 0.3999999985098839, 1, 0.7000000029802322, 0.6000000014901161]
+        },
+        "after": {
+          "extensionCpuPerFrameMs": {
+            "count": 4579,
+            "mean": 0.06811530902236537,
+            "median": 0,
+            "p95": 0.5,
+            "max": 3.800000000745058
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 8.399531175389269,
+            "median": 8.030839786165838,
+            "p95": 12.431860712059306,
+            "max": 12.431860712059306
+          },
+          "fullFrameMs": {
+            "count": 4578,
+            "mean": 15.489643730886858,
+            "median": 6.949,
+            "p95": 33.795,
+            "max": 484.226
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [
+            0.5, 0.5999999977648258, 0.3999999985098839, 0.6000000014901161, 0.3999999985098839, 0.8000000007450581
+          ]
+        },
+        "delta": {
+          "median": 0,
+          "p95": -0.10000000149011612,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      },
+      "spa": {
+        "before": {
+          "extensionCpuPerFrameMs": {
+            "count": 3296,
+            "mean": 0.19572208738022312,
+            "median": 0,
+            "p95": 0.19999999925494194,
+            "max": 59.79999999329448
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 17.88162153578966,
+            "median": 17.29549640226736,
+            "p95": 25.38526756881396,
+            "max": 25.38526756881396
+          },
+          "fullFrameMs": {
+            "count": 3309,
+            "mean": 16.80839921426416,
+            "median": 7.58,
+            "p95": 31.54,
+            "max": 1208.683
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [0.5, 0.09999999776482582, 0.10000000149011612, 0.3999999985098839, 0, 0.20000000298023224]
+        },
+        "after": {
+          "extensionCpuPerFrameMs": {
+            "count": 3307,
+            "mean": 0.20453583307075363,
+            "median": 0,
+            "p95": 0.19999999925494194,
+            "max": 70
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 18.730185882670924,
+            "median": 22.05227035277334,
+            "p95": 24.402415288823885,
+            "max": 24.402415288823885
+          },
+          "fullFrameMs": {
+            "count": 3320,
+            "mean": 16.7084355421687,
+            "median": 10.6355,
+            "p95": 32.208,
+            "max": 1154.721
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [
+            0.6999999992549419, 0.19999999552965164, 0, 0.4000000022351742, 0.10000000149011612, 0.5999999977648258
+          ]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      }
+    }
+  },
+  "skin3": {
+    "mode": "skin",
+    "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+    "measuredAt": "2026-10-26T08:25:34.764Z",
+    "builds": {
+      "before": "29b8d5ba923c4a0a06db96678a4c27346893dd95",
+      "after": "dfd617685191984c99c174f49f72956ab3cb2d88"
+    },
+    "pairs": 4,
+    "orders": [
+      ["plain", "skinned"],
+      ["skinned", "plain"],
+      ["plain", "skinned"],
+      ["skinned", "plain"]
+    ],
+    "summary": {
+      "startup": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 2052,
+            "mean": 0.18070175439540523,
+            "median": 0,
+            "p95": 1.199999999254942,
+            "max": 17.700000002980232
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 34.47454158731565,
+            "median": 28.404442534687234,
+            "p95": 54.23064358193897,
+            "max": 54.23064358193897
+          },
+          "fullFrameMs": {
+            "count": 2085,
+            "mean": 13.222731894484424,
+            "median": 7.052,
+            "p95": 34.218,
+            "max": 673.898
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [2.300000000745058, 0.6999999992549419, 0.6999999955296516, 0.6000000014901161]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 2237,
+            "mean": 0.12771569066512356,
+            "median": 0,
+            "p95": 0.6999999992549419,
+            "max": 8.5
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 27.98249790963094,
+            "median": 26.633713457496466,
+            "p95": 32.27140269178453,
+            "max": 32.27140269178453
+          },
+          "fullFrameMs": {
+            "count": 2272,
+            "mean": 12.034599911971839,
+            "median": 7.0344999999999995,
+            "p95": 24.219,
+            "max": 704.61
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.9999999962747097, 0.6999999992549419, 0.6000000014901161, 0.6000000014901161]
+        },
+        "delta": {
+          "median": 0,
+          "p95": -0.5,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      },
+      "steady": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 2915,
+            "mean": 0.07759862777554968,
+            "median": 0,
+            "p95": 0.6000000014901161,
+            "max": 3.300000000745058
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 9.142690278037009,
+            "median": 9.643329583419591,
+            "p95": 10.951802346352963,
+            "max": 10.951802346352963
+          },
+          "fullFrameMs": {
+            "count": 2921,
+            "mean": 16.879850736049324,
+            "median": 6.958,
+            "p95": 39.919,
+            "max": 477.072
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.6999999992549419, 0.3999999985098839, 0.6000000014901161, 0.7999999970197678]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 2731,
+            "mean": 0.09073599413888483,
+            "median": 0,
+            "p95": 0.6999999992549419,
+            "max": 3.400000002235174
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 9.966160576901817,
+            "median": 10.781366824838752,
+            "p95": 12.133891211350823,
+            "max": 12.133891211350823
+          },
+          "fullFrameMs": {
+            "count": 2738,
+            "mean": 13.346799488677874,
+            "median": 6.976,
+            "p95": 46.816,
+            "max": 408.515
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.30000000074505806, 0.6000000014901161, 0.7999999970197678, 0.8999999985098839]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0.09999999776482582,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      },
+      "spa": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 2174,
+            "mean": 0.20501379946481502,
+            "median": 0,
+            "p95": 0.19999999925494194,
+            "max": 54.900000013411045
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 18.494007888129566,
+            "median": 19.90273718667696,
+            "p95": 23.875145276564016,
+            "max": 23.875145276564016
+          },
+          "fullFrameMs": {
+            "count": 2189,
+            "mean": 14.325611694837823,
+            "median": 7.095,
+            "p95": 31.751,
+            "max": 1294.12
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.30000000074505806, 0, 0.19999999925494194, 0.3999999985098839]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 1944,
+            "mean": 0.24511316872427982,
+            "median": 0,
+            "p95": 0.29999999701976776,
+            "max": 63.29999999329448
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 19.70861795550911,
+            "median": 19.90870201070852,
+            "p95": 20.959616813693927,
+            "max": 20.959616813693927
+          },
+          "fullFrameMs": {
+            "count": 1958,
+            "mean": 15.914536772216568,
+            "median": 7.125500000000001,
+            "p95": 33.898,
+            "max": 1153.145
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.10000000149011612, 0.6000000014901161, 0.29999999701976776, 0.19999999925494194]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0.09999999776482582,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      }
+    }
+  },
+  "skin2": {
+    "mode": "skin",
+    "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+    "measuredAt": "2026-10-26T08:08:02.386Z",
+    "builds": {
+      "before": "29b8d5ba923c4a0a06db96678a4c27346893dd95",
+      "after": "6dc8296f1ab1335311f83170a9314b87d7ceec49"
+    },
+    "pairs": 4,
+    "orders": [
+      ["plain", "skinned"],
+      ["skinned", "plain"],
+      ["plain", "skinned"],
+      ["skinned", "plain"]
+    ],
+    "summary": {
+      "startup": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 2070,
+            "mean": 0.15260869563345747,
+            "median": 0,
+            "p95": 0.8000000007450581,
+            "max": 12.100000001490116
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 31.712231623071442,
+            "median": 31.428469854223533,
+            "p95": 37.47495430718258,
+            "max": 37.47495430718258
+          },
+          "fullFrameMs": {
+            "count": 2125,
+            "mean": 13.659593411764714,
+            "median": 7.145,
+            "p95": 30.064,
+            "max": 566.451
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [1.300000000745058, 0.5, 0.6999999992549419, 0.6999999955296516]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 2184,
+            "mean": 0.19629120879086764,
+            "median": 0,
+            "p95": 1.300000000745058,
+            "max": 9.699999999254942
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 35.548297950441444,
+            "median": 34.87442600730766,
+            "p95": 39.43896399005047,
+            "max": 39.43896399005047
+          },
+          "fullFrameMs": {
+            "count": 2223,
+            "mean": 12.942323436797128,
+            "median": 7.108,
+            "p95": 26.98,
+            "max": 743.742
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [1.3999999985098839, 1.199999999254942, 1.199999999254942, 1.5]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0.5,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      },
+      "steady": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 2620,
+            "mean": 0.10965648854563709,
+            "median": 0,
+            "p95": 0.8000000007450581,
+            "max": 3.199999999254942
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 11.561921300763915,
+            "median": 12.01398606860282,
+            "p95": 14.606687048818847,
+            "max": 14.606687048818847
+          },
+          "fullFrameMs": {
+            "count": 2621,
+            "mean": 18.634714994276976,
+            "median": 6.967,
+            "p95": 50.686,
+            "max": 469.175
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.6999999992549419, 0.4000000022351742, 1, 1.0999999977648258]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 2647,
+            "mean": 0.22814506989269379,
+            "median": 0,
+            "p95": 2.2999999970197678,
+            "max": 7.899999998509884
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 24.125994691694263,
+            "median": 22.814800216660288,
+            "p95": 29.030652388760927,
+            "max": 29.030652388760927
+          },
+          "fullFrameMs": {
+            "count": 2658,
+            "mean": 14.508015425131664,
+            "median": 7.0024999999999995,
+            "p95": 47.475,
+            "max": 513.652
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [2.199999999254942, 2.100000001490116, 2, 2.5]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 1.4999999962747097,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": false
+        }
+      },
+      "spa": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 2170,
+            "mean": 0.20073732719306023,
+            "median": 0,
+            "p95": 0.19999999925494194,
+            "max": 57.49999999254942
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 18.11398575401597,
+            "median": 17.006855476463407,
+            "p95": 23.57635713704299,
+            "max": 23.57635713704299
+          },
+          "fullFrameMs": {
+            "count": 2181,
+            "mean": 15.067110499770779,
+            "median": 7.187,
+            "p95": 28.517,
+            "max": 1158.615
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0, 0.19999999925494194, 0.30000000074505806, 0.30000000074505806]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 1971,
+            "mean": 0.34880771183653086,
+            "median": 0,
+            "p95": 0.29999999701976776,
+            "max": 67.99999999627471
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 28.491879950623687,
+            "median": 28.318339656237715,
+            "p95": 34.55028211691136,
+            "max": 34.55028211691136
+          },
+          "fullFrameMs": {
+            "count": 1984,
+            "mean": 15.434774193548394,
+            "median": 7.1665,
+            "p95": 32.355,
+            "max": 1381.976
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.10000000149011612, 0.19999999925494194, 0.8000000007450581, 0.3999999985098839]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0.09999999776482582,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      }
+    }
+  },
+  "build2": {
+    "mode": "build",
+    "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+    "measuredAt": "2026-10-26T08:12:22.666Z",
+    "builds": {
+      "before": "29b8d5ba923c4a0a06db96678a4c27346893dd95",
+      "after": "6dc8296f1ab1335311f83170a9314b87d7ceec49"
+    },
+    "pairs": 6,
+    "orders": [
+      ["before", "after"],
+      ["after", "before"],
+      ["before", "after"],
+      ["after", "before"],
+      ["before", "after"],
+      ["after", "before"]
+    ],
+    "summary": {
+      "startup": {
+        "before": {
+          "extensionCpuPerFrameMs": {
+            "count": 973,
+            "mean": 0.8919835560950321,
+            "median": 0,
+            "p95": 4.5,
+            "max": 25
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 89.35505852336114,
+            "median": 70.29249913047565,
+            "p95": 135.7941330930276,
+            "max": 135.7941330930276
+          },
+          "fullFrameMs": {
+            "count": 1027,
+            "mean": 30.85741772151898,
+            "median": 7.045,
+            "p95": 118.643,
+            "max": 1341.891
+          },
+          "pairMedians": [0, 0, 1, 0, 0, 0],
+          "pairP95": [2.899999998509884, 5.400000002235174, 5.700000002980232, 14.600000001490116, 3, 4.699999999254942]
+        },
+        "after": {
+          "extensionCpuPerFrameMs": {
+            "count": 1453,
+            "mean": 0.6786648313869342,
+            "median": 0,
+            "p95": 3.3000000044703484,
+            "max": 33.79999999701977
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 75.67414040183702,
+            "median": 69.93054451150027,
+            "p95": 103.04571839242098,
+            "max": 103.04571839242098
+          },
+          "fullFrameMs": {
+            "count": 1506,
+            "mean": 22.91317397078354,
+            "median": 6.967499999999999,
+            "p95": 91.805,
+            "max": 1530.73
+          },
+          "pairMedians": [0, 0, 1.1500000022351742, 0, 0, 0],
+          "pairP95": [2.699999999254942, 4.399999998509884, 8.099999997764826, 2.899999998509884, 3.099999997764826, 3]
+        },
+        "delta": {
+          "median": 0,
+          "p95": -1.1999999955296516,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      },
+      "steady": {
+        "before": {
+          "extensionCpuPerFrameMs": {
+            "count": 3827,
+            "mean": 0.12636529919619593,
+            "median": 0,
+            "p95": 0.8999999985098839,
+            "max": 6.800000000745058
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 12.963620957298552,
+            "median": 11.485398479595784,
+            "p95": 28.09994676625718,
+            "max": 28.09994676625718
+          },
+          "fullFrameMs": {
+            "count": 3840,
+            "mean": 17.969116145833294,
+            "median": 7,
+            "p95": 50.278,
+            "max": 483.894
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [0.8000000007450581, 0.6000000014901161, 0.5, 2.2000000029802322, 1, 0.8999999985098839]
+        },
+        "after": {
+          "extensionCpuPerFrameMs": {
+            "count": 4076,
+            "mean": 0.08464180572018744,
+            "median": 0,
+            "p95": 0.6999999992549419,
+            "max": 3.699999999254942
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 9.286136065356551,
+            "median": 9.337233038225511,
+            "p95": 10.668425967178953,
+            "max": 10.668425967178953
+          },
+          "fullFrameMs": {
+            "count": 4080,
+            "mean": 17.342559313725467,
+            "median": 6.9755,
+            "p95": 42.289,
+            "max": 490.785
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [
+            0.7000000029802322, 0.6999999992549419, 0.8000000007450581, 0.5, 0.6999999992549419, 0.5999999977648258
+          ]
+        },
+        "delta": {
+          "median": 0,
+          "p95": -0.19999999925494194,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      },
+      "spa": {
+        "before": {
+          "extensionCpuPerFrameMs": {
+            "count": 2447,
+            "mean": 0.4111973845719999,
+            "median": 0,
+            "p95": 1,
+            "max": 79.8999999947846
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 27.529480413887843,
+            "median": 24.537170181114767,
+            "p95": 47.08034467793203,
+            "max": 47.08034467793203
+          },
+          "fullFrameMs": {
+            "count": 2465,
+            "mean": 21.209422718052714,
+            "median": 8.773,
+            "p95": 56.771,
+            "max": 1561.716
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [
+            0.6000000014901161, 0.6000000014901161, 4.50000000372529, 0.6000000014901161, 0.5, 0.6999999992549419
+          ]
+        },
+        "after": {
+          "extensionCpuPerFrameMs": {
+            "count": 2868,
+            "mean": 0.3081938633123722,
+            "median": 0,
+            "p95": 0.4000000022351742,
+            "max": 81
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 6,
+            "mean": 24.485581530322417,
+            "median": 26.201265887600037,
+            "p95": 29.529978406551056,
+            "max": 29.529978406551056
+          },
+          "fullFrameMs": {
+            "count": 2881,
+            "mean": 18.14461332870527,
+            "median": 10.539,
+            "p95": 36.894,
+            "max": 1267.605
+          },
+          "pairMedians": [0, 0, 0, 0, 0, 0],
+          "pairP95": [
+            0.20000000298023224, 0.3999999985098839, 0.20000000298023224, 0.6999999992549419, 0.6999999992549419,
+            0.4000000022351742
+          ]
+        },
+        "delta": {
+          "median": 0,
+          "p95": -0.5999999977648258,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      }
+    }
+  },
+  "skin": {
+    "mode": "skin",
+    "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+    "measuredAt": "2026-10-26T07:59:34.253Z",
+    "builds": {
+      "before": "29b8d5ba923c4a0a06db96678a4c27346893dd95",
+      "after": "00adcd2cbd6eaa139d6c23aee877597c9b90ce4c"
+    },
+    "pairs": 4,
+    "orders": [
+      ["plain", "skinned"],
+      ["skinned", "plain"],
+      ["plain", "skinned"],
+      ["skinned", "plain"]
+    ],
+    "summary": {
+      "startup": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 2099,
+            "mean": 0.14749880893605843,
+            "median": 0,
+            "p95": 0.8999999985098839,
+            "max": 18.900000002235174
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 30.14140096058906,
+            "median": 27.109029809648852,
+            "p95": 39.398945428301175,
+            "max": 39.398945428301175
+          },
+          "fullFrameMs": {
+            "count": 2140,
+            "mean": 13.074732242990661,
+            "median": 7.1185,
+            "p95": 26.81,
+            "max": 701.547
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [1.699999999254942, 0.9000000022351742, 0.5000000037252903, 0.5]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 2202,
+            "mean": 0.18664850134040473,
+            "median": 0,
+            "p95": 1.3999999947845936,
+            "max": 10.600000001490116
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 34.35307539042072,
+            "median": 34.12753800268054,
+            "p95": 35.43345686621858,
+            "max": 35.43345686621858
+          },
+          "fullFrameMs": {
+            "count": 2238,
+            "mean": 13.204488382484355,
+            "median": 7.1185,
+            "p95": 26.328,
+            "max": 801.991
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [1.2000000029802322, 1.3999999947845936, 1.2999999970197678, 1.5]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0.4999999962747097,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      },
+      "steady": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 2553,
+            "mean": 0.11778300037827158,
+            "median": 0,
+            "p95": 0.8999999985098839,
+            "max": 4.099999997764826
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 12.04824083202843,
+            "median": 11.695628647343128,
+            "p95": 15.42932373891145,
+            "max": 15.42932373891145
+          },
+          "fullFrameMs": {
+            "count": 2559,
+            "mean": 19.052227823368526,
+            "median": 6.974,
+            "p95": 52.522,
+            "max": 477.476
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.8000000007450581, 0.8999999985098839, 1.199999999254942, 0.8000000007450581]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 2607,
+            "mean": 0.23970080554302414,
+            "median": 0,
+            "p95": 2.300000000745058,
+            "max": 9.300000000745058
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 24.998040083805027,
+            "median": 25.762712380128963,
+            "p95": 27.597142582079968,
+            "max": 27.597142582079968
+          },
+          "fullFrameMs": {
+            "count": 2616,
+            "mean": 16.105177752293567,
+            "median": 6.9985,
+            "p95": 52.099,
+            "max": 497.925
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [2.400000002235174, 2.399999998509884, 2.199999999254942, 2.100000001490116]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 1.4000000022351742,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": false
+        }
+      },
+      "spa": {
+        "plain": {
+          "extensionCpuPerFrameMs": {
+            "count": 1936,
+            "mean": 0.23011363635593948,
+            "median": 0,
+            "p95": 0.20000000298023224,
+            "max": 64.70000000670552
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 18.474123606193533,
+            "median": 18.531035768593057,
+            "p95": 20.00231240569916,
+            "max": 20.00231240569916
+          },
+          "fullFrameMs": {
+            "count": 1946,
+            "mean": 15.86573484069886,
+            "median": 7.094,
+            "p95": 32.201,
+            "max": 1407.206
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.29999999701976776, 0.3999999985098839, 0.19999999925494194, 0.19999999925494194]
+        },
+        "skinned": {
+          "extensionCpuPerFrameMs": {
+            "count": 1900,
+            "mean": 0.3364210526311868,
+            "median": 0,
+            "p95": 0.30000000074505806,
+            "max": 80
+          },
+          "extensionCpuPerSecondMs": {
+            "count": 4,
+            "mean": 26.563149588889605,
+            "median": 26.603917857963395,
+            "p95": 28.44860495956846,
+            "max": 28.44860495956846
+          },
+          "fullFrameMs": {
+            "count": 1913,
+            "mean": 15.998646628332484,
+            "median": 7.127,
+            "p95": 33.623,
+            "max": 1222.668
+          },
+          "pairMedians": [0, 0, 0, 0],
+          "pairP95": [0.30000000074505806, 0.20000000298023224, 0.30000000074505806, 0.4000000022351742]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0.09999999776482582,
+          "limits": {
+            "median": 0.5,
+            "p95": 1
+          },
+          "pass": true
+        }
+      }
+    }
+  },
+  "note": "build3/skin3 are the final revision dfd6176. skin (3e18edc+harness fix) and skin2 (6dc8296) are the failing runs before the compact fix. Extension CPU per frame = all extension callbacks (rAF, timers, Mutation/Resize/IntersectionObserver, listeners, top-level eval) grouped by frame. Full-frame values from Chrome trace AnimationFrame flows, reference only."
+}

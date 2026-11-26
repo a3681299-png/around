@@ -1,0 +1,3317 @@
+{
+  "openReply": {
+    "ok": true
+  },
+  "window": {
+    "editor": {
+      "alwaysOnTop": false,
+      "focused": true,
+      "height": 760,
+      "id": 925911512,
+      "incognito": false,
+      "left": 0,
+      "state": "normal",
+      "top": 0,
+      "type": "popup",
+      "width": 1100
+    },
+    "tab": {
+      "active": true,
+      "audible": false,
+      "autoDiscardable": true,
+      "discarded": false,
+      "frozen": false,
+      "groupId": -1,
+      "height": 713,
+      "highlighted": true,
+      "id": 925911513,
+      "incognito": false,
+      "index": 0,
+      "lastAccessed": 1793793288989.876,
+      "mutedInfo": {
+        "muted": false
+      },
+      "pinned": false,
+      "selected": true,
+      "splitViewId": -1,
+      "status": "complete",
+      "width": 1082,
+      "windowId": 925911512
+    }
+  },
+  "saved": {
+    "baseThemeId": null,
+    "decorations": [
+      {
+        "assetId": "asset-50e23ecd97d7cc20cfa556bbc9c762cf8e9aad5a102e24ce8ba46e162794c900",
+        "character": {
+          "motions": [
+            {
+              "assetId": "asset-b7729782eb38fed22a5f7e46860daf023331d24efb8b01e1e6b645a531d04b88",
+              "id": "motion-0",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-0",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-92b1b12f63e5e60640206d59936a1a23a364808ef9d31d834c20895c43a47f80",
+              "id": "motion-1",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-1",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-aed4684527a0d808165e61069446d74a83bac0543abebd698a01306d74f8358c",
+              "id": "motion-2",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-2",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-bb5879a2ba4b911ca38da27eff411969ec97364e9c074fc90b88d65f6adc97fe",
+              "id": "motion-3",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-3",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-a8b6a71f5858149b4dec482e741d9c370e578acd576e260a654460b40ab8887d",
+              "id": "motion-4",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-4",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-f104a1f4610d695372ac2916b645e71f99d8e56fc0668d0289c0eb0d37338d0d",
+              "id": "motion-5",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-5",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-c4f915fd362c0b82add5d026aeaec649ae74f844a4fca78f869120fe3cf3ae3e",
+              "id": "motion-6",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-6",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-b3b6d73e0aa1bb4b090888275370c6c6d9ad73824193b356626603f187e614b4",
+              "id": "motion-7",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-7",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-381626e0d57f47198957c22b535b29cb44420b2e09465bd30a74637e20609dc7",
+              "id": "motion-8",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-8",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-4c665a90e6e936d18cdaed30fa2ffed4e7ec44b97f5474eec8da5456a77cdd88",
+              "id": "motion-9",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-9",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-5bdedbdf843c7a9399d116014bee6e120a6784dc1c9ca40b05637a660b23cdc7",
+              "id": "motion-10",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-10",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-73673f9f67d1cff12731395cf187da0332e9055f31cd75833849941aee9d0287",
+              "id": "motion-11",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-11",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-f633c9faf0f1207e360cf417f9498eebb10d4b52f233c86694c98316e26e763d",
+              "id": "motion-12",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-12",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-a1d0faebcfeb9f575146f287fd4b438298461e2430a34cab8c3ae65dd04bfa11",
+              "id": "motion-13",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-13",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-4d368032e6bfecba11ecc313d6e78d0d3ca25e62a13d24c2910975970f91ad31",
+              "id": "motion-14",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-14",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-34172e60c7e22085e903cf8c65f24c3728e93d70eff8814dd99e87d8dff86c70",
+              "id": "motion-15",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-15",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-eb32b3d39ca6e36f6825407c79e1356aac63254d3177c9007b14bb72d8651383",
+              "id": "motion-16",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-16",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-f76f50a7116dc23c60397a92f8ded08fc3212f5d2db4096610fad04ff17bfeac",
+              "id": "motion-17",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-17",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-499326a0b163f445995cc8012836b69c3d3c43583787d7606c921b22291397ed",
+              "id": "motion-18",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-18",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-bda480d82e8c2718175a61b37021ce2034986c8a546cff0936b73272e6529c6e",
+              "id": "motion-19",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-19",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-e31149c5ec39d444da3bbcfeb7d2f651f7b85a720eb5f690b817f67a19a07cd4",
+              "id": "motion-20",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-20",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-bf1c2eb37871d1a044d285c44a1054e5930ee8fb85ad4f7d32d55a18c7075e22",
+              "id": "motion-21",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-21",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-045fd5944dfc8d503564dc2ee418fd330170a848206709ff8fba5c26bd331aec",
+              "id": "motion-22",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-22",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-e701c719f1391cd79694d1bd7887ce8f234c9a7e493411e5ecf90be23472f831",
+              "id": "motion-23",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-23",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-9bb8700580b9e3345fcd9f77cab2f52d6d60cb78c38f4f9b68912fdfeb2b18e8",
+              "id": "motion-24",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-24",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-326082abfa82ee3bf7692757ffc3b54c50884ba480453c73e4d09f14946d0503",
+              "id": "motion-25",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-25",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-6cbb51aacdb809c3163f3e91b4e84f793624354cf4752c3a299926b50d646dcb",
+              "id": "motion-26",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-26",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-018f95085e2309a7bb90519c58f8b94fbe88160ed6b5a096ebc7761364461192",
+              "id": "motion-27",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-27",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-a934c7464567dd270729e028cade6f77d473fc6b1e1989002fcbfbcd97f244cc",
+              "id": "motion-28",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-28",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-3a82eede5604cf9fb7f3955c476d93560e0b668b1fe910712d0dba80eec6bd7f",
+              "id": "motion-29",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-29",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-265850b23009b5ed48072223018fd02dcc3ac9d2025995bb8e81fe126a0bafaa",
+              "id": "motion-30",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-30",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-d7cd83ccb643879121b3ded3fac1e2652bed686c809782d5124f60383045d140",
+              "id": "motion-31",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-31",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-db6468394ce8cad5c70f6fa51bdc26642add72b70dc9cac9aa86171b7a1d54a1",
+              "id": "motion-32",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-32",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-30926879abacfea3f215ec755ffc90431c116281a78c6189218518e32550070a",
+              "id": "motion-33",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-33",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-6bc50651501f2ac6edda28db42f56c2256f4f0872fb941a7d1ef6874ccaa9d8d",
+              "id": "motion-34",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-34",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-f7ea8a3071eb9533dc5150c4b36ecd4e38eabb256e8ca49291eb3bf766936dd1",
+              "id": "motion-35",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-35",
+                "restHipsHeight": 0.9
+              }
+            }
+          ],
+          "standardMotions": "auto"
+        },
+        "id": "image-11cbb1b0-550b-43b4-9a5f-a831f1a734d9",
+        "kind": "model3d",
+        "locked": false,
+        "model": {
+          "clip": 0,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+            "enabled": false,
+            "faceMovement": true,
+            "forwardDeg": 0,
+            "idle": null,
+            "run": null,
+            "runSpeed": 220,
+            "walk": null,
+            "walkSpeed": 10
+          },
+          "look": {
+            "bone": 3,
+            "enabled": true,
+            "lagMs": 160,
+            "pitchLimit": 30,
+            "yawLimit": 50
+          },
+          "loop": true,
+          "playing": true,
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "speed": 1,
+          "vrm": {
+            "expressions": {},
+            "headFollow": true,
+            "lookAt": true,
+            "springBone": true
+          }
+        },
+        "name": "Original.vrm",
+        "opacity": 1,
+        "placement": {
+          "anchor": {
+            "kind": "viewport"
+          },
+          "heightPx": 200,
+          "rotationDeg": 0,
+          "widthPx": 200,
+          "x": 0.45,
+          "y": 0.45
+        },
+        "source": {
+          "bones": [
+            {
+              "name": "Hips",
+              "node": 2
+            },
+            {
+              "name": "Head",
+              "node": 3
+            },
+            {
+              "name": "spine",
+              "node": 4
+            },
+            {
+              "name": "leftUpperArm",
+              "node": 5
+            },
+            {
+              "name": "leftLowerArm",
+              "node": 6
+            },
+            {
+              "name": "leftHand",
+              "node": 7
+            },
+            {
+              "name": "leftUpperLeg",
+              "node": 8
+            },
+            {
+              "name": "leftLowerLeg",
+              "node": 9
+            },
+            {
+              "name": "leftFoot",
+              "node": 10
+            },
+            {
+              "name": "leftEye",
+              "node": 11
+            },
+            {
+              "name": "rightUpperArm",
+              "node": 12
+            },
+            {
+              "name": "rightLowerArm",
+              "node": 13
+            },
+            {
+              "name": "rightHand",
+              "node": 14
+            },
+            {
+              "name": "rightUpperLeg",
+              "node": 15
+            },
+            {
+              "name": "rightLowerLeg",
+              "node": 16
+            },
+            {
+              "name": "rightFoot",
+              "node": 17
+            },
+            {
+              "name": "rightEye",
+              "node": 18
+            }
+          ],
+          "clips": [
+            {
+              "duration": 2,
+              "name": "Rest / 待機"
+            },
+            {
+              "duration": 2,
+              "name": "Stride"
+            },
+            {
+              "duration": 2,
+              "name": "Sprint"
+            }
+          ],
+          "format": "vrm",
+          "textureBytes": 4,
+          "triangles": 12,
+          "vertices": 8,
+          "vrm": {
+            "body": {
+              "armLength": 0.29999999999999993,
+              "armRatio": 0.27272727272727265,
+              "headLength": 0.25,
+              "headsTall": 4.4,
+              "height": 1.1,
+              "hipsHeight": 0.5,
+              "hipsRatio": 0.45454545454545453,
+              "legLength": 0.2618033988749895,
+              "legRatio": 0.23800308988635407,
+              "shoulderWidth": 0.3
+            },
+            "expressions": ["happy", "blink"],
+            "humanoid": [
+              {
+                "bone": "hips",
+                "node": 2
+              },
+              {
+                "bone": "head",
+                "node": 3
+              },
+              {
+                "bone": "spine",
+                "node": 4
+              },
+              {
+                "bone": "leftUpperArm",
+                "node": 5
+              },
+              {
+                "bone": "leftLowerArm",
+                "node": 6
+              },
+              {
+                "bone": "leftHand",
+                "node": 7
+              },
+              {
+                "bone": "leftUpperLeg",
+                "node": 8
+              },
+              {
+                "bone": "leftLowerLeg",
+                "node": 9
+              },
+              {
+                "bone": "leftFoot",
+                "node": 10
+              },
+              {
+                "bone": "leftEye",
+                "node": 11
+              },
+              {
+                "bone": "rightUpperArm",
+                "node": 12
+              },
+              {
+                "bone": "rightLowerArm",
+                "node": 13
+              },
+              {
+                "bone": "rightHand",
+                "node": 14
+              },
+              {
+                "bone": "rightUpperLeg",
+                "node": 15
+              },
+              {
+                "bone": "rightLowerLeg",
+                "node": 16
+              },
+              {
+                "bone": "rightFoot",
+                "node": 17
+              },
+              {
+                "bone": "rightEye",
+                "node": 18
+              }
+            ],
+            "lookAt": true,
+            "mtoon": true,
+            "springBone": true,
+            "version": "1.0"
+          }
+        },
+        "visible": true,
+        "zIndex": 0
+      }
+    ],
+    "id": "youtube-custom",
+    "rules": [],
+    "schemaVersion": 14,
+    "siteId": "youtube"
+  },
+  "backup": {
+    "assets": 37,
+    "designs": [
+      {
+        "schemaVersion": 14,
+        "id": "youtube-custom",
+        "siteId": "youtube",
+        "baseThemeId": null,
+        "rules": [],
+        "decorations": [
+          {
+            "id": "image-11cbb1b0-550b-43b4-9a5f-a831f1a734d9",
+            "assetId": "asset-50e23ecd97d7cc20cfa556bbc9c762cf8e9aad5a102e24ce8ba46e162794c900",
+            "name": "Original.vrm",
+            "placement": {
+              "anchor": {
+                "kind": "viewport"
+              },
+              "x": 0.45,
+              "y": 0.45,
+              "widthPx": 200,
+              "heightPx": 200,
+              "rotationDeg": 0
+            },
+            "opacity": 1,
+            "zIndex": 0,
+            "visible": true,
+            "locked": false,
+            "kind": "model3d",
+            "source": {
+              "format": "vrm",
+              "vrm": {
+                "version": "1.0",
+                "humanoid": [
+                  {
+                    "bone": "hips",
+                    "node": 2
+                  },
+                  {
+                    "bone": "head",
+                    "node": 3
+                  },
+                  {
+                    "bone": "spine",
+                    "node": 4
+                  },
+                  {
+                    "bone": "leftUpperArm",
+                    "node": 5
+                  },
+                  {
+                    "bone": "leftLowerArm",
+                    "node": 6
+                  },
+                  {
+                    "bone": "leftHand",
+                    "node": 7
+                  },
+                  {
+                    "bone": "leftUpperLeg",
+                    "node": 8
+                  },
+                  {
+                    "bone": "leftLowerLeg",
+                    "node": 9
+                  },
+                  {
+                    "bone": "leftFoot",
+                    "node": 10
+                  },
+                  {
+                    "bone": "leftEye",
+                    "node": 11
+                  },
+                  {
+                    "bone": "rightUpperArm",
+                    "node": 12
+                  },
+                  {
+                    "bone": "rightLowerArm",
+                    "node": 13
+                  },
+                  {
+                    "bone": "rightHand",
+                    "node": 14
+                  },
+                  {
+                    "bone": "rightUpperLeg",
+                    "node": 15
+                  },
+                  {
+                    "bone": "rightLowerLeg",
+                    "node": 16
+                  },
+                  {
+                    "bone": "rightFoot",
+                    "node": 17
+                  },
+                  {
+                    "bone": "rightEye",
+                    "node": 18
+                  }
+                ],
+                "expressions": ["happy", "blink"],
+                "lookAt": true,
+                "springBone": true,
+                "mtoon": true,
+                "body": {
+                  "height": 1.1,
+                  "headLength": 0.25,
+                  "headsTall": 4.4,
+                  "legLength": 0.2618033988749895,
+                  "legRatio": 0.23800308988635407,
+                  "armLength": 0.29999999999999993,
+                  "armRatio": 0.27272727272727265,
+                  "hipsHeight": 0.5,
+                  "hipsRatio": 0.45454545454545453,
+                  "shoulderWidth": 0.3
+                }
+              },
+              "clips": [
+                {
+                  "name": "Rest / 待機",
+                  "duration": 2
+                },
+                {
+                  "name": "Stride",
+                  "duration": 2
+                },
+                {
+                  "name": "Sprint",
+                  "duration": 2
+                }
+              ],
+              "bones": [
+                {
+                  "node": 2,
+                  "name": "Hips"
+                },
+                {
+                  "node": 3,
+                  "name": "Head"
+                },
+                {
+                  "node": 4,
+                  "name": "spine"
+                },
+                {
+                  "node": 5,
+                  "name": "leftUpperArm"
+                },
+                {
+                  "node": 6,
+                  "name": "leftLowerArm"
+                },
+                {
+                  "node": 7,
+                  "name": "leftHand"
+                },
+                {
+                  "node": 8,
+                  "name": "leftUpperLeg"
+                },
+                {
+                  "node": 9,
+                  "name": "leftLowerLeg"
+                },
+                {
+                  "node": 10,
+                  "name": "leftFoot"
+                },
+                {
+                  "node": 11,
+                  "name": "leftEye"
+                },
+                {
+                  "node": 12,
+                  "name": "rightUpperArm"
+                },
+                {
+                  "node": 13,
+                  "name": "rightLowerArm"
+                },
+                {
+                  "node": 14,
+                  "name": "rightHand"
+                },
+                {
+                  "node": 15,
+                  "name": "rightUpperLeg"
+                },
+                {
+                  "node": 16,
+                  "name": "rightLowerLeg"
+                },
+                {
+                  "node": 17,
+                  "name": "rightFoot"
+                },
+                {
+                  "node": 18,
+                  "name": "rightEye"
+                }
+              ],
+              "vertices": 8,
+              "triangles": 12,
+              "textureBytes": 4
+            },
+            "model": {
+              "rotationX": 0,
+              "rotationY": 0,
+              "rotationZ": 0,
+              "clip": 0,
+              "playing": true,
+              "loop": true,
+              "speed": 1,
+              "crossFadeMs": 250,
+              "inPlace": true,
+              "locomotion": {
+                "enabled": false,
+                "idle": null,
+                "walk": null,
+                "run": null,
+                "walkSpeed": 10,
+                "runSpeed": 220,
+                "faceMovement": true,
+                "forwardDeg": 0
+              },
+              "look": {
+                "enabled": true,
+                "bone": 3,
+                "yawLimit": 50,
+                "pitchLimit": 30,
+                "lagMs": 160
+              },
+              "vrm": {
+                "lookAt": true,
+                "headFollow": true,
+                "springBone": true,
+                "expressions": {}
+              }
+            },
+            "character": {
+              "standardMotions": "auto",
+              "motions": [
+                {
+                  "id": "motion-0",
+                  "assetId": "asset-b7729782eb38fed22a5f7e46860daf023331d24efb8b01e1e6b645a531d04b88",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-0",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-1",
+                  "assetId": "asset-92b1b12f63e5e60640206d59936a1a23a364808ef9d31d834c20895c43a47f80",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-1",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-2",
+                  "assetId": "asset-aed4684527a0d808165e61069446d74a83bac0543abebd698a01306d74f8358c",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-2",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-3",
+                  "assetId": "asset-bb5879a2ba4b911ca38da27eff411969ec97364e9c074fc90b88d65f6adc97fe",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-3",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-4",
+                  "assetId": "asset-a8b6a71f5858149b4dec482e741d9c370e578acd576e260a654460b40ab8887d",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-4",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-5",
+                  "assetId": "asset-f104a1f4610d695372ac2916b645e71f99d8e56fc0668d0289c0eb0d37338d0d",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-5",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-6",
+                  "assetId": "asset-c4f915fd362c0b82add5d026aeaec649ae74f844a4fca78f869120fe3cf3ae3e",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-6",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-7",
+                  "assetId": "asset-b3b6d73e0aa1bb4b090888275370c6c6d9ad73824193b356626603f187e614b4",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-7",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-8",
+                  "assetId": "asset-381626e0d57f47198957c22b535b29cb44420b2e09465bd30a74637e20609dc7",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-8",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-9",
+                  "assetId": "asset-4c665a90e6e936d18cdaed30fa2ffed4e7ec44b97f5474eec8da5456a77cdd88",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-9",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-10",
+                  "assetId": "asset-5bdedbdf843c7a9399d116014bee6e120a6784dc1c9ca40b05637a660b23cdc7",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-10",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-11",
+                  "assetId": "asset-73673f9f67d1cff12731395cf187da0332e9055f31cd75833849941aee9d0287",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-11",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-12",
+                  "assetId": "asset-f633c9faf0f1207e360cf417f9498eebb10d4b52f233c86694c98316e26e763d",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-12",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-13",
+                  "assetId": "asset-a1d0faebcfeb9f575146f287fd4b438298461e2430a34cab8c3ae65dd04bfa11",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-13",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-14",
+                  "assetId": "asset-4d368032e6bfecba11ecc313d6e78d0d3ca25e62a13d24c2910975970f91ad31",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-14",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-15",
+                  "assetId": "asset-34172e60c7e22085e903cf8c65f24c3728e93d70eff8814dd99e87d8dff86c70",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-15",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-16",
+                  "assetId": "asset-eb32b3d39ca6e36f6825407c79e1356aac63254d3177c9007b14bb72d8651383",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-16",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-17",
+                  "assetId": "asset-f76f50a7116dc23c60397a92f8ded08fc3212f5d2db4096610fad04ff17bfeac",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-17",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-18",
+                  "assetId": "asset-499326a0b163f445995cc8012836b69c3d3c43583787d7606c921b22291397ed",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-18",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-19",
+                  "assetId": "asset-bda480d82e8c2718175a61b37021ce2034986c8a546cff0936b73272e6529c6e",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-19",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-20",
+                  "assetId": "asset-e31149c5ec39d444da3bbcfeb7d2f651f7b85a720eb5f690b817f67a19a07cd4",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-20",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-21",
+                  "assetId": "asset-bf1c2eb37871d1a044d285c44a1054e5930ee8fb85ad4f7d32d55a18c7075e22",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-21",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-22",
+                  "assetId": "asset-045fd5944dfc8d503564dc2ee418fd330170a848206709ff8fba5c26bd331aec",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-22",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-23",
+                  "assetId": "asset-e701c719f1391cd79694d1bd7887ce8f234c9a7e493411e5ecf90be23472f831",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-23",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-24",
+                  "assetId": "asset-9bb8700580b9e3345fcd9f77cab2f52d6d60cb78c38f4f9b68912fdfeb2b18e8",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-24",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-25",
+                  "assetId": "asset-326082abfa82ee3bf7692757ffc3b54c50884ba480453c73e4d09f14946d0503",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-25",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-26",
+                  "assetId": "asset-6cbb51aacdb809c3163f3e91b4e84f793624354cf4752c3a299926b50d646dcb",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-26",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-27",
+                  "assetId": "asset-018f95085e2309a7bb90519c58f8b94fbe88160ed6b5a096ebc7761364461192",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-27",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-28",
+                  "assetId": "asset-a934c7464567dd270729e028cade6f77d473fc6b1e1989002fcbfbcd97f244cc",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-28",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-29",
+                  "assetId": "asset-3a82eede5604cf9fb7f3955c476d93560e0b668b1fe910712d0dba80eec6bd7f",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-29",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-30",
+                  "assetId": "asset-265850b23009b5ed48072223018fd02dcc3ac9d2025995bb8e81fe126a0bafaa",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-30",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-31",
+                  "assetId": "asset-d7cd83ccb643879121b3ded3fac1e2652bed686c809782d5124f60383045d140",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-31",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-32",
+                  "assetId": "asset-db6468394ce8cad5c70f6fa51bdc26642add72b70dc9cac9aa86171b7a1d54a1",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-32",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-33",
+                  "assetId": "asset-30926879abacfea3f215ec755ffc90431c116281a78c6189218518e32550070a",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-33",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-34",
+                  "assetId": "asset-6bc50651501f2ac6edda28db42f56c2256f4f0872fb941a7d1ef6874ccaa9d8d",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-34",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                },
+                {
+                  "id": "motion-35",
+                  "assetId": "asset-f7ea8a3071eb9533dc5150c4b36ecd4e38eabb256e8ca49291eb3bf766936dd1",
+                  "role": "idle",
+                  "origin": "character",
+                  "loop": true,
+                  "source": {
+                    "format": "vrma",
+                    "name": "motion-35",
+                    "duration": 1,
+                    "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                    "hipsTranslation": true,
+                    "restHipsHeight": 0.9,
+                    "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": [
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-27",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-018f95085e2309a7bb90519c58f8b94fbe88160ed6b5a096ebc7761364461192",
+      "name": "motion-27.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-22",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-045fd5944dfc8d503564dc2ee418fd330170a848206709ff8fba5c26bd331aec",
+      "name": "motion-22.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-30",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-265850b23009b5ed48072223018fd02dcc3ac9d2025995bb8e81fe126a0bafaa",
+      "name": "motion-30.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-33",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-30926879abacfea3f215ec755ffc90431c116281a78c6189218518e32550070a",
+      "name": "motion-33.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-25",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-326082abfa82ee3bf7692757ffc3b54c50884ba480453c73e4d09f14946d0503",
+      "name": "motion-25.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-15",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-34172e60c7e22085e903cf8c65f24c3728e93d70eff8814dd99e87d8dff86c70",
+      "name": "motion-15.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-8",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-381626e0d57f47198957c22b535b29cb44420b2e09465bd30a74637e20609dc7",
+      "name": "motion-8.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-29",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-3a82eede5604cf9fb7f3955c476d93560e0b668b1fe910712d0dba80eec6bd7f",
+      "name": "motion-29.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-18",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-499326a0b163f445995cc8012836b69c3d3c43583787d7606c921b22291397ed",
+      "name": "motion-18.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-9",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-4c665a90e6e936d18cdaed30fa2ffed4e7ec44b97f5474eec8da5456a77cdd88",
+      "name": "motion-9.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-14",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-4d368032e6bfecba11ecc313d6e78d0d3ca25e62a13d24c2910975970f91ad31",
+      "name": "motion-14.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 256,
+      "height": 256,
+      "model": {
+        "format": "vrm",
+        "vrm": {
+          "version": "1.0",
+          "humanoid": [
+            {
+              "bone": "hips",
+              "node": 2
+            },
+            {
+              "bone": "head",
+              "node": 3
+            },
+            {
+              "bone": "spine",
+              "node": 4
+            },
+            {
+              "bone": "leftUpperArm",
+              "node": 5
+            },
+            {
+              "bone": "leftLowerArm",
+              "node": 6
+            },
+            {
+              "bone": "leftHand",
+              "node": 7
+            },
+            {
+              "bone": "leftUpperLeg",
+              "node": 8
+            },
+            {
+              "bone": "leftLowerLeg",
+              "node": 9
+            },
+            {
+              "bone": "leftFoot",
+              "node": 10
+            },
+            {
+              "bone": "leftEye",
+              "node": 11
+            },
+            {
+              "bone": "rightUpperArm",
+              "node": 12
+            },
+            {
+              "bone": "rightLowerArm",
+              "node": 13
+            },
+            {
+              "bone": "rightHand",
+              "node": 14
+            },
+            {
+              "bone": "rightUpperLeg",
+              "node": 15
+            },
+            {
+              "bone": "rightLowerLeg",
+              "node": 16
+            },
+            {
+              "bone": "rightFoot",
+              "node": 17
+            },
+            {
+              "bone": "rightEye",
+              "node": 18
+            }
+          ],
+          "expressions": ["happy", "blink"],
+          "lookAt": true,
+          "springBone": true,
+          "mtoon": true,
+          "body": {
+            "height": 1.1,
+            "headLength": 0.25,
+            "headsTall": 4.4,
+            "legLength": 0.2618033988749895,
+            "legRatio": 0.23800308988635407,
+            "armLength": 0.29999999999999993,
+            "armRatio": 0.27272727272727265,
+            "hipsHeight": 0.5,
+            "hipsRatio": 0.45454545454545453,
+            "shoulderWidth": 0.3
+          }
+        },
+        "clips": [
+          {
+            "name": "Rest / 待機",
+            "duration": 2
+          },
+          {
+            "name": "Stride",
+            "duration": 2
+          },
+          {
+            "name": "Sprint",
+            "duration": 2
+          }
+        ],
+        "bones": [
+          {
+            "node": 2,
+            "name": "Hips"
+          },
+          {
+            "node": 3,
+            "name": "Head"
+          },
+          {
+            "node": 4,
+            "name": "spine"
+          },
+          {
+            "node": 5,
+            "name": "leftUpperArm"
+          },
+          {
+            "node": 6,
+            "name": "leftLowerArm"
+          },
+          {
+            "node": 7,
+            "name": "leftHand"
+          },
+          {
+            "node": 8,
+            "name": "leftUpperLeg"
+          },
+          {
+            "node": 9,
+            "name": "leftLowerLeg"
+          },
+          {
+            "node": 10,
+            "name": "leftFoot"
+          },
+          {
+            "node": 11,
+            "name": "leftEye"
+          },
+          {
+            "node": 12,
+            "name": "rightUpperArm"
+          },
+          {
+            "node": 13,
+            "name": "rightLowerArm"
+          },
+          {
+            "node": 14,
+            "name": "rightHand"
+          },
+          {
+            "node": 15,
+            "name": "rightUpperLeg"
+          },
+          {
+            "node": 16,
+            "name": "rightLowerLeg"
+          },
+          {
+            "node": 17,
+            "name": "rightFoot"
+          },
+          {
+            "node": 18,
+            "name": "rightEye"
+          }
+        ],
+        "vertices": 8,
+        "triangles": 12,
+        "textureBytes": 4
+      },
+      "id": "asset-50e23ecd97d7cc20cfa556bbc9c762cf8e9aad5a102e24ce8ba46e162794c900",
+      "name": "Original.vrm",
+      "byteLength": 5708
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-10",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-5bdedbdf843c7a9399d116014bee6e120a6784dc1c9ca40b05637a660b23cdc7",
+      "name": "motion-10.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-34",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-6bc50651501f2ac6edda28db42f56c2256f4f0872fb941a7d1ef6874ccaa9d8d",
+      "name": "motion-34.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-26",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-6cbb51aacdb809c3163f3e91b4e84f793624354cf4752c3a299926b50d646dcb",
+      "name": "motion-26.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-11",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-73673f9f67d1cff12731395cf187da0332e9055f31cd75833849941aee9d0287",
+      "name": "motion-11.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-1",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-92b1b12f63e5e60640206d59936a1a23a364808ef9d31d834c20895c43a47f80",
+      "name": "motion-1.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-24",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-9bb8700580b9e3345fcd9f77cab2f52d6d60cb78c38f4f9b68912fdfeb2b18e8",
+      "name": "motion-24.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-13",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-a1d0faebcfeb9f575146f287fd4b438298461e2430a34cab8c3ae65dd04bfa11",
+      "name": "motion-13.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-4",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-a8b6a71f5858149b4dec482e741d9c370e578acd576e260a654460b40ab8887d",
+      "name": "motion-4.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-28",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-a934c7464567dd270729e028cade6f77d473fc6b1e1989002fcbfbcd97f244cc",
+      "name": "motion-28.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-2",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-aed4684527a0d808165e61069446d74a83bac0543abebd698a01306d74f8358c",
+      "name": "motion-2.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-7",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-b3b6d73e0aa1bb4b090888275370c6c6d9ad73824193b356626603f187e614b4",
+      "name": "motion-7.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-0",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-b7729782eb38fed22a5f7e46860daf023331d24efb8b01e1e6b645a531d04b88",
+      "name": "motion-0.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-3",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-bb5879a2ba4b911ca38da27eff411969ec97364e9c074fc90b88d65f6adc97fe",
+      "name": "motion-3.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-19",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-bda480d82e8c2718175a61b37021ce2034986c8a546cff0936b73272e6529c6e",
+      "name": "motion-19.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-21",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-bf1c2eb37871d1a044d285c44a1054e5930ee8fb85ad4f7d32d55a18c7075e22",
+      "name": "motion-21.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-6",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-c4f915fd362c0b82add5d026aeaec649ae74f844a4fca78f869120fe3cf3ae3e",
+      "name": "motion-6.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-31",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-d7cd83ccb643879121b3ded3fac1e2652bed686c809782d5124f60383045d140",
+      "name": "motion-31.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-32",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-db6468394ce8cad5c70f6fa51bdc26642add72b70dc9cac9aa86171b7a1d54a1",
+      "name": "motion-32.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-20",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-e31149c5ec39d444da3bbcfeb7d2f651f7b85a720eb5f690b817f67a19a07cd4",
+      "name": "motion-20.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-23",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-e701c719f1391cd79694d1bd7887ce8f234c9a7e493411e5ecf90be23472f831",
+      "name": "motion-23.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-16",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-eb32b3d39ca6e36f6825407c79e1356aac63254d3177c9007b14bb72d8651383",
+      "name": "motion-16.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-5",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-f104a1f4610d695372ac2916b645e71f99d8e56fc0668d0289c0eb0d37338d0d",
+      "name": "motion-5.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-12",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-f633c9faf0f1207e360cf417f9498eebb10d4b52f233c86694c98316e26e763d",
+      "name": "motion-12.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-17",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-f76f50a7116dc23c60397a92f8ded08fc3212f5d2db4096610fad04ff17bfeac",
+      "name": "motion-17.vrma",
+      "byteLength": 1572
+    },
+    {
+      "mime": "model/gltf-binary",
+      "width": 1,
+      "height": 1,
+      "vrmAnimation": {
+        "format": "vrma",
+        "name": "motion-35",
+        "duration": 1,
+        "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+        "hipsTranslation": true,
+        "restHipsHeight": 0.9,
+        "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612]
+      },
+      "id": "asset-f7ea8a3071eb9533dc5150c4b36ecd4e38eabb256e8ca49291eb3bf766936dd1",
+      "name": "motion-35.vrma",
+      "byteLength": 1572
+    }
+  ],
+  "restored": {
+    "baseThemeId": null,
+    "decorations": [
+      {
+        "assetId": "asset-50e23ecd97d7cc20cfa556bbc9c762cf8e9aad5a102e24ce8ba46e162794c900",
+        "character": {
+          "motions": [
+            {
+              "assetId": "asset-b7729782eb38fed22a5f7e46860daf023331d24efb8b01e1e6b645a531d04b88",
+              "id": "motion-0",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-0",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-92b1b12f63e5e60640206d59936a1a23a364808ef9d31d834c20895c43a47f80",
+              "id": "motion-1",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-1",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-aed4684527a0d808165e61069446d74a83bac0543abebd698a01306d74f8358c",
+              "id": "motion-2",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-2",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-bb5879a2ba4b911ca38da27eff411969ec97364e9c074fc90b88d65f6adc97fe",
+              "id": "motion-3",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-3",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-a8b6a71f5858149b4dec482e741d9c370e578acd576e260a654460b40ab8887d",
+              "id": "motion-4",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-4",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-f104a1f4610d695372ac2916b645e71f99d8e56fc0668d0289c0eb0d37338d0d",
+              "id": "motion-5",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-5",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-c4f915fd362c0b82add5d026aeaec649ae74f844a4fca78f869120fe3cf3ae3e",
+              "id": "motion-6",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-6",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-b3b6d73e0aa1bb4b090888275370c6c6d9ad73824193b356626603f187e614b4",
+              "id": "motion-7",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-7",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-381626e0d57f47198957c22b535b29cb44420b2e09465bd30a74637e20609dc7",
+              "id": "motion-8",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-8",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-4c665a90e6e936d18cdaed30fa2ffed4e7ec44b97f5474eec8da5456a77cdd88",
+              "id": "motion-9",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-9",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-5bdedbdf843c7a9399d116014bee6e120a6784dc1c9ca40b05637a660b23cdc7",
+              "id": "motion-10",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-10",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-73673f9f67d1cff12731395cf187da0332e9055f31cd75833849941aee9d0287",
+              "id": "motion-11",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-11",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-f633c9faf0f1207e360cf417f9498eebb10d4b52f233c86694c98316e26e763d",
+              "id": "motion-12",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-12",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-a1d0faebcfeb9f575146f287fd4b438298461e2430a34cab8c3ae65dd04bfa11",
+              "id": "motion-13",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-13",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-4d368032e6bfecba11ecc313d6e78d0d3ca25e62a13d24c2910975970f91ad31",
+              "id": "motion-14",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-14",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-34172e60c7e22085e903cf8c65f24c3728e93d70eff8814dd99e87d8dff86c70",
+              "id": "motion-15",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-15",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-eb32b3d39ca6e36f6825407c79e1356aac63254d3177c9007b14bb72d8651383",
+              "id": "motion-16",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-16",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-f76f50a7116dc23c60397a92f8ded08fc3212f5d2db4096610fad04ff17bfeac",
+              "id": "motion-17",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-17",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-499326a0b163f445995cc8012836b69c3d3c43583787d7606c921b22291397ed",
+              "id": "motion-18",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-18",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-bda480d82e8c2718175a61b37021ce2034986c8a546cff0936b73272e6529c6e",
+              "id": "motion-19",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-19",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-e31149c5ec39d444da3bbcfeb7d2f651f7b85a720eb5f690b817f67a19a07cd4",
+              "id": "motion-20",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-20",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-bf1c2eb37871d1a044d285c44a1054e5930ee8fb85ad4f7d32d55a18c7075e22",
+              "id": "motion-21",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-21",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-045fd5944dfc8d503564dc2ee418fd330170a848206709ff8fba5c26bd331aec",
+              "id": "motion-22",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-22",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-e701c719f1391cd79694d1bd7887ce8f234c9a7e493411e5ecf90be23472f831",
+              "id": "motion-23",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-23",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-9bb8700580b9e3345fcd9f77cab2f52d6d60cb78c38f4f9b68912fdfeb2b18e8",
+              "id": "motion-24",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-24",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-326082abfa82ee3bf7692757ffc3b54c50884ba480453c73e4d09f14946d0503",
+              "id": "motion-25",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-25",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-6cbb51aacdb809c3163f3e91b4e84f793624354cf4752c3a299926b50d646dcb",
+              "id": "motion-26",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-26",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-018f95085e2309a7bb90519c58f8b94fbe88160ed6b5a096ebc7761364461192",
+              "id": "motion-27",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-27",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-a934c7464567dd270729e028cade6f77d473fc6b1e1989002fcbfbcd97f244cc",
+              "id": "motion-28",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-28",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-3a82eede5604cf9fb7f3955c476d93560e0b668b1fe910712d0dba80eec6bd7f",
+              "id": "motion-29",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-29",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-265850b23009b5ed48072223018fd02dcc3ac9d2025995bb8e81fe126a0bafaa",
+              "id": "motion-30",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-30",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-d7cd83ccb643879121b3ded3fac1e2652bed686c809782d5124f60383045d140",
+              "id": "motion-31",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-31",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-db6468394ce8cad5c70f6fa51bdc26642add72b70dc9cac9aa86171b7a1d54a1",
+              "id": "motion-32",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-32",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-30926879abacfea3f215ec755ffc90431c116281a78c6189218518e32550070a",
+              "id": "motion-33",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-33",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-6bc50651501f2ac6edda28db42f56c2256f4f0872fb941a7d1ef6874ccaa9d8d",
+              "id": "motion-34",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-34",
+                "restHipsHeight": 0.9
+              }
+            },
+            {
+              "assetId": "asset-f7ea8a3071eb9533dc5150c4b36ecd4e38eabb256e8ca49291eb3bf766936dd1",
+              "id": "motion-35",
+              "loop": true,
+              "origin": "character",
+              "role": "idle",
+              "source": {
+                "bones": ["hips", "spine", "head", "leftUpperLeg", "leftLowerLeg", "rightUpperLeg"],
+                "duration": 1,
+                "format": "vrma",
+                "hipsTranslation": true,
+                "hipsTravel": [0, -0.3999999761581421, 0.10000000149011612],
+                "name": "motion-35",
+                "restHipsHeight": 0.9
+              }
+            }
+          ],
+          "standardMotions": "auto"
+        },
+        "id": "image-11cbb1b0-550b-43b4-9a5f-a831f1a734d9",
+        "kind": "model3d",
+        "locked": false,
+        "model": {
+          "clip": 0,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+            "enabled": false,
+            "faceMovement": true,
+            "forwardDeg": 0,
+            "idle": null,
+            "run": null,
+            "runSpeed": 220,
+            "walk": null,
+            "walkSpeed": 10
+          },
+          "look": {
+            "bone": 3,
+            "enabled": true,
+            "lagMs": 160,
+            "pitchLimit": 30,
+            "yawLimit": 50
+          },
+          "loop": true,
+          "playing": true,
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "speed": 1,
+          "vrm": {
+            "expressions": {},
+            "headFollow": true,
+            "lookAt": true,
+            "springBone": true
+          }
+        },
+        "name": "Original.vrm",
+        "opacity": 1,
+        "placement": {
+          "anchor": {
+            "kind": "viewport"
+          },
+          "heightPx": 200,
+          "rotationDeg": 0,
+          "widthPx": 200,
+          "x": 0.45,
+          "y": 0.45
+        },
+        "source": {
+          "bones": [
+            {
+              "name": "Hips",
+              "node": 2
+            },
+            {
+              "name": "Head",
+              "node": 3
+            },
+            {
+              "name": "spine",
+              "node": 4
+            },
+            {
+              "name": "leftUpperArm",
+              "node": 5
+            },
+            {
+              "name": "leftLowerArm",
+              "node": 6
+            },
+            {
+              "name": "leftHand",
+              "node": 7
+            },
+            {
+              "name": "leftUpperLeg",
+              "node": 8
+            },
+            {
+              "name": "leftLowerLeg",
+              "node": 9
+            },
+            {
+              "name": "leftFoot",
+              "node": 10
+            },
+            {
+              "name": "leftEye",
+              "node": 11
+            },
+            {
+              "name": "rightUpperArm",
+              "node": 12
+            },
+            {
+              "name": "rightLowerArm",
+              "node": 13
+            },
+            {
+              "name": "rightHand",
+              "node": 14
+            },
+            {
+              "name": "rightUpperLeg",
+              "node": 15
+            },
+            {
+              "name": "rightLowerLeg",
+              "node": 16
+            },
+            {
+              "name": "rightFoot",
+              "node": 17
+            },
+            {
+              "name": "rightEye",
+              "node": 18
+            }
+          ],
+          "clips": [
+            {
+              "duration": 2,
+              "name": "Rest / 待機"
+            },
+            {
+              "duration": 2,
+              "name": "Stride"
+            },
+            {
+              "duration": 2,
+              "name": "Sprint"
+            }
+          ],
+          "format": "vrm",
+          "textureBytes": 4,
+          "triangles": 12,
+          "vertices": 8,
+          "vrm": {
+            "body": {
+              "armLength": 0.29999999999999993,
+              "armRatio": 0.27272727272727265,
+              "headLength": 0.25,
+              "headsTall": 4.4,
+              "height": 1.1,
+              "hipsHeight": 0.5,
+              "hipsRatio": 0.45454545454545453,
+              "legLength": 0.2618033988749895,
+              "legRatio": 0.23800308988635407,
+              "shoulderWidth": 0.3
+            },
+            "expressions": ["happy", "blink"],
+            "humanoid": [
+              {
+                "bone": "hips",
+                "node": 2
+              },
+              {
+                "bone": "head",
+                "node": 3
+              },
+              {
+                "bone": "spine",
+                "node": 4
+              },
+              {
+                "bone": "leftUpperArm",
+                "node": 5
+              },
+              {
+                "bone": "leftLowerArm",
+                "node": 6
+              },
+              {
+                "bone": "leftHand",
+                "node": 7
+              },
+              {
+                "bone": "leftUpperLeg",
+                "node": 8
+              },
+              {
+                "bone": "leftLowerLeg",
+                "node": 9
+              },
+              {
+                "bone": "leftFoot",
+                "node": 10
+              },
+              {
+                "bone": "leftEye",
+                "node": 11
+              },
+              {
+                "bone": "rightUpperArm",
+                "node": 12
+              },
+              {
+                "bone": "rightLowerArm",
+                "node": 13
+              },
+              {
+                "bone": "rightHand",
+                "node": 14
+              },
+              {
+                "bone": "rightUpperLeg",
+                "node": 15
+              },
+              {
+                "bone": "rightLowerLeg",
+                "node": 16
+              },
+              {
+                "bone": "rightFoot",
+                "node": 17
+              },
+              {
+                "bone": "rightEye",
+                "node": 18
+              }
+            ],
+            "lookAt": true,
+            "mtoon": true,
+            "springBone": true,
+            "version": "1.0"
+          }
+        },
+        "visible": true,
+        "zIndex": 0
+      }
+    ],
+    "id": "youtube-custom",
+    "rules": [],
+    "schemaVersion": 14,
+    "siteId": "youtube"
+  }
+}

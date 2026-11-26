@@ -22,7 +22,7 @@ export function createSignalSources(
   const onPointer = (event: PointerEvent) => {
     if (!event.isPrimary || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
     // Authoring controls keep the last canvas position so numeric edits stay visible.
-    if (event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control')))
+    if (event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-around-signal-control')))
       return;
     snapshot.pointer = { x: event.clientX, y: event.clientY };
     snapshot.pointerTimeMs = doc.defaultView!.performance.now();
@@ -37,7 +37,8 @@ export function createSignalSources(
         .some(
           (node) =>
             node instanceof Element &&
-            (node.hasAttribute('data-ww-signal-control') || node.matches('input,textarea,select,[contenteditable]')),
+            (node.hasAttribute('data-around-signal-control') ||
+              node.matches('input,textarea,select,[contenteditable]')),
         )
     )
       return;

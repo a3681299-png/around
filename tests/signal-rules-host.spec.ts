@@ -10,7 +10,7 @@ test('scroll opacity reaches the DOM before the first RAF of the scroll frame is
   const panel = await open(popup, youtube);
   await image(panel, youtube);
   await save(panel);
-  const key = 'webWorldThemes.design.youtube',
+  const key = 'around.design.youtube',
     design = await popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
   design.signalRules = [defaultScrollOpacityRule(design.decorations[0]!.id)];
   await popup.evaluate(async ({ key, design }) => chrome.storage.local.set({ [key]: design }), { key, design });
@@ -31,7 +31,7 @@ test('scroll opacity reaches the DOM before the first RAF of the scroll frame is
                 const root = document.scrollingElement!,
                   p = root.scrollTop / (root.scrollHeight - root.clientHeight);
                 const node = document
-                  .querySelector('#web-world-themes-decorations')!
+                  .querySelector('#around-decorations')!
                   .shadowRoot!.querySelector<HTMLElement>('.media')!;
                 resolve({ actual: Number(node.style.opacity), expected: 1 - Math.abs(p * 2 - 1) });
               });
@@ -54,7 +54,7 @@ test('saved page progress rules drive DOM opacity in both directions and restore
   const panel = await open(popup, youtube);
   await image(panel, youtube);
   await save(panel);
-  const key = 'webWorldThemes.design.youtube',
+  const key = 'around.design.youtube',
     design = await popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
   design.decorations[0]!.opacity = 0;
   design.signalRules = [defaultScrollOpacityRule(design.decorations[0]!.id)];
@@ -86,6 +86,6 @@ test('saved page progress rules drive DOM opacity in both directions and restore
     document.body.style.minHeight = '6000px';
   });
   await go(0.25);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });

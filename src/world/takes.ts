@@ -3,7 +3,7 @@ import { takeSignalSeries, projectNumericGhosts } from './take-signals';
 import { parseWorldInput, parseWorldState } from './recording';
 import { evaluateWorld, evaluatePreparedWorld } from './evaluate';
 import { evaluateLayout } from './layout';
-import { WORLD_RUNTIME_VERSION, type WorldInput, type WorldScene, type WorldState } from './types';
+import { WORLD_RUNTIME_VERSION, type WorldApproach, type WorldInput, type WorldScene, type WorldState } from './types';
 import { clampUnit, scrollProgress } from './keyframes';
 import type { SignalRule } from '../signals/keyframes';
 import { TAKE_LIMITS, TAKE_MESSAGES } from '../assets/limits';
@@ -11,7 +11,7 @@ export { TAKE_LIMITS } from '../assets/limits';
 
 /** Inputs only: rules and asset references belong to the artwork, never the take. */
 export interface SignalTake {
-  format: 'ww-signal-take';
+  format: 'around-signal-take';
   formatVersion: 1;
   runtimeVersion: typeof WORLD_RUNTIME_VERSION;
   id: string;
@@ -38,7 +38,7 @@ export function parseSignalTake(value: unknown): SignalTake {
   const data = value as Record<string, unknown>;
   const id = (value: unknown): value is string => typeof value === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(value);
   if (
-    data['format'] !== 'ww-signal-take' ||
+    data['format'] !== 'around-signal-take' ||
     data['formatVersion'] !== 1 ||
     ![WORLD_RUNTIME_VERSION, '1.2.0', '1.1.0'].includes(data['runtimeVersion'] as string) ||
     !id(data['id']) ||
@@ -60,7 +60,7 @@ export function parseSignalTake(value: unknown): SignalTake {
     previous = input.timeMs;
   }
   const take: SignalTake = {
-    format: 'ww-signal-take',
+    format: 'around-signal-take',
     formatVersion: 1,
     runtimeVersion: WORLD_RUNTIME_VERSION,
     id: data['id'],
@@ -103,6 +103,17 @@ function between(
         : {}),
     },
   };
+}
+/** What a take keeps of a live input: the creator's signals, without the Host restrictions
+ * (the whole-page rule or the roots held over a control). Playback applies the live ones. */
+export function takeInput(input: WorldInput): WorldInput {
+  const { safeInteraction, approach, ...environment } = input.environment;
+  // A part's reduced form and its seats are not part of a take (artwork data; its format is
+  // unchanged). Both are the adapter's facts about the page, given again on playback.
+  const { reducedParts, seats, ...recorded } = input;
+  if (safeInteraction === undefined && approach === undefined)
+    return reducedParts === undefined && seats === undefined ? input : recorded;
+  return { ...recorded, environment };
 }
 /** Upper bound keeps simultaneous events in their original recorded order. */
 function inputEnd(take: SignalTake, timeMs: number): number {
@@ -186,8 +197,11 @@ export function createTakeSampler(scene: WorldScene, source: SignalTake) {
     }
     return evaluatePreparedWorld(prepared, state, input, scene.signalRules);
   };
+  /** The live Host restriction joins the returned frame only, never the recorded history. */
+  const restricted = (input: WorldInput, approach?: WorldApproach) =>
+    approach ? { ...input, environment: { ...input.environment, approach } } : input;
   return {
-    at(positionMs: number) {
+    at(positionMs: number, approach?: WorldApproach) {
       const timeMs =
         take.inputs[0]!.timeMs +
         Math.max(0, Math.min(takeDuration(take), Number.isFinite(positionMs) ? positionMs : 0));
@@ -195,8 +209,10 @@ export function createTakeSampler(scene: WorldScene, source: SignalTake) {
       let start = Math.floor(Math.max(0, end - 1) / 32) * 32;
       while (!checkpoints.has(start)) start -= 32;
       let state = checkpoints.get(start)!,
+        prior = state,
         result: ReturnType<typeof evaluateWorld> | undefined;
       for (let index = start; index < end; index++) {
+        prior = state;
         result = step(state, take.inputs[index]!);
         state = result.state;
         if ((index + 1) % 32 === 0) checkpoints.set(index + 1, state);
@@ -204,8 +220,9 @@ export function createTakeSampler(scene: WorldScene, source: SignalTake) {
       const last = take.inputs[Math.max(0, end - 1)]!,
         input = between(last, take.inputs[end], timeMs, state.timeMs);
       // A sample at its exact timestamp must retain that sample's event occurrence.
-      if (last.timeMs === timeMs && result) return { ...result, input: last };
-      const evaluated = step(state, input);
+      if (last.timeMs === timeMs && result)
+        return { ...(approach ? step(prior, restricted(last, approach)) : result), input: last };
+      const evaluated = step(state, restricted(input, approach));
       return { ...evaluated, input };
     },
     get checkpoints() {

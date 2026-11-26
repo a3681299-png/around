@@ -4,7 +4,7 @@ import { test, expect } from './fixtures';
 import { modelFixture } from './helpers/model-fixture';
 import { vrmFixture } from './helpers/vrm-fixture';
 
-const backend = '#model-runtime-test [data-ww-three-backend]';
+const backend = '#model-runtime-test [data-around-three-backend]';
 async function mount(page: Page, bytes: Uint8Array) {
   const bundle = await build({
     entryPoints: ['tests/helpers/model-runtime.ts'],
@@ -31,7 +31,10 @@ for (const kind of ['glb', 'vrm'] as const) {
     youtube,
   }, info) => {
     // Control the production 30s timer, not the retention setting. GPU work and parser remain real.
-    await youtube.clock.install();
+    await youtube.clock.install({ time: new Date('2020-01-01T00:00:00Z') });
+    // Pause before the runtime exists. Loading/IPC must never race a Date.now()+50 deadline.
+    // Thereafter only explicit frame steps and the exact 29,999ms + 1ms boundary advance time.
+    await youtube.clock.pauseAt(new Date('2020-01-01T00:01:00Z'));
     await mount(youtube, kind === 'glb' ? modelFixture() : vrmFixture());
     const samples: unknown[] = [];
     let loaded: ReturnType<typeof memory> | undefined;
@@ -40,8 +43,12 @@ for (const kind of ['glb', 'vrm'] as const) {
       for (let run = 0; run < 5; run++) {
         // Reattach at 29,999ms while paused, before the old timer can expire during parsing.
         await youtube.evaluate(() => (globalThis as any).__modelRuntime.show());
-        await youtube.clock.resume();
-        await expect(youtube.locator('#model-runtime-test .model-media')).toHaveAttribute('data-renderer', 'three');
+        await expect
+          .poll(async () => {
+            await youtube.clock.runFor(16);
+            return youtube.locator('#model-runtime-test .model-media').getAttribute('data-renderer');
+          })
+          .toBe('three');
         const active = await stats(youtube);
         expect(active.errors).toEqual([]);
         loaded ??= memory(active);
@@ -51,7 +58,6 @@ for (const kind of ['glb', 'vrm'] as const) {
         expect(memory(active)).toEqual(loaded);
         if (previous && phase === 'retained') expect(await previous.evaluate((c) => c.isConnected)).toBe(true);
         previous = (await youtube.locator(backend).elementHandle())! as ElementHandle<HTMLCanvasElement>;
-        await youtube.clock.pauseAt(await youtube.evaluate(() => Date.now() + 50));
         await youtube.evaluate(() => (globalThis as any).__modelRuntime.hide());
         const idle = await stats(youtube);
         expect(idle).toMatchObject({

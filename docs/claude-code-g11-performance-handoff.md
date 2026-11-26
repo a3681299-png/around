@@ -4,11 +4,11 @@
 
 ## 取得するブランチ
 
-- リポジトリ：<https://github.com/a3681299-png/web-world-themes>
+- リポジトリ：<https://github.com/a3681299-png/around>
 - 実装の保存先：`codex/creator-editor-spike`
 - 性能修正の基点：`e2ac377ec5a6c3c0af1be44121de6ad30572388a`
 - 修正前G1：`ded8815103e935460528a332762403f24d9f27b4`
-- 基点の[GitHub Actions](https://github.com/a3681299-png/web-world-themes/actions/runs/39931836544)はunit・e2eとも成功を確認済み。この引継書とスクリプトを追加したcommitのCIとは区別する。
+- 基点の[GitHub Actions](https://github.com/a3681299-png/around/actions/runs/39931836544)はunit・e2eとも成功を確認済み。この引継書とスクリプトを追加したcommitのCIとは区別する。
 
 mainではなく上記ブランチを読む。変更はそのブランチ、またはそこから分けた専用ブランチで行う。修正前G1との比較には履歴が必要なので、浅いcloneでは対象commitを追加取得する。
 
@@ -104,8 +104,8 @@ PowerShellでは、例えば`$env:PLAYWRIGHT_BROWSERS_PATH='.work/browsers'`、`
 npm run lint
 npm run typecheck
 npm run test:unit
-WW_BUILD_OUT=.work/g11-check-dist npm run build
-WW_TEST_EXTENSION_PATH=.work/g11-check-dist \
+AROUND_BUILD_OUT=.work/g11-check-dist npm run build
+AROUND_TEST_EXTENSION_PATH=.work/g11-check-dist \
   npm run test:e2e -- tests/operation-safety.spec.ts tests/operation-controls.spec.ts
 ```
 

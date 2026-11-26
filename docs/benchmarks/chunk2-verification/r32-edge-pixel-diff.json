@@ -1,0 +1,17 @@
+{
+  "edge": {
+    "count": 427,
+    "left": 51,
+    "top": 56,
+    "right": 105,
+    "bottom": 67
+  },
+  "threshold": 30,
+  "band": {
+    "count": 0,
+    "left": 150,
+    "top": 132,
+    "right": -1,
+    "bottom": -1
+  }
+}

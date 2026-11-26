@@ -7,13 +7,21 @@ import type {
   ImagePatch,
   LayerPlacement,
   SurfaceStyle,
+  SurfaceSkin,
+  SkinState,
 } from '../design/types';
 import type { PlacementChange, PlacementFrame, PlacementSample, Point } from '../world/geometry';
 import type { Alignment, Distribution } from '../design/layout';
 import type { HistoryCheckpoint } from '../editor/history';
 import type { AnimationFormat } from '../assets/motion-types';
 import type { SignalRule } from '../signals/keyframes';
-export type EditorTool = 'select' | 'browse' | 'card';
+export type EditorTool = 'select' | 'browse' | 'card' | 'skin';
+export const EDITOR_TOOLS: readonly EditorTool[] = ['select', 'browse', 'card', 'skin'];
+/** View-only previews of the selected part on the real page; never saved or recorded. */
+export interface SkinPreview {
+  state?: SkinState;
+  compact?: boolean;
+}
 
 export interface EditorCapability {
   allowed: boolean;
@@ -35,6 +43,10 @@ export interface EditorCapabilities {
 export interface EditorView extends EditorCapabilities {
   selected: boolean;
   style: SurfaceStyle;
+  /** The selected native part (design target) and its UI skin, if any. */
+  target?: string;
+  skin?: SurfaceSkin;
+  skinPreview?: SkinPreview;
   dirty: boolean;
   saving: boolean;
   status: string;
@@ -64,6 +76,8 @@ export type EditCommand =
         | 'undo'
         | 'redo'
         | 'discard'
+        | 'restore-draft'
+        | 'keep-saved'
         | 'save'
         | 'close'
         | 'begin';
@@ -71,6 +85,8 @@ export type EditCommand =
   | { type: 'end'; cancel?: boolean }
   | { type: 'change'; id?: string; patch: ImagePatch }
   | { type: 'style'; style: SurfaceStyle }
+  | { type: 'skin'; skin: SurfaceSkin | null }
+  | { type: 'skin-preview'; state?: SkinState; compact?: boolean }
   | { type: 'delete' | 'duplicate'; id?: string }
   | { type: 'placements'; changes: readonly PlacementChange[] }
   | { type: 'reorder'; id: string; targetId: string; after: boolean }
@@ -88,13 +104,14 @@ export interface EditorAsset {
   height: number;
   model?: import('../models/types').ModelInfo;
   animation?: { format: AnimationFormat };
+  vrmAnimation?: import('../characters/motion-info').VrmAnimationInfo;
 }
 export interface EditorStorage<Source> {
   read(): Promise<DesignDocument | undefined>;
   watch(accept: (doc: DesignDocument | undefined) => void, error: (error: unknown) => void): () => void;
   retain(session: string, ids: readonly string[]): Promise<void>;
   release(session: string): Promise<void>;
-  save(doc: DesignDocument, session: string): Promise<void>;
+  save(doc: DesignDocument, session: string, revision: number): Promise<void>;
   validate(doc: DesignDocument, session: string): Promise<void>;
   import(source: Source, session: string): Promise<readonly EditorAsset[]>;
   cancelImport(): void;
@@ -106,7 +123,8 @@ export interface EditorGeometry {
 }
 export interface EditorPorts<Source> {
   siteId: string;
-  baseThemeId: string;
+  /** New artwork's base: null since the retro theme was removed. */
+  baseThemeId: string | null;
   targets: readonly DesignTarget[];
   makeId(kind: 'image' | 'group' | 'session'): string;
   geometry: EditorGeometry;
@@ -116,7 +134,9 @@ export interface EditorPorts<Source> {
 export interface EditorCheckpoint {
   version: 1;
   siteId: string;
+  origin?: EditorRevision;
   draft: DesignDocument;
+  /** Saved artwork the draft was based on, even if another tab has since saved. */
   saved?: DesignDocument;
   selectedIds: string[];
   selectedTarget?: string;
@@ -124,13 +144,21 @@ export interface EditorCheckpoint {
   snapping: boolean;
   history: HistoryCheckpoint<DesignDocument>;
 }
-export interface EditorSnapshot {
+export interface EditorRevision {
   sessionId: string;
   revision: number;
+}
+
+export interface EditorSnapshot extends EditorRevision {
+  /** Present when a view-only update advanced the command revision. */
+  checkpointRevision?: number;
   active: boolean;
   enabled: boolean;
   view: EditorView;
   document: DesignDocument;
   saved?: DesignDocument;
+  /** Present when a dirty draft is based on a different saved artwork. */
+  draftBase?: { saved?: DesignDocument };
+  recoveryPending?: true;
   selectedTarget?: string;
 }

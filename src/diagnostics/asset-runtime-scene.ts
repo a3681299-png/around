@@ -2,7 +2,7 @@ import { createModelRenderer, type ModelSurface } from '../renderers/three/model
 import { defaultModelSettings } from '../models/types';
 import type { ModelDecoration } from '../design/types';
 import type { AssetMetadata } from '../assets/validation';
-import type { loadAsset } from '../assets/client';
+import type { loadAsset } from '../browser/asset-client';
 import {
   newAssetProfile,
   linkAssetProfile,
@@ -42,7 +42,7 @@ export function createAssetLabScene(parent: HTMLElement, read: typeof loadAsset)
       pool.clear();
       stats = { contexts: 0, instances: 0, estimatedGpuAssetBytes: 0 };
     }
-    for (const child of [...shadow.children]) if (!child.hasAttribute('data-ww-three-backend')) child.remove();
+    for (const child of [...shadow.children]) if (!child.hasAttribute('data-around-three-backend')) child.remove();
   }
   function configure(settings: { shared?: boolean; warmup?: AssetWarmup }) {
     const nextShared = settings.shared === true,

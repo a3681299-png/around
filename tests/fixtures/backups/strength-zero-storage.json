@@ -1,0 +1,42 @@
+{
+  "around.creatorMode": true,
+  "around.design.youtube": {
+    "baseThemeId": "retro",
+    "decorations": [
+      {
+        "assetId": "asset-09c9f89b7844f43893d30827bee83baa355d89f9c6ce8d098f98cc7f735643e9",
+        "id": "image-903442ba-a04a-4776-957b-cd3f33c9e828",
+        "kind": "image",
+        "locked": false,
+        "name": "petal.png",
+        "opacity": 1,
+        "placement": {
+          "anchor": {
+            "kind": "viewport"
+          },
+          "heightPx": 195,
+          "rotationDeg": 0,
+          "widthPx": 260,
+          "x": 0.45,
+          "y": 0.45
+        },
+        "visible": true,
+        "zIndex": 0
+      }
+    ],
+    "id": "youtube-custom",
+    "rules": [],
+    "schemaVersion": 13,
+    "siteId": "youtube"
+  },
+  "around.enabled": true,
+  "around.features.bbs-comments": false,
+  "around.features.focus-titlebars": true,
+  "around.features.surface-noise": true,
+  "around.features.window-chrome": false,
+  "around.noiseStrength": 55,
+  "around.palette.brightness": 70,
+  "around.palette.hue": 210,
+  "around.palette.saturation": 40,
+  "around.strength": 0
+}

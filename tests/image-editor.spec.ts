@@ -1,19 +1,19 @@
 import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { Page, Locator, BrowserContext } from '@playwright/test';
 import { test, expect, launchExtension } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
-const key = 'webWorldThemes.design.youtube';
-const overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube';
+const overlay = '#around-decorations';
 const layers = `${overlay} [data-image-id]`;
 
 async function open(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await showArtwork(popup);
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const dialog = youtube.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(dialog).toBeVisible();
+  const { panel: dialog } = await openEditor(popup, youtube);
   await exposeEditorControls(dialog);
   return dialog;
 }
@@ -78,7 +78,7 @@ async function assets(context: BrowserContext) {
   return worker.evaluate(
     async () =>
       new Promise<Array<{ id: string; bytes: number; mime: string; leases: number }>>((resolve, reject) => {
-        const request = indexedDB.open('web-world-themes-assets', 1);
+        const request = indexedDB.open('around-assets', 1);
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
           const db = request.result,
@@ -134,11 +134,12 @@ test('import a transparent image, drag and resize it, save, reload and restart w
   expect(resized.width / resized.height).toBeCloseTo(original.width / original.height, 2);
   await save(dialog);
   const design = await stored(popup);
-  expect(design.schemaVersion).toBe(12);
+  expect(design.schemaVersion).toBe(18);
   expect(design.decorations).toHaveLength(1);
   expect(JSON.stringify(design)).not.toMatch(/data:image|base64|blob:/);
   expect(await assets(context)).toHaveLength(1);
   const persisted = design.decorations[0]!;
+  await closeEditorPages(youtube);
   await youtube.reload();
   await expect(youtube.locator(layers).locator('img')).toBeVisible();
   await expect(youtube.locator(layers)).not.toHaveAttribute('data-editable');
@@ -253,7 +254,7 @@ test('normal decoration is click-through; OFF and zero remove images and ON rest
 }) => {
   const dialog = await open(popup, youtube);
   await importImage(dialog, youtube);
-  const link = youtube.locator('[data-ww-surface~="video-card"]').first().locator('a').first();
+  const link = youtube.locator('[data-around-surface~="video-card"]').first().locator('a').first();
   const box = (await link.boundingBox())!;
   await dialog.getByLabel('画像のX位置').fill(String(Math.round(((box.x + box.width / 2) / 1100) * 10_000) / 100));
   await dialog.getByLabel('画像のY位置').fill(String(Math.round(((box.y + box.height / 2) / 760) * 10_000) / 100));
@@ -263,12 +264,12 @@ test('normal decoration is click-through; OFF and zero remove images and ON rest
   await link.click();
   await expect(youtube).toHaveURL(/\/watch\?/);
   await expect(youtube.locator(layers).locator('img')).toBeVisible();
-  for (const boundary of ['off', 'zero'] as const) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+  for (const boundary of ['off', 'emergency'] as const) {
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    if (boundary === 'off') await showArtwork(popup);
+    else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await expect(youtube.locator(layers).locator('img')).toBeVisible();
   }
 });
@@ -291,7 +292,7 @@ test('viewport placement follows resizing without scroll drift; player anchors f
   const resized = (await image.boundingBox())!;
   await youtube.evaluate(() => window.scrollTo(0, 300));
   expect((await image.boundingBox())!.y).toBeCloseTo(resized.y, 0);
-  await dialog.getByRole('button', { name: 'パネルを左へ' }).click();
+  // UI0-d: the editor is its own page; nothing needs moving off the page (was: パネルを左へ).
   await youtube.locator('#navigate').click();
   await expect(youtube).toHaveURL(/\/watch\?/);
   const beforeAnchor = (await image.boundingBox())!;
@@ -326,7 +327,7 @@ test('invalid files and missing assets fail without saving corrupt JSON or distu
   ).toBeUndefined();
   const response = await popup.evaluate(async () =>
     chrome.runtime.sendMessage({
-      type: 'web-world-themes:assets',
+      type: 'around:assets',
       action: 'save',
       session: 'session-test',
       design: {
@@ -414,13 +415,13 @@ test('turning the theme OFF while a save waits for asset retention still complet
       ),
     )
     .toBe(true);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   await worker.evaluate(() => {
     (globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune?.();
   });
   await expect.poll(async () => (await stored(popup)).decorations.length).toBe(1);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(layers)).toHaveCount(1);
   await expect(youtube.locator(layers).locator('img')).toBeVisible();
 });

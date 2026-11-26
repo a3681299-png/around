@@ -1,0 +1,365 @@
+import { showArtwork } from './helpers/artwork';
+// G1.4: artwork that is not redrawn is still rechecked (docs/g14-plan.md). Codex's long-wait repro
+// (docs/g13-bound2-verification.md, 長く入力しない条件), unchanged: an opaque layer that follows the
+// pointer a little is drawn only when the pointer moves. After the first group's check (300ms) its
+// control moves with no mutation, and the next pointer moves come only at 1,400ms and 1,500ms. The
+// guard must recheck the page by itself when the read's trust runs out, so the already-drawn layer
+// stops covering the moved control within the bound, without a new drawing input.
+import { build } from 'esbuild';
+import { test, expect } from './fixtures';
+import { openEditor } from './helpers/editor';
+import { exposeEditorControls } from './helpers/editor-workspace';
+import { parseDesign } from '../src/design/schema';
+import { defaultSignalRule } from '../src/signals/keyframes';
+import type { DesignDocument } from '../src/design/types';
+import { writeFile } from 'node:fs/promises';
+
+test('G1.4: a silent move stays protected through a longer interval without a new drawing input', async ({
+  popup,
+  youtube,
+  context,
+}, info) => {
+  // Rows are read in the adapter's selector order (seek bar first) and then document order, so the
+  // page's only seek bar is the first row of the answer check's first group. Last in the app, the
+  // box paints above the page's cards, so the screenshot shows it.
+  await youtube.addInitScript(() =>
+    document.addEventListener('DOMContentLoaded', () => {
+      const box = document.createElement('div');
+      box.id = 'g13-sparse-box';
+      box.style.cssText = 'position:fixed;left:300px;top:250px;width:500px;height:80px;display:flex;z-index:0';
+      box.innerHTML =
+        '<div id="below" style="display:flex;flex:none"><button id="g13-first" style="width:70px;height:40px">First</button></div><div id="secondary" style="flex:none"><div id="g13-second" class="ytp-progress-bar" style="width:70px;height:40px;background:#c00">Second</div></div>';
+      document.querySelector('ytd-app')!.append(box);
+    }),
+  );
+  await youtube.reload();
+  await expect(youtube.locator('#g13-second')).toBeVisible();
+  await showArtwork(popup);
+  const { panel } = await openEditor(popup, youtube);
+  await exposeEditorControls(panel);
+  const image = await youtube.evaluate(() => {
+    const c = document.createElement('canvas');
+    c.width = 64;
+    c.height = 48;
+    c.getContext('2d')!.fillRect(0, 0, 64, 48);
+    return c.toDataURL().split(',')[1]!;
+  });
+  await panel
+    .getByLabel('画像素材を追加')
+    .setInputFiles({ name: 'opaque.png', mimeType: 'image/png', buffer: Buffer.from(image, 'base64') });
+  await expect(youtube.locator('[data-image-id]').first()).toBeAttached();
+  await panel.getByRole('button', { name: '保存', exact: true }).click();
+  await expect(panel.locator('.status')).toHaveText('保存しました。');
+  await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
+  const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
+  const key = 'around.design.youtube';
+  const base = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
+  // x 275–725, y 190–350: over both buttons (cut out by the clip) and where Second moves to.
+  const follow = defaultSignalRule('g13-sparse', 'position.x', {
+    signal: 'pointer.x',
+    axis: 'x',
+    space: 'viewport',
+    inputRange: [0, 1],
+  });
+  follow.keyframes[0]!.value = 0;
+  // At most 40px, so the layer stays over where Second moves to; each 10px move below is drawn.
+  follow.keyframes[1]!.value = 40;
+  const design: DesignDocument = {
+    ...base,
+    decorations: [
+      {
+        ...base.decorations[0]!,
+        id: 'g13-sparse',
+        name: 'g13-sparse',
+        zIndex: 0,
+        placement: {
+          ...base.decorations[0]!.placement,
+          anchor: { kind: 'viewport' },
+          x: 500 / viewport.width,
+          y: 270 / viewport.height,
+          widthPx: 450,
+          heightPx: 160,
+          rotationDeg: 0,
+        },
+      },
+    ],
+    signalRules: [follow],
+  };
+  parseDesign(design);
+  await popup.evaluate(async ({ key, design }) => chrome.storage.local.set({ [key]: design }), { key, design });
+  const layer = '#around-decorations';
+  await expect
+    .poll(() =>
+      youtube.evaluate(
+        (l) =>
+          getComputedStyle(document.querySelector(l)!.shadowRoot!.querySelector('[data-image-id="g13-sparse"]')!)
+            .visibility,
+        layer,
+      ),
+    )
+    .toBe('visible');
+  // A hidden page subscribes to no signal, so the pointer would draw nothing. The other pages
+  // close instead of bringToFront, which would take the keyboard focus.
+  for (const page of context.pages()) if (page !== youtube) await page.close();
+  await expect.poll(() => youtube.evaluate(() => document.hidden)).toBe(false);
+  // Inside the viewport and away from every control, so no approach rule holds the layer.
+  const pointer = (step: number) =>
+    youtube.mouse.move(Math.round(viewport.width * 0.75) + step * 10, Math.round(viewport.height * 0.85));
+  await pointer(0);
+  await youtube.waitForTimeout(1500);
+  const cdp = await context.newCDPSession(youtube);
+  const screenshot = async (name: string) => {
+    const result = await cdp.send('Page.captureScreenshot', { format: 'png', fromSurface: true });
+    await writeFile(info.outputPath(name), Buffer.from(result.data, 'base64'));
+    return result.data;
+  };
+  // Every frame from the first move on: is Second's centre under the drawn, opaque layer?
+  await youtube.evaluate((l) => {
+    const button = document.querySelector<HTMLElement>('#g13-second')!;
+    const host = document.querySelector<HTMLElement>(l)!;
+    const node = host.shadowRoot!.querySelector<HTMLElement>('[data-image-id="g13-sparse"]')!;
+    document.documentElement.removeAttribute('data-around-guard-geometry');
+    const origin = performance.now();
+    const rows: any[] = [];
+    (window as any).g13Sparse = { origin, rows, done: false };
+    const sample = () => {
+      const r = button.getBoundingClientRect(),
+        x = r.left + r.width / 2,
+        y = r.top + r.height / 2;
+      const regions = [
+        ...host.style
+          .getPropertyValue('--around-decoration-clip')
+          .matchAll(/M(-?[\d.]+) (-?[\d.]+)h(-?[\d.]+)v(-?[\d.]+)/g),
+      ].map((m) => m.slice(1).map(Number));
+      const shown = getComputedStyle(node);
+      rows.push({
+        t: performance.now() - origin,
+        x,
+        moved: (window as any).g13SparseMovedAt !== undefined,
+        covered:
+          regions.some(([left, top, w, h]) => x > left! && x < left! + w! && y > top! && y < top! + h!) &&
+          shown.visibility === 'visible' &&
+          shown.opacity === '1',
+        left: node.getBoundingClientRect().left,
+      });
+      if (performance.now() - origin < 1900) requestAnimationFrame(sample);
+      else (window as any).g13Sparse.done = true;
+    };
+    requestAnimationFrame(sample);
+  }, layer);
+  const at = async (ms: number) => {
+    const elapsed = await youtube.evaluate(() => performance.now() - (window as any).g13Sparse.origin);
+    await youtube.waitForTimeout(Math.max(0, ms - elapsed));
+  };
+  await pointer(1);
+  await at(300);
+  await pointer(2);
+  // Right after the first group's check: Second moves under the layer with no mutation.
+  await youtube.evaluate(() => {
+    const animation = document
+      .querySelector('#g13-second')!
+      .animate([{ transform: 'translateX(0)' }, { transform: 'translateX(150px)' }], { duration: 1, fill: 'forwards' });
+    animation.pause();
+    animation.currentTime = 1;
+    (window as any).g13SparseMovedAt = performance.now() - (window as any).g13Sparse.origin;
+  });
+  await at(1000);
+  const idleImage = await screenshot('idle-before-new-read.png');
+  await at(1400);
+  await pointer(3);
+  await at(1500);
+  await pointer(4);
+  await at(1580);
+  await screenshot('after-sparse-reads.png');
+  await expect.poll(() => youtube.evaluate(() => (window as any).g13Sparse.done)).toBe(true);
+  const rows = await youtube.evaluate(() => (window as any).g13Sparse.rows);
+  const diagnostics = await youtube.evaluate(() => ({
+    origin: (window as any).g13Sparse.origin,
+    geometry: JSON.parse(document.documentElement.getAttribute('data-around-guard-geometry') ?? '[]'),
+    safety: document.querySelector('#around-decorations')?.getAttribute('data-around-safety'),
+  }));
+  // Kept next to the images, so a passing run can be read too (with AROUND_GUARD_TRACE=1 builds).
+  await writeFile(info.outputPath('idle-geometry.json'), JSON.stringify(diagnostics, null, 2));
+  const movedAt = await youtube.evaluate(() => (window as any).g13SparseMovedAt);
+  await info.attach('sparse-visual.json', {
+    body: JSON.stringify({ movedAt, rows }, null, 2),
+    contentType: 'application/json',
+  });
+  const drawn = await cdp.send('Page.captureScreenshot', { format: 'png', fromSurface: true });
+  const native = await youtube.evaluate(() => {
+    const r = document.querySelector('#g13-second')!.getBoundingClientRect();
+    document.querySelector<HTMLElement>('#around-decorations')!.style.setProperty('visibility', 'hidden', 'important');
+    return { x: Math.ceil(r.left), y: Math.ceil(r.top), width: Math.floor(r.width), height: Math.floor(r.height) };
+  });
+  const reference = await cdp.send('Page.captureScreenshot', { format: 'png', fromSurface: true });
+  const pixels = await youtube.evaluate(
+    async ({ drawn, reference, idleImage, native }) => {
+      const read = async (base64: string) => {
+        const bitmap = await createImageBitmap(new Blob([Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))]));
+        const canvas = document.createElement('canvas');
+        canvas.width = native.width;
+        canvas.height = native.height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(bitmap, native.x, native.y, native.width, native.height, 0, 0, native.width, native.height);
+        bitmap.close();
+        return [...ctx.getImageData(0, 0, native.width, native.height).data];
+      };
+      const a = await read(drawn),
+        b = await read(reference),
+        idle = await read(idleImage);
+      let different = 0,
+        idleDifferent = 0;
+      for (let i = 0; i < a.length; i += 4) if (a.slice(i, i + 4).some((v, k) => v !== b[i + k])) different++;
+      for (let i = 0; i < a.length; i += 4) if (idle.slice(i, i + 4).some((v, k) => v !== b[i + k])) idleDifferent++;
+      return { ...native, pixels: a.length / 4, different, idleDifferent };
+    },
+    { drawn: drawn.data, reference: reference.data, idleImage, native },
+  );
+  await writeFile(info.outputPath('final-drawing.png'), Buffer.from(drawn.data, 'base64'));
+  await writeFile(info.outputPath('native-reference.png'), Buffer.from(reference.data, 'base64'));
+  await info.attach('native-pixel-comparison.json', {
+    body: JSON.stringify(pixels, null, 2),
+    contentType: 'application/json',
+  });
+  await cdp.detach();
+  // The layer is drawn on each pointer move only (so the source is read sparsely), not idle.
+  const drawnAt = rows
+    .filter((r: any, i: number) => i && Math.abs(r.left - rows[i - 1].left) > 0.01)
+    .map((r: any) => Math.round(r.t));
+  const covered = rows.filter((r: any) => r.moved && r.covered).map((r: any) => Math.round(r.t));
+  console.log('SPARSE_VISUAL', JSON.stringify({ movedAt, frames: rows.length, drawnAt, covered }));
+  expect(
+    rows.filter((r: any) => !r.moved && r.covered),
+    'cut out before the move',
+  ).toEqual([]);
+  expect(drawnAt.length, 'the layer is drawn by the pointer moves').toBeGreaterThanOrEqual(3);
+  // Codex's order: the remaining groups are caught up at 520ms and the next read is at 620ms.
+  // The caught-up read compares the moved control's group again, so nothing after it is covered.
+  expect(
+    covered.filter((t: number) => t > movedAt + 404 + 34),
+    'a moved control must not remain under already-painted opaque artwork beyond the bound, even without a new pointer input',
+  ).toEqual([]);
+  expect(
+    pixels.different,
+    'every pixel of the native control must match the reference with the authored layer hidden',
+  ).toBe(0);
+  // At 1,000ms, before any new pointer input: the recheck has already cut the moved control out.
+  expect(pixels.idleDifferent, 'the moved control is uncovered before the next drawing input').toBe(0);
+});
+
+async function probeCode() {
+  const result = await build({
+    stdin: {
+      contents: `export {youtubeOperations} from './src/sites/youtube-operations'; export {createOperationGuardHost} from './src/host/operation-guard';`,
+      resolveDir: process.cwd(),
+    },
+    bundle: true,
+    write: false,
+    format: 'iife',
+    globalName: 'G14Probe',
+    dropLabels: [
+      'AROUND_GUARD_TRACE',
+      'AROUND_TEST_PAGE_CHANGE',
+      ...(process.env.AROUND_NO_IDLE_RECHECK === '1' ? ['AROUND_IDLE_RECHECK'] : []),
+    ],
+  });
+  return result.outputFiles[0]!.text;
+}
+
+// The recheck's work: it runs only while artwork is shown and a read's trust has run out, and it
+// redraws nothing while the page is unchanged. A moved control hides the artwork within the bound.
+test('G1.4: the idle recheck runs only for shown artwork and hides it when a control moved silently', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G14Probe;
+    const control = document.createElement('div');
+    control.className = 'ytp-progress-bar';
+    control.style.cssText = 'position:fixed;left:300px;top:250px;width:70px;height:40px';
+    document.querySelector('ytd-app')!.append(control);
+    const paint = (id: string, opacity = 1) => ({
+      id,
+      bounds: { left: 200, top: 150, right: 700, bottom: 400 },
+      opacity,
+      pointerEvents: false,
+      outset: 0,
+      composition: 'overlay',
+    });
+    const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+    // One guard per case: count its reads and redraw requests over an idle spell with no frames.
+    const idle = async (setup: (host: any) => void, ms = 1500) => {
+      const source = api.youtubeOperations(document),
+        capture = source.capture.bind(source);
+      let reads = 0;
+      const invalidations: { at: number; hide: boolean }[] = [];
+      source.capture = (options?: unknown) => {
+        reads++;
+        return capture(options);
+      };
+      const host = api.createOperationGuardHost(document, source, (stop: unknown) =>
+        invalidations.push({ at: performance.now(), hide: Boolean(stop) }),
+      );
+      host.setActive(true);
+      host.sample(performance.now());
+      setup(host);
+      reads = 0;
+      invalidations.length = 0;
+      const started = performance.now();
+      await wait(ms);
+      host.destroy();
+      return { reads, invalidations: invalidations.map((i) => ({ ...i, at: i.at - started })) };
+    };
+    const none = await idle((host) => host.commit([]));
+    const transparent = await idle((host) => host.commit([paint('clear', 0)]));
+    const stopped = await idle((host) => {
+      for (let i = 0; i < 3; i++) host.pause('stopped by test', true, ['art']);
+      host.commit([paint('art')]);
+    });
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    const hidden = await idle((host) => host.commit([paint('art')]));
+    // Hidden after the commit: the pending recheck is dropped as the tab goes to the back.
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+    document.dispatchEvent(new Event('visibilitychange'));
+    const hiddenLater = await idle((host) => {
+      host.commit([paint('art')]);
+      setTimeout(() => {
+        Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+        document.dispatchEvent(new Event('visibilitychange'));
+      }, 50);
+    });
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+    document.dispatchEvent(new Event('visibilitychange'));
+    const shown = await idle((host) => host.commit([paint('art')]));
+    let movedAt = 0;
+    const moved = await idle((host) => {
+      host.commit([paint('art')]);
+      setTimeout(() => {
+        const animation = control.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(150px)' }], {
+          duration: 1,
+          fill: 'forwards',
+        });
+        animation.pause();
+        animation.currentTime = 1;
+        movedAt = performance.now();
+      }, 100);
+    }, 900);
+    control.remove();
+    return { none, transparent, stopped, hidden, hiddenLater, shown, moved, movedAt };
+  });
+  console.log('G14_IDLE', JSON.stringify(result));
+  for (const name of ['none', 'transparent', 'hidden', 'hiddenLater'] as const)
+    expect(result[name], `${name}: no recheck`).toEqual({ reads: 0, invalidations: [] });
+  // A stopped layer keeps the guard's own recovery redraw (400ms after the pause, as before), but
+  // the page is not read for it.
+  expect(result.stopped.reads, 'stopped: no recheck').toBe(0);
+  // Unchanged page with shown artwork: a read about every TRUST_MS (404ms), no redraw.
+  expect(result.shown.reads).toBeGreaterThanOrEqual(2);
+  expect(result.shown.reads).toBeLessThanOrEqual(4);
+  expect(result.shown.invalidations).toEqual([]);
+  // The silent move at 100ms is found by the recheck, which hides the artwork before its redraw.
+  const hides = result.moved.invalidations.filter((i) => i.hide);
+  expect(hides.length, 'the moved control hides the artwork').toBeGreaterThanOrEqual(1);
+  expect(hides[0]!.at, 'within the bound after the move').toBeLessThan(100 + 404 + 34);
+});

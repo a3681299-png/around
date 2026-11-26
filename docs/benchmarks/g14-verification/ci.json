@@ -1,0 +1,45 @@
+{
+  "url": "https://github.com/a3681299-png/around/actions/runs/41772161277",
+  "headSha": "ed03b29c75e7997fa13d1d781350e84751131c1a",
+  "jobs": [
+    {
+      "id": 126384111777,
+      "name": "e2e (1)",
+      "conclusion": "success"
+    },
+    {
+      "id": 126384111904,
+      "name": "unit",
+      "conclusion": "success"
+    },
+    {
+      "id": 126384111953,
+      "name": "e2e (2)",
+      "conclusion": "failure"
+    },
+    {
+      "id": 126384112006,
+      "name": "e2e (3)",
+      "conclusion": "success"
+    },
+    {
+      "id": 126384112101,
+      "name": "e2e (4)",
+      "conclusion": "success"
+    }
+  ],
+  "observedCounts": {
+    "unit": {
+      "passed": 421
+    },
+    "e2e": {
+      "passed": 267,
+      "failed": 1,
+      "skipped": 60
+    },
+    "nativeEntry": {
+      "passed": 4
+    }
+  },
+  "failedCase": "tests/operation-safety.spec.ts:233, assertion line 263 before pointer input, stale handle expected own:true, received own:false"
+}

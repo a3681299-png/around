@@ -1,45 +1,91 @@
 import {
+  approachLayers,
   editorClaims,
   guardPaint,
-  initialProximity,
-  stepProximity,
+  initialApproach,
+  stepApproach,
+  type ApproachState,
   type OperationSnapshot,
   type PaintFootprint,
   type SafetyIssue,
 } from '../world/operations';
-import type { OperationSource } from './operation-source';
-import type { Point } from '../world/geometry';
+import { layoutOf, type OperationSource } from './operation-source';
+import { traceApproach, traceGuardStop } from './guard-trace';
+import type { PlacementFrame, Point } from '../world/geometry';
+import type { WorldApproach } from '../world/types';
 
 export interface SafetyStatus {
   issues: readonly SafetyIssue[];
   surfaces: OperationSnapshot;
   approaching: boolean;
+  /** What a stop protected, one sentence; empty while drawing. */
   stopped: string;
+  /** How to fix it, one sentence. */
+  remedy: string;
+  /** Automatic recovery has ended; only 描画を再開 (resume) brings drawing back. */
+  latched: boolean;
   overlay: boolean;
+}
+// Stops say what they protected and how to fix it, one sentence each, in the creator's words
+// (docs/around-studio-design-system/README.md, Copy).
+const COVERED = 'クリックがページの操作部品に届くよう、絵の表示を止めました。';
+const MOVED = 'ページの操作部品が動いた直後の入力だったため、絵の表示を一時的に止めました。';
+const SHIFTED = 'ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。';
+const HOLD = 'ページの操作部品が動いている間は、絵の表示を止めています。';
+const CLAIMED = '編集の枠の下にページの操作部品があったため、その操作を止めました。';
+const SETTLES = '動きが落ち着くと、自動で表示に戻ります。';
+const RESUME = '操作チェックの「描画を再開」を押してください。';
+const sameIssues = (a: readonly SafetyIssue[], b: readonly SafetyIssue[]) =>
+  a.length === b.length &&
+  a.every(
+    (x, i) =>
+      x.layerId === b[i]!.layerId &&
+      x.surfaceId === b[i]!.surfaceId &&
+      x.severity === b[i]!.severity &&
+      x.action === b[i]!.action &&
+      x.reason === b[i]!.reason &&
+      x.remedy === b[i]!.remedy,
+  );
+const quote = (names: readonly string[]) => names.map((name) => `「${name}」`).join('と');
+/** The remedy for a stop: the named layers to move, and 描画を再開 once recovery has ended. */
+function remedyFor(latched: boolean, names: readonly string[], remedy: string) {
+  if (latched)
+    return names.length ? `${quote(names)}を操作部品から離してから、${RESUME}` : `絵の位置を確かめてから、${RESUME}`;
+  return names.length ? `${quote(names)}を操作部品から離すか、小さくしてください。` : remedy;
 }
 export interface OperationGuardHost {
   setActive(value: boolean): void;
-  sample(time: number): { approaching: boolean; idleSeconds: number };
+  /** `approach`: the roots that yield to a near control (G1.2), absent when none do. */
+  sample(time: number): { approach?: WorldApproach; idleSeconds: number };
   commit(paints: readonly PaintFootprint[]): ReadonlySet<string>;
   readonly source: OperationSource;
   snapshot(): SafetyStatus;
   subscribe(listener: (value: SafetyStatus) => void): () => void;
   overlay(value: boolean): void;
-  pause(reason: string, repeatedFailure?: boolean, layerIds?: readonly string[]): void;
+  /** `names`: layers the creator can move to fix it; `remedy`: how it recovers otherwise. */
+  pause(
+    reason: string,
+    repeatedFailure?: boolean,
+    layerIds?: readonly string[],
+    names?: readonly string[],
+    remedy?: string,
+  ): void;
+  /** 描画を再開 from the editor: ends a stop, including a latched one, and counts failures anew. */
+  resume(): void;
   /** Input-time check for an editor gesture: false (and drawing paused) when a fresh read finds
    * a protected surface under the point. */
-  claim(point: Point): boolean;
+  /** underStacking: the press reached a handle on the beneath plane (chunk 4, editorClaims). */
+  claim(point: Point, underStacking?: boolean): boolean;
   destroy(): void;
 }
 /** Inspection observes the whole page; it runs only while authored paint can exist. */
 export function guardWanted(state: {
   suspended: boolean;
   enabled: boolean;
-  strength: number;
   layers: number;
   editing: boolean;
 }): boolean {
-  return !state.suspended && state.enabled && state.strength > 0 && (state.layers > 0 || state.editing);
+  return !state.suspended && state.enabled && (state.layers > 0 || state.editing);
 }
 export function createOperationGuardHost(
   doc: Document,
@@ -53,32 +99,64 @@ export function createOperationGuardHost(
   const layerFailures = new Map<string, number>(),
     latchedLayers = new Map<string, string>();
   let surfaces = source.capture(),
-    proximity = { ...initialProximity(), safe: false },
+    approach: ApproachState = initialApproach(),
     point: Point | undefined,
-    before: Point | undefined;
-  const boundaryKey = (snapshot: OperationSnapshot) =>
-    JSON.stringify([
+    before: Point | undefined,
+    /** Where the pointer is held down, and whether a key is, until released. */
+    pressed: Point | undefined,
+    keyed = false;
+  const round = (value: number) => Math.round(value * 100) / 100;
+  // In document coordinates (G1.3): a page scroll moves the inner scroll boxes of page content
+  // with everything else, which is no change of the boundary. Sticky columns are unbounded.
+  const boundaryKey = (snapshot: OperationSnapshot) => {
+    const sx = snapshot.scroll?.x ?? 0,
+      sy = snapshot.scroll?.y ?? 0;
+    return JSON.stringify([
       snapshot.supported,
       snapshot.viewport,
       snapshot.surfaces
         .filter((s) => s.availability.visible)
-        .map((s) => [
-          s.id,
-          s.compositionCapability,
-          s.policy,
-          s.protectedEnvelope.left,
-          s.protectedEnvelope.width,
-          ...(s.scrolls ? [] : [s.protectedEnvelope.top, s.protectedEnvelope.height]),
-          s.scrollBox ? [s.scrollBox.left, s.scrollBox.top, s.scrollBox.width, s.scrollBox.height] : null,
-        ]),
+        .map((s) => {
+          const box = s.scrollBox,
+            bx = s.scrolls && box && box.height < 1e6 ? sx : 0,
+            by = s.scrolls && box && box.height < 1e6 ? sy : 0;
+          return [
+            s.id,
+            s.compositionCapability,
+            s.policy,
+            round(s.protectedEnvelope.left + (s.scrolls ? sx : 0)),
+            round(s.protectedEnvelope.width),
+            ...(s.scrolls ? [] : [s.protectedEnvelope.top, s.protectedEnvelope.height]),
+            box ? [round(box.left + bx), round(box.top + by), round(box.width), round(box.height)] : null,
+          ];
+        }),
     ]);
+  };
   let boundary = boundaryKey(surfaces);
   let lastActivity = view.performance.now(),
     interacting = false,
     stopped = '',
+    stoppedRemedy = '',
     stableAt = 0,
     failures = 0,
-    lastGeneration = surfaces.generation.geometry;
+    lastGeneration = layoutOf(surfaces);
+  /** Paints over controls whose look just changed (G1.3, D9): hidden from that change until the
+   * next frame samples the page. The change itself was checked not to move any control. */
+  let looked: ReadonlySet<string> = new Set();
+  const paintsOver = (regions: readonly PlacementFrame[]) =>
+    new Set(
+      paints
+        .filter((p) =>
+          regions.some(
+            (r) =>
+              p.bounds.right + p.outset > r.left &&
+              p.bounds.left - p.outset < r.left + r.width &&
+              p.bounds.bottom + p.outset > r.top &&
+              p.bounds.top - p.outset < r.top + r.height,
+          ),
+        )
+        .map((p) => p.id),
+    );
   let issues: readonly SafetyIssue[] = [],
     paints: readonly PaintFootprint[] = [],
     overlay = false,
@@ -87,24 +165,130 @@ export function createOperationGuardHost(
   let overlayHost: HTMLElement | undefined,
     lastStatus = '',
     timer: number | undefined,
-    holdTimer: number | undefined;
-  const HOLD = '操作面が変化している間は、まとめて確認するまで描画を停止しています。';
-  const snapshot = (): SafetyStatus => ({ issues, surfaces, approaching: proximity.safe, stopped, overlay });
+    holdTimer: number | undefined,
+    recheckTimer: number | undefined,
+    /** The last commit left some artwork drawn: a layer not stopped and not fully transparent. */
+    shownArt = false;
+  const cancelRecheck = () => {
+    if (recheckTimer !== undefined) view.clearTimeout(recheckTimer);
+    recheckTimer = undefined;
+  };
+  /** Artwork drawn from a read stays on screen until the next redraw, which may not come (it can
+   * follow the pointer only): a control that moved with no mutation stayed under it for over a
+   * second (G1.4, docs/g13-bound2-verification.md). So when the read's trust runs out, the guard
+   * reads the page itself, which checks every group (TRUST_MS); a moved control hides the artwork
+   * and redraws it with the new cut-outs. Nothing moved: no redraw, only the next recheck. Only
+   * while artwork is drawn and the tab is in front; nothing is scheduled otherwise.
+   * One timer at most: the oldest check never goes back, so a timer already set fires no later
+   * than the trust runs out, and a frame that read the page meanwhile only moves it on. */
+  const scheduleRecheck = () => {
+    if (recheckTimer !== undefined || !active || !enabled || !shownArt || doc.hidden) return;
+    const wait = source.trustExpiresIn();
+    if (wait === undefined) return;
+    // The trust runs out strictly past TRUST_MS (the source compares with `>`).
+    recheckTimer = view.setTimeout(recheck, Math.ceil(wait) + 1);
+  };
+  const recheck = () => {
+    recheckTimer = undefined;
+    if (!active || !enabled || !shownArt || doc.hidden) return;
+    if ((source.trustExpiresIn() ?? 0) > 0) return scheduleRecheck();
+    const drawn = surfaces.generation.geometry;
+    // A held read (a burst still arriving) has its own timer and hides the artwork already.
+    const read = source.capture({ coalesce: true });
+    if (read.generation.geometry !== drawn) return invalidate(true);
+    scheduleRecheck();
+  };
+  const latched = () => failures >= 3 || latchedLayers.size > 0;
+  /** The issues without the guard's own stop entries (all, or those with this reason). A stop that
+   * ends keeps the layers' restrictions until the next paint recomputes them: an empty list in
+   * between reads as "nothing restricted" and hid the editor's open 操作チェック (G1.3 fix). */
+  const withoutStops = (reason?: string) =>
+    issues.filter(
+      (i) => !(i.surfaceId === 'host' && i.action === 'stop' && (reason === undefined || i.reason === reason)),
+    );
+  const approaching = () => approach.near.size > 0;
+  /** Near controls, and the roots over them in the last committed paint. */
+  // The renderer and the world evaluation both sample in one frame. With the same inputs, a
+  // second step within half a frame would only move a clear deadline by those milliseconds.
+  let stepped: { approach: ApproachState; inputs: readonly unknown[]; timeMs: number } | undefined;
+  const step = (timeMs: number, snapshot: OperationSnapshot) => {
+    const inputs = [snapshot, point, before, pressed, keyed, paints];
+    if (
+      stepped?.approach === approach &&
+      timeMs - stepped.timeMs < 8 &&
+      timeMs >= stepped.timeMs &&
+      inputs.every((value, i) => value === stepped!.inputs[i])
+    )
+      return approach;
+    const next = stepApproach(
+      approach,
+      snapshot,
+      {
+        timeMs,
+        ...(point ? { point } : {}),
+        ...(before ? { previousPoint: before } : {}),
+        ...(pressed ? { pressed } : {}),
+        keyed,
+      },
+      paints,
+    );
+    stepped = { approach: next, inputs, timeMs };
+    return next;
+  };
+  /** Whether the held roots differ: the only change the world (and a redraw) depends on. */
+  const heldChanged = (next: ApproachState) =>
+    next.held.size !== approach.held.size || [...next.held.keys()].some((root) => !approach.held.has(root));
+  const nearChanged = (next: ApproachState) =>
+    next.near.size !== approach.near.size || [...next.near.keys()].some((key) => !approach.near.has(key));
+  const clearing = () => [...approach.near.values()].some((entry) => entry.clearSince !== null);
+  const snapshot = (): SafetyStatus => ({
+    issues,
+    surfaces,
+    approaching: approaching(),
+    stopped,
+    remedy: stopped ? stoppedRemedy : '',
+    latched: latched(),
+    overlay,
+  });
   // Same objects and flags as the last publish cannot change the signature below.
   let published: readonly unknown[] = [];
   const publish = () => {
-    const inputs = [issues, stopped, overlay, proximity.safe, overlay ? surfaces : null, overlayHost];
+    const inputs = [
+      issues,
+      stopped,
+      stoppedRemedy,
+      latched(),
+      overlay,
+      approaching(),
+      overlay ? surfaces : null,
+      overlayHost,
+    ];
     if (inputs.length === published.length && inputs.every((value, i) => value === published[i])) return;
     published = inputs;
-    const signature = JSON.stringify([issues, stopped, overlay, proximity.safe, overlay ? surfaces : null]);
+    const signature = JSON.stringify([
+      issues,
+      stopped,
+      stoppedRemedy,
+      latched(),
+      overlay,
+      approaching(),
+      overlay ? surfaces : null,
+    ]);
     if (signature === lastStatus) return;
     lastStatus = signature;
     if (overlayHost) {
       const shadow = overlayHost.shadowRoot!;
       shadow.replaceChildren();
       const style = doc.createElement('style');
+      // around-protect: the 45° vermilion hatch (the one diagonal, and the one red, in the system), a ruled
+      // edge, and the part's ID in mono on the first line, kept off the hatch by its own ground.
+      // Gesso's values: the marks sit over any picture. YouTube has dozens of overlapping envelopes,
+      // so the hatch is fixed to the window (overlaps share the same lines) and there is no wash,
+      // which would build up into an opaque block.
       style.textContent =
-        ':host{all:initial!important;position:fixed!important;inset:0!important;pointer-events:none!important;z-index:2147481999!important}div{position:absolute;border:1px dashed #b55b00;background:#eeac3315;box-sizing:border-box;font:11px sans-serif;color:#a34c00;pointer-events:none}';
+        ':host{all:initial!important;position:fixed!important;inset:0!important;pointer-events:none!important;z-index:2147481999!important}' +
+        "div{position:absolute;box-sizing:border-box;padding:4px;border:1px solid #bf3f1d;background:repeating-linear-gradient(45deg,#bf3f1d 0 1.2px,transparent 1.2px 6px) fixed;box-shadow:inset 0 0 0 1px rgba(255,255,255,.5);font:500 12px/20px 'IBM Plex Mono',ui-monospace,'SFMono-Regular','Cascadia Mono',Consolas,'BIZ UDPGothic','Yu Gothic UI','Meiryo UI',monospace;font-variant-numeric:tabular-nums;color:#bf3f1d;white-space:nowrap;pointer-events:none}" +
+        "div::first-line{background:#fbfaf8}div::before,div::after{content:'\\a0'}";
       shadow.append(style);
       for (const surface of surfaces.surfaces.filter((s) => s.availability.visible)) {
         const box = doc.createElement('div'),
@@ -131,7 +315,13 @@ export function createOperationGuardHost(
     }
     listeners.forEach((listener) => listener(snapshot()));
   };
-  function pause(reason: string, repeatedFailure = false, layerIds?: readonly string[]) {
+  function pause(
+    reason: string,
+    repeatedFailure = false,
+    layerIds?: readonly string[],
+    names: readonly string[] = [],
+    remedy = SETTLES,
+  ) {
     stopped = reason;
     stoppedIds = layerIds ? new Set(layerIds) : undefined;
     if (repeatedFailure && layerIds)
@@ -141,6 +331,7 @@ export function createOperationGuardHost(
         if (count >= 3) latchedLayers.set(id, reason);
       }
     else if (repeatedFailure) failures++;
+    stoppedRemedy = remedyFor(failures >= 3, names, remedy);
     stableAt = view.performance.now();
     issues = paints
       .filter((p) => !stoppedIds || stoppedIds.has(p.id))
@@ -149,10 +340,7 @@ export function createOperationGuardHost(
         surfaceId: 'host',
         severity: 'enforced',
         reason,
-        remedy:
-          failures >= 3
-            ? '破綻が繰り返されたため自動復帰を止めました。対象を確認してページを再読み込みしてください。'
-            : '操作を終え、配置基準が安定すると復帰します。',
+        remedy: stoppedRemedy,
       }));
     invalidate(layerIds ?? true);
     publish();
@@ -162,63 +350,97 @@ export function createOperationGuardHost(
         if (active) invalidate();
       }, 400);
   }
+  /** Names of the drawn layers at a covered click: the ones a creator can move away. */
+  const layersAt = ({ clientX: x, clientY: y }: MouseEvent) => [
+    ...new Set(
+      paints
+        .filter(
+          (p) =>
+            p.name &&
+            x >= p.bounds.left - p.outset &&
+            x <= p.bounds.right + p.outset &&
+            y >= p.bounds.top - p.outset &&
+            y <= p.bounds.bottom + p.outset,
+        )
+        .map((p) => p.name!),
+    ),
+  ];
   const activity = (event: Event) => {
     if (event.type === 'visibilitychange' || event.type === 'blur') {
+      AROUND_GUARD_TRACE: traceApproach(doc, 'forget', { value: interacting, event });
       lastActivity = view.performance.now();
-      before = point = undefined;
-      interacting = false;
+      before = point = pressed = undefined;
+      interacting = keyed = false;
+      // A tab at the back is rechecked by its first read when it comes back (G1.3), not idly.
+      if (doc.hidden) cancelRecheck();
       return;
     }
     lastActivity = view.performance.now();
-    const owned = event
-      .composedPath()
-      .some((node) => node instanceof Element && node.id.startsWith('web-world-themes'));
+    const owned = event.composedPath().some((node) => node instanceof Element && node.id.startsWith('around'));
     if (owned) {
       // Authoring UI owns its input region. Native hit/paint protection remains
       // enforced, while Timeline/numeric previews can show their authored values.
-      before = point = undefined;
-      interacting = false;
-      proximity = { safe: false, clearSince: null };
+      AROUND_GUARD_TRACE: if (interacting || point) traceApproach(doc, 'forget', { value: interacting, event });
+      before = point = pressed = undefined;
+      interacting = keyed = false;
+      approach = initialApproach();
       return;
     }
     if (event instanceof PointerEvent) {
       before = point;
       point = { x: event.clientX, y: event.clientY };
     }
-    if (event.type === 'pointerdown' || event.type === 'keydown') interacting = true;
+    if (event.type === 'pointerdown' || event.type === 'keydown') {
+      AROUND_GUARD_TRACE: if (!interacting) traceApproach(doc, 'interacting', { value: true, event });
+      interacting = true;
+      if (event.type === 'keydown') keyed = true;
+      else pressed = point;
+    }
     if (
       event.type === 'pointerup' ||
       event.type === 'pointercancel' ||
       event.type === 'keyup' ||
       event.type === 'blur'
     ) {
-      interacting = false;
+      AROUND_GUARD_TRACE: if (interacting) traceApproach(doc, 'interacting', { value: false, event });
+      interacting = keyed = false;
+      pressed = undefined;
     }
     if (!owned && (event.type === 'keydown' || event.type === 'pointerdown' || event.type === 'focusin')) {
       // validate() reads the page synchronously; the snapshot it leaves behind is the current
       // one, so a geometry change is never mistaken for a repeated failure.
       const valid = source.validate(surfaces, event);
-      const geometryChanged = source.capture().generation.geometry !== surfaces.generation.geometry;
-      if (!valid) pause('入力直前に操作面の世代またはクリック先が変わりました。', !geometryChanged);
+      // A page scroll keeps the layout: a press right after it is not one after a move (G1.3, D3).
+      const geometryChanged = layoutOf(source.capture()) !== layoutOf(surfaces);
+      if (!valid && geometryChanged) pause(MOVED);
+      else if (!valid) pause(COVERED, true, undefined, event instanceof MouseEvent ? layersAt(event) : []);
     }
     // Pointer paths are tested immediately, including movement across a control.
-    const next = stepProximity(proximity, source.capture(), {
-      timeMs: lastActivity,
-      ...(point ? { point } : {}),
-      ...(before ? { previousPoint: before } : {}),
-      interacting,
-    });
-    const changed = next.safe !== proximity.safe;
-    proximity = next;
-    // Consume this path once. A following frame can then test the stationary
-    // endpoint and start its clear hysteresis without another pointer event.
+    const next = step(lastActivity, source.capture());
+    const changed = heldChanged(next);
+    AROUND_GUARD_TRACE: if (changed || nearChanged(next))
+      traceApproach(doc, 'approach', {
+        value: next.near.size > 0,
+        event,
+        ...(point ? { point } : {}),
+        interacting,
+        surfaces: source.capture().surfaces,
+        approach: next,
+      });
+    approach = next;
+    // Consume this path once and test the stationary endpoint now: controls only the path came
+    // near start their clear hysteresis without another pointer event or a redraw. The
+    // endpoint is on the path, so it can only clear controls, never hold another root.
     before = point;
-    if (next.safe && next.clearSince !== null && timer === undefined && paints.some((p) => p.dynamic))
+    if (event instanceof PointerEvent && approach.near.size) approach = step(lastActivity, source.capture());
+    // A clearing control (and the roots it holds) is released by a later frame; make sure one comes.
+    if (clearing() && timer === undefined && paints.some((p) => p.dynamic))
       timer = view.setTimeout(() => {
         timer = undefined;
         if (active) invalidate();
       }, 360);
-    if ((changed || (next.safe && event instanceof PointerEvent)) && paints.some((p) => p.dynamic)) invalidate();
+    // Only the held roots reach the world: redraw when they change, not on every move.
+    if (changed) invalidate();
     else publish();
   };
   const events = [
@@ -238,6 +460,15 @@ export function createOperationGuardHost(
   const changed = () => invalidate();
   const unsubscribeSource = source.subscribe(() => {
     boundaryDirty = true;
+    const change = source.pending();
+    // A page scroll moves no surface against the clip (G1.3): redraw, hide nothing.
+    if (change === 'scroll') return invalidate();
+    // A look change the source checked moved no control: hide only the paints over those
+    // controls, until the next frame (D9).
+    if (change === 'look') {
+      looked = new Set([...looked, ...paintsOver(source.lookRegions())]);
+      return invalidate([...looked]);
+    }
     // Hide before paint without forcing native layout in every observer
     // microtask. Input validation still performs a fresh synchronous read.
     invalidate(true);
@@ -260,6 +491,7 @@ export function createOperationGuardHost(
       if (holdTimer !== undefined) view.clearTimeout(holdTimer);
       holdTimer = undefined;
       timer = undefined;
+      cancelRecheck();
       if (value) {
         events.forEach((type) => doc.addEventListener(type, activity, { capture: true, passive: true }));
         doc.addEventListener('scroll', changed, { capture: true, passive: true });
@@ -267,9 +499,9 @@ export function createOperationGuardHost(
         view.addEventListener('blur', activity);
         reduced.addEventListener('change', changed);
         lastActivity = view.performance.now();
-        before = point = undefined;
-        interacting = false;
-        proximity = { safe: false, clearSince: null };
+        before = point = pressed = undefined;
+        interacting = keyed = false;
+        approach = initialApproach();
       } else {
         overlay = false;
         overlayHost?.remove();
@@ -280,12 +512,24 @@ export function createOperationGuardHost(
     source,
     sample(time) {
       surfaces = source.capture({ coalesce: true });
+      // This frame reads the page again: paints held for a look change are drawn as decided below.
+      looked = new Set();
+      // A shifted read is checked against a full one when its window ends, even if nothing else
+      // asks for a frame by then.
+      const settles = source.settlesIn();
+      if (settles > 0 && holdTimer === undefined)
+        holdTimer = view.setTimeout(() => {
+          holdTimer = undefined;
+          if (active) invalidate();
+        }, Math.ceil(settles));
       const wait = source.deferredFor();
       if (wait > 0) {
         // Native changes are still arriving and this snapshot is not current: hold all
         // drawing, keep the boundary comparison pending and come back when the window ends.
         if (!stopped) {
+          AROUND_GUARD_TRACE: traceGuardStop(doc, 'hold', { wait });
           stopped = HOLD;
+          stoppedRemedy = remedyFor(false, [], SETTLES);
           stoppedIds = undefined;
         }
         if (holdTimer === undefined)
@@ -296,18 +540,24 @@ export function createOperationGuardHost(
       } else {
         if (stopped === HOLD) {
           stopped = '';
-          issues = [];
+          issues = withoutStops(HOLD);
         }
         if (boundaryDirty) {
           boundaryDirty = false;
           const nextBoundary = boundaryKey(surfaces);
           if (nextBoundary !== boundary) {
+            AROUND_GUARD_TRACE: traceGuardStop(doc, 'shifted', {
+              entry: 'boundary',
+              before: boundary,
+              after: nextBoundary,
+            });
             boundary = nextBoundary;
-            pause('操作面の保護範囲が変わったため、安定するまで描画を停止しています。');
+            pause(SHIFTED);
           }
         }
       }
-      const generation = surfaces.generation.geometry;
+      // Stable means no surface moved in the document: a page scroll does not restart the wait.
+      const generation = layoutOf(surfaces);
       if (generation !== lastGeneration) {
         lastGeneration = generation;
         stableAt = time;
@@ -316,15 +566,22 @@ export function createOperationGuardHost(
         (s) => s.availability.editing || s.availability.dragging || s.availability.captured,
       );
       if (stopped && stopped !== HOLD && failures < 3 && !interacting && !nativeEditing && time - stableAt >= 350) {
+        AROUND_GUARD_TRACE: traceGuardStop(doc, 'release', { reason: stopped });
+        issues = withoutStops(stopped);
         stopped = '';
-        issues = [];
       }
-      proximity = stepProximity(proximity, surfaces, {
-        timeMs: time,
-        ...(point ? { point } : {}),
-        ...(before ? { previousPoint: before } : {}),
-        interacting,
-      });
+      // The world evaluation that follows in this frame reads the result: a root moving onto a
+      // near control is held from here, one frame after the paint that put it there.
+      const next = step(time, surfaces);
+      AROUND_GUARD_TRACE: if (heldChanged(next) || nearChanged(next))
+        traceApproach(doc, 'approach', {
+          value: next.near.size > 0,
+          ...(point ? { point } : {}),
+          interacting,
+          surfaces: surfaces.surfaces,
+          approach: next,
+        });
+      approach = next;
       before = point;
       publish();
       if (stopped && failures < 3 && timer === undefined)
@@ -332,37 +589,59 @@ export function createOperationGuardHost(
           timer = undefined;
           if (active) invalidate();
         }, 360);
-      if (proximity.safe && proximity.clearSince !== null && timer === undefined && paints.some((p) => p.dynamic))
+      if (clearing() && timer === undefined && paints.some((p) => p.dynamic))
         timer = view.setTimeout(() => {
           timer = undefined;
           if (active) invalidate();
         }, 360);
+      const layers = approachLayers(approach);
       return {
-        approaching: proximity.safe,
+        ...(layers ? { approach: layers } : {}),
         idleSeconds: doc.hidden ? 0 : Math.max(0, Math.min(1e9, (time - lastActivity) / 1000)),
       };
     },
-    claim(point) {
-      if (editorClaims(source.capture({ fresh: true }), point)) return true;
-      pause('入力直前の照合で、編集ハンドルの下に本物の操作面がありました。');
+    claim(point, underStacking = false) {
+      if (editorClaims(source.capture({ fresh: true }), point, underStacking)) return true;
+      pause(CLAIMED, false, undefined, [], '操作部品から離れた場所で、絵をつかんでください。');
       return false;
     },
     commit(next) {
+      const previousIssues = issues;
       paints = next;
-      if (!source.validate(surfaces)) pause('反映前に操作面の幾何世代が変わりました。');
+      if (!source.validate(surfaces)) {
+        AROUND_GUARD_TRACE: traceGuardStop(doc, 'shifted', { entry: 'validate' });
+        pause(SHIFTED);
+      }
+      // A root this paint put onto a near control is held from the next frame, even when nothing
+      // else would draw one (it stopped there).
+      if (approach.near.size) {
+        const after = step(view.performance.now(), surfaces);
+        if (heldChanged(after)) {
+          AROUND_GUARD_TRACE: traceApproach(doc, 'approach', {
+            value: after.near.size > 0,
+            ...(point ? { point } : {}),
+            interacting,
+            surfaces: surfaces.surfaces,
+            approach: after,
+          });
+          approach = after;
+          invalidate();
+        }
+      }
+      // A beneath paint whose pending changes the stacking order covers by itself needs none of
+      // the guard's stops for a stale or moving read (chunk 4, docs/layering-plan.md):
+      // whatever the player paints over its picture stays painted over it, wherever it moves.
+      const structural = (p: PaintFootprint) => p.composition === 'native-beneath' && p.settled === true;
       const pausedIssues: SafetyIssue[] = stopped
         ? next
-            .filter((p) => !stoppedIds || stoppedIds.has(p.id))
+            .filter((p) => (!stoppedIds || stoppedIds.has(p.id)) && !structural(p))
             .map((p) => ({
               layerId: p.id,
               surfaceId: 'host',
               severity: 'enforced',
               action: 'stop',
               reason: stopped,
-              remedy:
-                failures >= 3
-                  ? '破綻が繰り返されたためページの再読み込みが必要です。'
-                  : '操作を終え、配置基準が安定すると復帰します。',
+              remedy: stoppedRemedy,
             }))
         : [];
       for (const id of latchedLayers.keys())
@@ -383,14 +662,28 @@ export function createOperationGuardHost(
               severity: 'enforced',
               action: 'stop',
               reason: latchedLayers.get(p.id)!,
-              remedy: '同じレイヤーの破綻が繰り返されたため、確認後にページを再読み込みしてください。',
+              remedy: `絵の状態を確かめてから、${RESUME}`,
+            })),
+          // Over a control whose look changed since the last sample (D9).
+          ...next
+            .filter((p) => looked.has(p.id) && !stopped && !structural(p))
+            .map((p): SafetyIssue => ({
+              layerId: p.id,
+              surfaceId: 'host',
+              severity: 'enforced',
+              action: 'stop',
+              reason: HOLD,
+              remedy: SETTLES,
             })),
         ];
-        if (reduced.matches || proximity.safe)
+        // Approach: only the held roots are flattened (G1.2); reduced motion flattens everything.
+        if (reduced.matches || approach.held.size)
           issues = [
             ...issues,
             ...next
-              .filter((p) => p.dynamic || (reduced.matches && p.animated))
+              .filter((p) =>
+                reduced.matches ? p.dynamic || p.animated : p.dynamic && approach.held.has(p.root ?? p.id),
+              )
               .map((p): SafetyIssue => ({
                 layerId: p.id,
                 surfaceId: reduced.matches ? 'environment.reduced-motion' : 'native.approach',
@@ -405,10 +698,17 @@ export function createOperationGuardHost(
               })),
           ];
       }
+      // The same issues as the last commit keep that array, so publish and the renderer's record
+      // stop at an identity check instead of serialising every frame (G1.3, c3).
+      if (sameIssues(previousIssues, issues)) issues = previousIssues;
       publish();
-      return new Set(
+      const blocked = new Set(
         issues.filter((i) => i.severity === 'enforced' && (!i.action || i.action === 'stop')).map((i) => i.layerId),
       );
+      shownArt = next.some((p) => p.opacity > 0 && !blocked.has(p.id));
+      if (!shownArt) cancelRecheck();
+      AROUND_IDLE_RECHECK: scheduleRecheck();
+      return blocked;
     },
     snapshot,
     subscribe(listener) {
@@ -425,7 +725,7 @@ export function createOperationGuardHost(
       overlayHost = undefined;
       if (value) {
         overlayHost = doc.createElement('div');
-        overlayHost.id = 'web-world-themes-operation-check';
+        overlayHost.id = 'around-operation-check';
         overlayHost.attachShadow({ mode: 'open' });
       }
       lastStatus = '';
@@ -433,9 +733,24 @@ export function createOperationGuardHost(
       publish();
     },
     pause,
+    resume() {
+      // Trusted editor UI only (never artwork): the same covered click stops drawing again, and
+      // three in a row end automatic recovery again.
+      failures = 0;
+      layerFailures.clear();
+      latchedLayers.clear();
+      stopped = stoppedRemedy = '';
+      stoppedIds = undefined;
+      issues = withoutStops();
+      stableAt = view.performance.now();
+      published = [];
+      invalidate();
+      publish();
+    },
     destroy() {
       unsubscribeSource();
       active = false;
+      cancelRecheck();
       if (timer !== undefined) view.clearTimeout(timer);
       if (holdTimer !== undefined) view.clearTimeout(holdTimer);
       holdTimer = undefined;

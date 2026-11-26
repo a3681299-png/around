@@ -1,0 +1,100 @@
+{
+  "algorithm": "SHA-256",
+  "files": [
+    {
+      "file": "../../screenshots/g14-verification/ci-stale-handle.png",
+      "bytes": 129933,
+      "sha256": "8576251e50c2a232c981d74f79f6b0707f5a23854285af94687d58c408af0fd1"
+    },
+    {
+      "file": "../../screenshots/g14-verification/idle-before.png",
+      "bytes": 87266,
+      "sha256": "d61dd1c550442a662424ad37efa1006b3a80c97a62309ee2ae26d4a74300aa48"
+    },
+    {
+      "file": "../../screenshots/g14-verification/idle-no-recheck.png",
+      "bytes": 87266,
+      "sha256": "d61dd1c550442a662424ad37efa1006b3a80c97a62309ee2ae26d4a74300aa48"
+    },
+    {
+      "file": "../../screenshots/g14-verification/idle-normal.png",
+      "bytes": 88561,
+      "sha256": "7e7a21392db6778f3ac396c7d8fa24594ead01ee690d8517fdd2af04e858f2ab"
+    },
+    {
+      "file": "../../screenshots/g14-verification/native-reference.png",
+      "bytes": 88561,
+      "sha256": "7e7a21392db6778f3ac396c7d8fa24594ead01ee690d8517fdd2af04e858f2ab"
+    },
+    {
+      "file": "../../screenshots/g14-verification/perf-gap-failed.png",
+      "bytes": 1014590,
+      "sha256": "b8d68efb99ed3f2213f3f3c07e3452b60d7d25b16b879891ec4288d197959bcb"
+    },
+    {
+      "file": "../../screenshots/g14-verification/perf-pair-1-after.png",
+      "bytes": 2028590,
+      "sha256": "07cae6719fd7e44a5352442f58938fd5853051618ddff1256d275c155d4ab954"
+    },
+    {
+      "file": "../../screenshots/g14-verification/perf-pair-1-before.png",
+      "bytes": 2087513,
+      "sha256": "cbdb80b6dc2013f7948c913ac199167573e16d303026f9f7c2194d95377e2558"
+    },
+    {
+      "file": "../../screenshots/g14-verification/perf-setup-after-spa.png",
+      "bytes": 1074373,
+      "sha256": "5755c7d661e2fe99af0ac82fe0a0ae6cfcbc2c15871b10c754d66424ecff8655"
+    },
+    {
+      "file": "../../screenshots/g14-verification/youtube-after.png",
+      "bytes": 1306201,
+      "sha256": "99106b833bf3f38e14397c2cb88ae2a5d183bda418ef4160c3e7ab5362dd4d12"
+    },
+    {
+      "file": "../../screenshots/g14-verification/youtube-before.png",
+      "bytes": 1264517,
+      "sha256": "23b094ce374143d05b65fc578e2e636d83ff6241a0993d558fc9d8ef88d16ec5"
+    },
+    {
+      "file": "../../screenshots/g14-verification/youtube-g12.png",
+      "bytes": 1297121,
+      "sha256": "9c7156edabe045ce8a16705371f57ea66864fe3fdd327f4a0285ba5ae91a0f30"
+    },
+    {
+      "file": "../../screenshots/g14-verification/youtube-record.png",
+      "bytes": 1406285,
+      "sha256": "28cf2889a11d21f16f76d50a50446f09b35443773f7d13c7c2074b4697963853"
+    },
+    {
+      "file": "ci-stale-handle-trace.zip",
+      "bytes": 1803638,
+      "sha256": "67f9654ec3a72b743a1b73c912bcfa0091b4647ae43fb51ca62eb98938c39e59"
+    },
+    {
+      "file": "logs-raw.json.gz",
+      "bytes": 126311,
+      "sha256": "a72d925be0fa5d259bf97049fa472024cf298bd17d6e300882e5b1a1bc6b2cd4"
+    },
+    {
+      "file": "performance-raw.json.gz",
+      "bytes": 347859,
+      "sha256": "f3585878e66a5bafdb1130156918de64fed6d8c81f0564660656d721fe6a0376"
+    },
+    {
+      "file": "setup-raw.json.gz",
+      "bytes": 181284,
+      "sha256": "82aa5b60936db3514aa61e9923bd06b801cc6329c09c746676baf64c739a7b46"
+    },
+    {
+      "file": "test-raw.json.gz",
+      "bytes": 2716241,
+      "sha256": "fca618b7de1da156bec6882b4a25d1aeee57cc3c28e2bdd3c348cb434b80547a"
+    },
+    {
+      "file": "visual-raw.json.gz",
+      "bytes": 32554,
+      "sha256": "b81cbfb52548d3ae428c02f1b93d605c9e9d94e55b846e7d3d94bf7751192ad4"
+    }
+  ]
+}

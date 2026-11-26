@@ -46,7 +46,7 @@ export function vrmFixture(mutate?: (json: Record<string, any>) => void): Buffer
         meta: {
           name: 'WW original test rig',
           version: '1',
-          authors: ['Web World Themes tests'],
+          authors: ['Around tests'],
           licenseUrl: 'https://vrm.dev/licenses/1.0/',
         },
         humanoid: { humanBones },

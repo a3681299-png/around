@@ -1,24 +1,24 @@
 import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { Page, Locator, CDPSession } from '@playwright/test';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { test, expect, launchExtension } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { emptyDesign } from '../src/design/schema';
 
-const key = 'webWorldThemes.design.youtube',
-  overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube',
+  overlay = '#around-decorations';
 const layers =
-  ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
+  ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]';
 const fixture = (extension: string) => path.resolve(`tests/fixtures/motion/petal.${extension}`);
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await showArtwork(popup);
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
   return panel;
 }
@@ -111,7 +111,7 @@ for (const [extension, format] of [
     await save(panel);
     const saved = await stored(popup);
     expect(saved).toMatchObject({
-      schemaVersion: 12,
+      schemaVersion: 18,
       decorations: [
         {
           kind: 'animation',
@@ -123,6 +123,7 @@ for (const [extension, format] of [
       ],
     });
     expect(JSON.stringify(saved)).not.toMatch(/data:image|base64|blob:/);
+    await closeEditorPages(youtube);
     await youtube.reload();
     await ready(youtube, 1);
     await expect(layer).not.toHaveAttribute('data-editable');
@@ -212,7 +213,7 @@ test('player anchors follow SPA; normal animation stays click-through and OFF/ze
   await panel.getByLabel('アニメーション素材を追加').setInputFiles(fixture('gif'));
   await ready(youtube, 1);
   await youtube.locator('#navigate').evaluate((node: HTMLButtonElement) => node.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await panel.getByLabel('配置の基準').selectOption('video-player');
   await save(panel);
   await panel.getByRole('button', { name: '編集を終了' }).click();
@@ -221,12 +222,12 @@ test('player anchors follow SPA; normal animation stays click-through and OFF/ze
   await expect(youtube.locator(layers)).toBeHidden();
   await youtube.locator('#navigate').click();
   await ready(youtube, 1);
-  for (const boundary of ['off', 'zero'] as const) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+  for (const boundary of ['off', 'emergency'] as const) {
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    if (boundary === 'off') await showArtwork(popup);
+    else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await ready(youtube, 1);
   }
@@ -261,7 +262,7 @@ test('untrusted Lottie is rejected in content and worker; native page classes ca
   const result = await popup.evaluate(
     async (base64) =>
       chrome.runtime.sendMessage({
-        type: 'web-world-themes:assets',
+        type: 'around:assets',
         action: 'import',
         session: 'session-invalid',
         files: [{ name: 'bad.json', mime: 'application/json', base64 }],
@@ -385,7 +386,7 @@ test('eight animations share decoders, stay bounded, respect reduced motion/hidd
     expression: 'delete document.hidden; document.dispatchEvent(new Event("visibilitychange"));',
   });
   await expect(youtube.locator(`${layers} .media[data-playback="playing"]`)).toHaveCount(8);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   const stopped = (
     await runtime.session.send('Runtime.evaluate', {
@@ -443,7 +444,7 @@ test('an external save during asset preflight is preserved and the unfinished im
     rules: [{ kind: 'surface-style', target: 'video-card', style: { backgroundColor: '#cceeff' } }],
   };
   await popup.evaluate(async ({ k, design }) => chrome.storage.local.set({ [k]: design }), { k: key, design: foreign });
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toHaveCSS(
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toHaveCSS(
     'background-color',
     'rgb(204, 238, 255)',
   );
@@ -461,7 +462,7 @@ test('an external save during asset preflight is preserved and the unfinished im
   await expect
     .poll(() =>
       popup.evaluate(
-        async (id) => (await chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'get', id })).ok,
+        async (id) => (await chrome.runtime.sendMessage({ type: 'around:assets', action: 'get', id })).ok,
         assetId,
       ),
     )

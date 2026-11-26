@@ -1,29 +1,31 @@
+/* The 表示設定 panel the in-video icon opens: a floating around-panel over someone else's page, so it
+   keeps the one shadow the system allows (shadow-float) and radius-float. Its contents are
+   settings.css. */
 :host {
   /* Important host rules outrank the page's player-wide div resets. */
   all: initial !important;
   position: fixed !important;
-  left: var(--ww-settings-x, 12px) !important;
-  top: var(--ww-settings-y, 12px) !important;
+  left: var(--around-settings-x, 12px) !important;
+  top: var(--around-settings-y, 12px) !important;
   z-index: 2147483645 !important;
   display: block !important;
   width: 340px !important;
   max-width: calc(100vw - 24px) !important;
-  max-height: var(--ww-settings-height, calc(100vh - 24px)) !important;
+  max-height: var(--around-settings-height, calc(100vh - 24px)) !important;
   overflow: auto !important;
   overscroll-behavior: contain !important;
-  color-scheme: light !important;
-  color: var(--ww-ink) !important;
-  background: var(--ww-panel) !important;
-  border: 1px solid var(--ww-dark) !important;
-  border-radius: 0 !important;
-  box-shadow: var(--ww-overlay-shadow) !important;
-  font: 13px/1.5 var(--ww-font) !important;
+  color: var(--ink) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-float) !important;
+  box-shadow: var(--shadow-float) !important;
+  font: 13px/20px var(--font-ui) !important;
   text-align: left !important;
 }
 :host([hidden]) {
   display: none !important;
 }
-.ww-titlebar {
+.around-titlebar {
   cursor: move;
   touch-action: none;
 }

@@ -1,0 +1,480 @@
+{
+  "completed": false,
+  "checks": {
+    "stage": "wheel scroll",
+    "gifRuleEditedAndSaved": true,
+    "pointer": {
+      "point": {
+        "x": 36,
+        "y": 456.5
+      },
+      "gif": {
+        "x": 563.4375,
+        "y": 313.34375,
+        "width": 260,
+        "height": 195
+      },
+      "gifId": "image-9b48b6c9-6e0b-440a-8652-325f4e997f6d",
+      "under": [
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.25,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.75,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "div#primary",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        }
+      ]
+    },
+    "scrollSpeedAndDirectionIndependent": true,
+    "wheel": {
+      "events": 24,
+      "frames": 377,
+      "hidden": 33,
+      "unexplained": 33,
+      "explainedSpans": [],
+      "traced": false,
+      "stops": ["", "ページの操作部品が動いている間は、絵の表示を止めています。"],
+      "near": [
+        [[16, 354, 52, 43]],
+        [
+          [52, 376, 104, 40],
+          [16, 432, 36, 39],
+          [68, 432, 63, 20],
+          [60, 478, 32, 32]
+        ],
+        [
+          [60, 358, 32, 32],
+          [52, 402, 115, 40],
+          [16, 458, 36, 39],
+          [68, 458, 67, 20]
+        ],
+        [
+          [52, 376, 104, 40],
+          [16, 432, 36, 39],
+          [68, 432, 63, 20],
+          [60, 478, 32, 32]
+        ],
+        [[16, 354, 52, 43]],
+        []
+      ],
+      "samples": [
+        {
+          "t": 19654.6,
+          "scrollY": 90,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 19869.3,
+          "scrollY": 90,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20341.4,
+          "scrollY": 270,
+          "visible": false,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 20799.7,
+          "scrollY": 360,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 21084.3,
+          "scrollY": 360,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 21396.8,
+          "scrollY": 450,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 21681.5,
+          "scrollY": 540,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 21959.4,
+          "scrollY": 630,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 22244,
+          "scrollY": 720,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 22494,
+          "scrollY": 720,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 22799.3,
+          "scrollY": 810,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 23000.8,
+          "scrollY": 900,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 23250.7,
+          "scrollY": 990,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 23341,
+          "scrollY": 990,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 23549.4,
+          "scrollY": 1080,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 23653.6,
+          "scrollY": 1080,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 23792.4,
+          "scrollY": 1080,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 23945.1,
+          "scrollY": 990,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 24070.1,
+          "scrollY": 900,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 24202.1,
+          "scrollY": 900,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 24334.5,
+          "scrollY": 810,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 24438.1,
+          "scrollY": 810,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 24556.1,
+          "scrollY": 810,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 24736.6,
+          "scrollY": 720,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 24826.9,
+          "scrollY": 720,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 24951.9,
+          "scrollY": 630,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 25104.6,
+          "scrollY": 630,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 25187.9,
+          "scrollY": 630,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 25396.3,
+          "scrollY": 540,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 25535.1,
+          "scrollY": 540,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 25785.1,
+          "scrollY": 450,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 25875.3,
+          "scrollY": 450,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 26146.2,
+          "scrollY": 360,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 26319.8,
+          "scrollY": 360,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 26632.3,
+          "scrollY": 270,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 26764.2,
+          "scrollY": 270,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 27069.8,
+          "scrollY": 180,
+          "visible": false,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 27729.4,
+          "scrollY": 90,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        }
+      ]
+    }
+  },
+  "browser": "143.0.7499.4"
+}

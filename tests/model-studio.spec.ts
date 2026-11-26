@@ -1,4 +1,5 @@
 import { modelPoseError } from './helpers/model-assertions';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from './fixtures';
 import { modelFixture } from './helpers/model-fixture';
 import type { ModelEvaluation } from '../src/world/models';
@@ -11,20 +12,20 @@ test('standalone Studio configures model pursuit and clips, records/seeks poses,
   youtube,
 }) => {
   test.setTimeout(60000);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await showArtwork(popup);
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
-  await popup.locator('#creator-studio-open').evaluate((b: HTMLButtonElement) => b.click());
+  await popup.locator('#creator-editor-window').evaluate((b: HTMLButtonElement) => b.click());
   const studio = await opened;
   await studio.setViewportSize({ width: 1440, height: 1000 });
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-  const panel = studio.locator('#web-world-themes-creator');
+  const panel = studio.locator('#around-creator');
   await panel
     .locator('.model-file')
     .setInputFiles({ name: 'Character.glb', mimeType: 'model/gltf-binary', buffer: modelFixture() });
-  const media = youtube.locator('#web-world-themes-decorations .model-media'),
-    image = youtube.locator('#web-world-themes-decorations .image');
+  const media = youtube.locator('#around-decorations .model-media'),
+    image = youtube.locator('#around-decorations .image');
   await expect(media).toHaveAttribute('data-renderer', 'three');
   for (const [label, value] of [
     ['待機クリップ', '0'],
@@ -41,10 +42,7 @@ test('standalone Studio configures model pursuit and clips, records/seeks poses,
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   const stored = () =>
     popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
   const design = await stored(),
     base = design.decorations[0]!.placement;
@@ -74,13 +72,13 @@ test('standalone Studio configures model pursuit and clips, records/seeks poses,
   await expect(panel.locator('.take-saved')).toHaveText('テイク保存済み');
   const take = await studio.evaluate(async () => {
     const list = await chrome.runtime.sendMessage({
-      type: 'web-world-themes:signal-takes',
+      type: 'around:signal-takes',
       action: 'list',
       siteId: 'youtube',
     });
     return (
       await chrome.runtime.sendMessage({
-        type: 'web-world-themes:signal-takes',
+        type: 'around:signal-takes',
         action: 'get',
         siteId: 'youtube',
         id: list.value[0].id,

@@ -33,5 +33,47 @@
     "file": "tests/vrm-data.spec.ts",
     "test": "VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip",
     "extraction": "first explicit parseDesign input accepted by the historical parser"
+  },
+  {
+    "version": 12,
+    "commit": "5b442ff69e7cc2297ca58e5e5490d91a711b72ad",
+    "file": "tests/design-migrations.spec.ts",
+    "test": "v12 renderMode keeps normal by omission, stores atmosphere, and keeps a group undivided",
+    "extraction": "first explicit parseDesign input with a group accepted by the historical parser; expected result captured with 29b8d5b"
+  },
+  {
+    "version": 13,
+    "commit": "3e18edcadf07fe04aa0195556bdb97149aeed017",
+    "file": "tests/vrm-data.spec.ts",
+    "test": "VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip",
+    "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with 133f88b"
+  },
+  {
+    "version": 14,
+    "commit": "800373875d9a933b101e4e1cfdbfe7cfa40412e8",
+    "file": "tests/character-data.spec.ts",
+    "test": "v14 character roundtrips; clip indices then address its motions",
+    "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with 3a41aa2"
+  },
+  {
+    "version": 15,
+    "commit": "83601bb8f61add3d92a5016c1f0a3d5693f9f7eb",
+    "file": "tests/character-v15.spec.ts",
+    "test": "v15 roundtrips personality and the switches; absent keys keep v14 behaviour",
+    "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with e0b14ca"
+  },
+  {
+    "version": 16,
+    "commit": "e6e958d46d6a92236df2e587ad14459f2938a15a",
+    "file": "tests/character-data.spec.ts",
+    "test": "a motion hips height roundtrips at its limit and stays absent when not given",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
+  },
+  {
+    "version": 17,
+    "commit": "18b8b6ff53163dc7a6b37c5b99b4fd4f669f297c",
+    "file": "tests/space-data.spec.ts",
+    "test": "v17 roundtrips the space and a room-depth layer; omission keeps every layer in front",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
   }
 ]

@@ -1,0 +1,32 @@
+{
+  "baseline": "29b8d5ba923c4a0a06db96678a4c27346893dd95",
+  "targets": [
+    {
+      "id": "video-card",
+      "surface": "video-card",
+      "label": "動画カード"
+    }
+  ],
+  "css": {
+    "history-v10.json": "",
+    "history-v11.json": "",
+    "history-v12.json": "",
+    "history-v7.json": "",
+    "history-v8.json": "",
+    "history-v9.json": "",
+    "v1.json": "html[data-around-design][data-around-site] [data-around-surface~=\"video-card\"],html[data-around-design][data-around-site] [data-around-surface~=\"video-card\"]:hover{background:#abcdef !important;box-shadow:inset 0 0 0 4px #443366 !important;border-radius:12px !important;}",
+    "v2.json": "",
+    "v3.json": "",
+    "v4.json": "",
+    "v5.json": "",
+    "v6.json": "",
+    "v7.json": "",
+    "v8.json": "",
+    "v9.json": "",
+    "history-v13.json": "",
+    "history-v14.json": "",
+    "history-v15.json": "",
+    "history-v16.json": "",
+    "history-v17.json": ""
+  }
+}

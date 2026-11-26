@@ -1,0 +1,8 @@
+{
+  "rawArtifact": {
+    "file": "setup-raw.json.gz",
+    "sha256": "82aa5b60936db3514aa61e9923bd06b801cc6329c09c746676baf64c739a7b46",
+    "bytes": 181284
+  },
+  "note": "Discarded setup attempts are not used in the formal performance verdict; static-smoke is an additional preparation pair."
+}

@@ -11,7 +11,7 @@ async function mount(page: Page, legacy = false) {
       : route.abort(),
   );
   await page.goto('https://www.youtube.com/');
-  await page.addScriptTag({ content: await pageChangeBundle(undefined, legacy) });
+  await page.addScriptTag({ content: await pageChangeBundle(legacy) });
   await page.evaluate(() => {
     (globalThis as any).__pageTest = (globalThis as any).PageChangeTest.mount();
   });
@@ -24,14 +24,14 @@ async function settle(page: Page) {
   });
 }
 
-test('small text mutations do not write theme variables, refresh features or recompile artwork', async ({ page }) => {
+test('small text mutations do not write root variables or recompile artwork', async ({ page }) => {
   await mount(page);
   const counts = await page.evaluate(async () => {
     const runtime = (globalThis as any).__pageTest;
     runtime.reset();
     return runtime.mutate(12);
   });
-  expect(counts).toMatchObject({ themeWrites: 0, variables: 0, compiles: 0, featureRefreshes: 0 });
+  expect(counts).toMatchObject({ variables: 0, compiles: 0 });
   expect(counts.surfaces).toBeGreaterThan(0);
   // A text-only edit can change card eligibility or duration classification.
   await page
@@ -41,59 +41,31 @@ test('small text mutations do not write theme variables, refresh features or rec
       node.textContent = 'LIVE';
     });
   await expect(page.locator('ytd-thumbnail-overlay-time-status-renderer').first()).not.toHaveAttribute(
-    'data-ww-surface',
+    'data-around-surface',
     /duration/,
   );
 });
 
-test('page following reattaches the cached sheets and discovers new native surfaces without recompilation', async ({
+test('page following reattaches the artwork sheet and discovers new native surfaces without recompilation', async ({
   page,
 }) => {
   await mount(page);
   await page.evaluate(() => {
     const runtime = (globalThis as any).__pageTest;
-    (globalThis as any).__sheets = [
-      document.getElementById('web-world-themes-style'),
-      document.getElementById('web-world-themes-design-style'),
-    ];
+    (globalThis as any).__sheet = document.getElementById('around-design-style');
     runtime.reset();
-    for (const sheet of (globalThis as any).__sheets) sheet.remove();
+    (globalThis as any).__sheet.remove();
     const card = document.querySelector('ytd-rich-grid-media')!.cloneNode(true) as Element;
-    card.removeAttribute('data-ww-surface');
+    card.removeAttribute('data-around-surface');
     card.id = 'new-native-card';
     document.querySelector('ytd-rich-grid-renderer')!.append(card);
   });
-  await expect(page.locator('#new-native-card')).toHaveAttribute('data-ww-surface', /video-card/);
+  await expect(page.locator('#new-native-card')).toHaveAttribute('data-around-surface', /video-card/);
   await settle(page);
-  expect(await page.evaluate(() => (globalThis as any).__sheets.every((sheet: Element) => sheet.isConnected))).toBe(
-    true,
-  );
+  expect(await page.evaluate(() => (globalThis as any).__sheet.isConnected)).toBe(true);
   expect(await page.evaluate(() => (globalThis as any).__pageTest.counts.compiles)).toBe(0);
-  expect(await page.evaluate(() => (globalThis as any).__pageTest.counts.themeWrites)).toBe(0);
-  expect(await page.evaluate(() => (globalThis as any).__pageTest.counts.featureRefreshes)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => (globalThis as any).__pageTest.counts.variables)).toBe(0);
   await expect(page.locator('#new-native-card')).toHaveCSS('background-color', 'rgb(201, 212, 232)');
-});
-
-test('removed owned feature UI is restored once without resuming full rendering on text changes', async ({ page }) => {
-  await mount(page);
-  await page.evaluate(() => {
-    (globalThis as any).__chromeBefore = document.getElementById('web-world-themes-window-chrome');
-    (globalThis as any).__pageTest.reset();
-    (globalThis as any).__chromeBefore.remove();
-  });
-  await expect(page.locator('#web-world-themes-window-chrome')).toHaveCount(1);
-  expect(
-    await page.evaluate(
-      () => (globalThis as any).__chromeBefore === document.getElementById('web-world-themes-window-chrome'),
-    ),
-  ).toBe(true);
-  await settle(page);
-  const counts = await page.evaluate(async () => {
-    const runtime = (globalThis as any).__pageTest;
-    runtime.reset();
-    return runtime.mutate(6);
-  });
-  expect(counts).toMatchObject({ themeWrites: 0, variables: 0, compiles: 0, featureRefreshes: 0 });
 });
 
 test('settings, artwork, navigation, native modes and fullscreen match the former full-render route', async ({
@@ -106,22 +78,13 @@ test('settings, artwork, navigation, native modes and fullscreen match the forme
     const snapshots: Record<string, Buffer> = {};
     const capture = async (name: string) => {
       await settle(page);
-      snapshots[name] = await page.screenshot({
-        animations: 'disabled',
-        mask: [page.locator('#web-world-themes-clock, #web-world-themes-daily-detail')],
-      });
+      snapshots[name] = await page.screenshot({ animations: 'disabled' });
     };
     await capture('home');
     await page.evaluate(() => {
       const { controller } = (globalThis as any).__pageTest;
       // Settings stay validated by their existing boundary; this harness supplies trusted typed values.
-      controller.update({
-        enabled: true,
-        strength: 35,
-        features: { palette: true, 'window-chrome': true },
-        palette: { hue: 210, saturation: 60, brightness: 65 },
-        noiseStrength: 22,
-      });
+      controller.update({ creatorMode: false, enabled: true, strength: 35 });
     });
     await capture('settings');
     await page.evaluate(() => {
@@ -141,16 +104,17 @@ test('settings, artwork, navigation, native modes and fullscreen match the forme
     await page.evaluate(() => document.documentElement.removeAttribute('dark'));
     await capture('light');
     await page.locator('#movie_player [aria-label="Fullscreen"]').click();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-fullscreen', '');
+    await expect(page.locator('html')).toHaveAttribute('data-around-fullscreen', '');
     await capture('fullscreen');
     await page.evaluate(() => document.exitFullscreen());
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-fullscreen', '');
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-fullscreen', '');
     await capture('exit-fullscreen');
     await page.evaluate(() => {
       const runtime = (globalThis as any).__pageTest;
-      runtime.controller.updateDesign({ ...runtime.design, baseThemeId: null });
+      // Artwork saved while the retro theme existed draws the same.
+      runtime.controller.updateDesign({ ...runtime.design, baseThemeId: 'retro' });
     });
-    await capture('independent');
+    await capture('legacy-base');
     captures.push(snapshots);
     await page.close();
   }

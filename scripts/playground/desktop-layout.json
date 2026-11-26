@@ -1,0 +1,9 @@
+{
+  "monitor": {
+    "position": [650, -61, -535],
+    "rotationDeg": [0, -12, 0],
+    "size": [526, 330]
+  },
+  "floorY": -508,
+  "viewer": [713, -164]
+}

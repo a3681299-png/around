@@ -1,0 +1,47 @@
+{
+  "target": "447b2bf31e319051e327f9ada2b83954276b8ff8",
+  "before": "8e63f0d451eeaf7811b7e0b5b60070d10b5233a9",
+  "branch": "codex/creator-editor-spike",
+  "normalContentSha256": "7a4f111a6c711d2cc571582d195c9389fa64c7f99510d7253fda3a60ff052b19",
+  "calibrationSource": {
+    "Revision": "70cea3aec2b01612a35de7e353c81be6150d5d46",
+    "ContentSha256": "C21B75B0F36C807328E61F46AAB97D4D13603688924E10138F749CBD8286D81E",
+    "BusyContentSha256": "1E91A1CB2AABCEC3D31A10A0C05AEF58997134C8387F13ACB945005357E0951B",
+    "NormalContentSha256": "7A4F111A6C711D2CC571582D195C9389FA64C7F99510D7253FDA3A60FF052B19"
+  },
+  "calibrationContentIdentical": true,
+  "captureControl": {
+    "interrupted": true,
+    "reason": "User changed background CPU from a 5% rejection gate to reference data; capture stopped after enough complete pairs existed.",
+    "backgroundPolicy": "reference only",
+    "oldBackgroundThresholdPercent": 5,
+    "selection": "first four complete pairs in chronological order; never selected by CPU values",
+    "requestedPairs": 4,
+    "reviewedAt": "2026-11-04T14:42:16.165Z",
+    "captureScript": "capture-strict.spec.ts"
+  },
+  "captureScriptSha256": "5e01d7db8960cb7051e54f504e62e29578995df976d4159b49795d059fb42eb8",
+  "legacyFixtureSha256": "6ffc5374b3b4d2ed6f19c9d00fd8afb51246586a0c97bf98efaaa7c5cf3fc465",
+  "beforeBuild": {
+    "source": "BASELINE",
+    "revision": "8e63f0d451eeaf7811b7e0b5b60070d10b5233a9",
+    "dirtySource": false,
+    "probe": "isolated-world-v3",
+    "asyncContinuations": "lowered-promises",
+    "busyMs": 0,
+    "busyAfterAwait": false,
+    "disableInk": false
+  },
+  "afterBuild": {
+    "source": "WORKTREE",
+    "revision": "447b2bf31e319051e327f9ada2b83954276b8ff8",
+    "dirtySource": false,
+    "probe": "isolated-world-v3",
+    "asyncContinuations": "lowered-promises",
+    "busyMs": 0,
+    "busyAfterAwait": false,
+    "disableInk": false
+  },
+  "privateAssetsCommitted": false,
+  "normalProbe": false
+}

@@ -1,0 +1,12 @@
+        npx playwright show-trace .work\test-results\e2e\side-panel-the-official-pa-3be99-d-art-through-its-own-lease-e2e\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5 failed
+    [e2e] › tests\operation-controls.spec.ts:252:1 › Studio exposes protection overlays, per-layer restrictions and emergency OFF 
+    [e2e] › tests\operation-editing-input.spec.ts:33:1 › dressing a card and picking cards to edit never stop drawing 
+    [e2e] › tests\side-panel.spec.ts:564:1 › the official panel edits scroll keyframes through the shared Core and retains saved rules 
+    [e2e] › tests\side-panel.spec.ts:712:1 › official panel records raw signals, plays/seeks without live input, and restores independent saved takes 
+    [e2e] › tests\side-panel.spec.ts:838:1 › the official panel dresses UI parts: page part list, picking on the page and art through its own lease 
+  60 skipped
+  255 passed (20.0m)

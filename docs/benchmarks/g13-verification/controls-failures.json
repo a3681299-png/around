@@ -1,0 +1,2966 @@
+[
+  {
+    "trace": ".work\\g13-controls-1-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat2\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "SUMMARY",
+        "id": "",
+        "className": "",
+        "text": "1"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 347.6000000014901,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1422000676 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-386ae564-3798-42e9-a75"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1422000676 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-386ae564-3798-42e9-a75"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 375.8999999985099,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1422000676 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-386ae564-3798-42e9-a75"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1422000676 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-386ae564-3798-42e9-a75"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 436.5,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1422000676 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-386ae564-3798-42e9-a75"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 436.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 437.3999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 437.5,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-1-before\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat3\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://dkegigilemmgnglngbinlflmfcbofhdj/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#1745727987 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-775b5034-ecce-4365-95e"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 371.19999999552965,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1745727987 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-775b5034-ecce-4365-95e"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1745727987 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-775b5034-ecce-4365-95e"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 399.69999999552965,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1745727987 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-775b5034-ecce-4365-95e"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1745727987 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-775b5034-ecce-4365-95e"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 462.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1745727987 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-775b5034-ecce-4365-95e"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 463.3999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 463.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 464,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-2-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat1\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#117022208 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-00c14bb7-9f11-408e-bd43"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 337.80000000447035,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#117022208 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-00c14bb7-9f11-408e-bd43"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#117022208 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-00c14bb7-9f11-408e-bd43"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 370,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#117022208 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-00c14bb7-9f11-408e-bd43"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#117022208 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-00c14bb7-9f11-408e-bd43"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 427,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#117022208 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-00c14bb7-9f11-408e-bd43"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 427.5,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 427.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 428,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-2-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat2\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#1709606830 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-93b59104-e93d-41f4-8cc"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 351.79999999701977,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1709606830 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-93b59104-e93d-41f4-8cc"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1709606830 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-93b59104-e93d-41f4-8cc"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 377.79999999701977,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1709606830 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-93b59104-e93d-41f4-8cc"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1709606830 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-93b59104-e93d-41f4-8cc"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 436.3999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1709606830 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-93b59104-e93d-41f4-8cc"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 436.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 437.3999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 437.5,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-2-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat3\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#1710803551 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-1cb6065f-9afc-4d46-949"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 359.5,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1710803551 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1cb6065f-9afc-4d46-949"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1710803551 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1cb6065f-9afc-4d46-949"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 388,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1710803551 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1cb6065f-9afc-4d46-949"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1710803551 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1cb6065f-9afc-4d46-949"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 442.1000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1710803551 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1cb6065f-9afc-4d46-949"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 442.5,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 442.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 443.70000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-2-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat4\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#1642232487 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-79389aee-8512-4681-87f"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 387.30000000447035,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1642232487 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-79389aee-8512-4681-87f"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1642232487 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-79389aee-8512-4681-87f"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 424.30000000447035,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1642232487 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-79389aee-8512-4681-87f"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1642232487 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-79389aee-8512-4681-87f"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 483.6000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1642232487 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-79389aee-8512-4681-87f"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 484.5,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 485,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 485.1000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-2-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#592411957 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-fd97573d-9ec2-41ed-ab39"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 333.90000000596046,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#592411957 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-fd97573d-9ec2-41ed-ab39"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#592411957 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-fd97573d-9ec2-41ed-ab39"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 361.1000000014901,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#592411957 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-fd97573d-9ec2-41ed-ab39"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#592411957 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-fd97573d-9ec2-41ed-ab39"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 416.5,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#592411957 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-fd97573d-9ec2-41ed-ab39"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 417,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 417.40000000596046,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 417.6000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-2-before\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat4\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://dkegigilemmgnglngbinlflmfcbofhdj/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#1563114193 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-362598d3-d65c-42f9-a8b"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 377.19999999552965,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1563114193 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-362598d3-d65c-42f9-a8b"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1563114193 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-362598d3-d65c-42f9-a8b"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 413,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1563114193 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-362598d3-d65c-42f9-a8b"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1563114193 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-362598d3-d65c-42f9-a8b"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 477.6000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1563114193 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-362598d3-d65c-42f9-a8b"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 478.19999999552965,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 478.6000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 478.79999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat1\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#345865176 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-ff60082a-3134-41a0-880d"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 356.6000000014901,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#345865176 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-ff60082a-3134-41a0-880d"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#345865176 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-ff60082a-3134-41a0-880d"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 387.80000000447035,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#345865176 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-ff60082a-3134-41a0-880d"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#345865176 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-ff60082a-3134-41a0-880d"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 440.20000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#345865176 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-ff60082a-3134-41a0-880d"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 440.6000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 441.20000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 441.30000000447035,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat2\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#499586632 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-a10cc22d-3f34-4385-8717"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 334.1000000014901,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#499586632 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-a10cc22d-3f34-4385-8717"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#499586632 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-a10cc22d-3f34-4385-8717"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 361.1000000014901,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#499586632 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-a10cc22d-3f34-4385-8717"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#499586632 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-a10cc22d-3f34-4385-8717"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 418.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#499586632 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-a10cc22d-3f34-4385-8717"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 419.6000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 420.1000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 420.20000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat3\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#1505043536 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-8c237f0f-ed89-465b-8c2"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 350.40000000596046,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1505043536 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-8c237f0f-ed89-465b-8c2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1505043536 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-8c237f0f-ed89-465b-8c2"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 382.1000000014901,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1505043536 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-8c237f0f-ed89-465b-8c2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1505043536 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-8c237f0f-ed89-465b-8c2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 436.1000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1505043536 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-8c237f0f-ed89-465b-8c2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 436.70000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 437,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 437.1000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat4\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#651664719 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-78927da7-5606-4b6e-8ceb"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 349.5,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#651664719 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-78927da7-5606-4b6e-8ceb"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#651664719 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-78927da7-5606-4b6e-8ceb"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 377.5,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#651664719 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-78927da7-5606-4b6e-8ceb"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#651664719 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-78927da7-5606-4b6e-8ceb"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 437.6000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#651664719 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-78927da7-5606-4b6e-8ceb"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 438.29999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 438.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 438.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#921885633 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-50f15d1c-7ddc-4fbf-8124"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 366,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#921885633 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-50f15d1c-7ddc-4fbf-8124"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#921885633 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-50f15d1c-7ddc-4fbf-8124"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 395.5,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#921885633 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-50f15d1c-7ddc-4fbf-8124"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#921885633 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-50f15d1c-7ddc-4fbf-8124"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 454,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#921885633 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-50f15d1c-7ddc-4fbf-8124"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 454.5,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 455.1000000014901,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 455.20000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-before\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat1\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://dkegigilemmgnglngbinlflmfcbofhdj/studio/index.html",
+      "active": {
+        "tag": "SUMMARY",
+        "id": "",
+        "className": "",
+        "text": "1"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 348.29999999701977,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#2028652849 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-7bca190d-177b-4ee4-bd2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#2028652849 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-7bca190d-177b-4ee4-bd2"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 377.5,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#2028652849 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-7bca190d-177b-4ee4-bd2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#2028652849 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-7bca190d-177b-4ee4-bd2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 438.29999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#2028652849 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-7bca190d-177b-4ee4-bd2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 438.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 439.20000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 439.3999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-before\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat2\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://dkegigilemmgnglngbinlflmfcbofhdj/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#724268470 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-1697f558-f771-4836-8321"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 338.5,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#724268470 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1697f558-f771-4836-8321"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#724268470 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1697f558-f771-4836-8321"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 364.59999999403954,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#724268470 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1697f558-f771-4836-8321"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#724268470 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1697f558-f771-4836-8321"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 422.69999999552965,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#724268470 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-1697f558-f771-4836-8321"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 423.29999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 423.79999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 423.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-before\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat3\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://dkegigilemmgnglngbinlflmfcbofhdj/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#409611672 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-cd6dd475-2e34-4e78-90cc"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 365.59999999403954,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#409611672 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-cd6dd475-2e34-4e78-90cc"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#409611672 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-cd6dd475-2e34-4e78-90cc"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 395.09999999403954,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#409611672 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-cd6dd475-2e34-4e78-90cc"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#409611672 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-cd6dd475-2e34-4e78-90cc"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 447.79999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#409611672 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-cd6dd475-2e34-4e78-90cc"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 448.29999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 448.69999999552965,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 448.79999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-3-before\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat4\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://dkegigilemmgnglngbinlflmfcbofhdj/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#268875573 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-0984f9f2-8f4b-4131-b4b3"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 379,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#268875573 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-0984f9f2-8f4b-4131-b4b3"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#268875573 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-0984f9f2-8f4b-4131-b4b3"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 408.20000000298023,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#268875573 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-0984f9f2-8f4b-4131-b4b3"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#268875573 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-0984f9f2-8f4b-4131-b4b3"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 463.8999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#268875573 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-0984f9f2-8f4b-4131-b4b3"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 464.3999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 464.79999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 464.79999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-4-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e-repeat1\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#1905628446 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-32874142-fd41-44a9-94f"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 336,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1905628446 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-32874142-fd41-44a9-94f"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1905628446 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-32874142-fd41-44a9-94f"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 363.79999999701977,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1905628446 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-32874142-fd41-44a9-94f"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1905628446 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-32874142-fd41-44a9-94f"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 425.3999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#1905628446 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-32874142-fd41-44a9-94f"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 426,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 426.29999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 426.3999999985099,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  },
+  {
+    "trace": ".work\\g13-controls-4-after\\g13-operation-controls-dia-45a18-trictions-and-emergency-OFF-e2e\\trace.zip",
+    "studio": {
+      "url": "chrome-extension://ikdbhaondakjdjnmmocajogndlcbljhc/studio/index.html",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "編集対象 対象を選ぶ#325627327 YouTube adapter fixture設定接続中緊急OFF描画を再開1操作面の保護範囲を表示image-c9773970-49d2-440d-8efa"
+      },
+      "events": [
+        {
+          "type": "focusin",
+          "at": 336.6000000014901,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#325627327 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-c9773970-49d2-440d-8efa"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#325627327 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-c9773970-49d2-440d-8efa"
+          },
+          "hit": null
+        },
+        {
+          "type": "keydown",
+          "at": 362.70000000298023,
+          "target": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#325627327 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-c9773970-49d2-440d-8efa"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#325627327 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-c9773970-49d2-440d-8efa"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerdown",
+          "at": 420.20000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "ASIDE",
+            "id": "around-creator",
+            "className": "",
+            "text": "編集対象 対象を選ぶ#325627327 YouTube adapter fixture設定接続中緊急OFF描画を再開2操作面の保護範囲を表示image-c9773970-49d2-440d-8efa"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "focusin",
+          "at": 420.70000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": null
+        },
+        {
+          "type": "pointerup",
+          "at": 421.20000000298023,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921.9299926757812,
+          "y": 19.5
+        },
+        {
+          "type": "click",
+          "at": 421.29999999701977,
+          "target": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "active": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "hit": {
+            "tag": "SUMMARY",
+            "id": "",
+            "className": "",
+            "text": "2"
+          },
+          "x": 921,
+          "y": 19
+        }
+      ],
+      "summary": [
+        {
+          "open": false,
+          "text": "1"
+        }
+      ],
+      "player": null
+    },
+    "youtube": {
+      "url": "https://www.youtube.com/",
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "className": "",
+        "text": "\n    \n      \n        ☰▶YouTube\n        ⌕\n        ＋AJ\n        Legacy search target\n      \n      \n    "
+      },
+      "events": [],
+      "summary": [],
+      "player": null
+    }
+  }
+]

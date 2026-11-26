@@ -17,8 +17,8 @@ export function shortcutCommand(
   if (input.isComposing) return;
   const command = (input.ctrlKey || input.metaKey) && !input.altKey,
     key = input.key.toLowerCase();
-  if (tools && !command && !input.altKey && ['v', 'h', 'c'].includes(key))
-    return { type: 'tool', tool: key === 'h' ? 'browse' : key === 'c' ? 'card' : 'select' };
+  if (tools && !command && !input.altKey && ['v', 'h', 'c', 'u'].includes(key))
+    return { type: 'tool', tool: key === 'h' ? 'browse' : key === 'c' ? 'card' : key === 'u' ? 'skin' : 'select' };
   if (command && (key === 'z' || key === 'y')) return { type: key === 'y' || input.shiftKey ? 'redo' : 'undo' };
   if (command && key === 'd' && state.selectedIds.length) return { type: 'duplicate' };
   if (input.key === 'Delete' && state.selectedIds.length) return { type: 'delete' };

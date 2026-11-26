@@ -9,7 +9,7 @@ export async function renderDiagnostics(context: BrowserContext) {
       .map(async (page) => {
         try {
           const layout = await page.evaluate(() => {
-            const root = document.querySelector('#web-world-themes-creator')?.shadowRoot;
+            const root = document.querySelector('#around-creator')?.shadowRoot;
             const selectors = [
               '.layers-pane',
               '.layers-section',
@@ -42,7 +42,7 @@ export async function renderDiagnostics(context: BrowserContext) {
             const fonts: Record<string, unknown> = {};
             for (const selector of ['.layer-title', '.selection-tip']) {
               const { result } = await session.send('Runtime.evaluate', {
-                expression: `document.querySelector('#web-world-themes-creator')?.shadowRoot?.querySelector(${JSON.stringify(selector)})`,
+                expression: `document.querySelector('#around-creator')?.shadowRoot?.querySelector(${JSON.stringify(selector)})`,
               });
               if (result.objectId)
                 fonts[selector] = await session.send(

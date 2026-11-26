@@ -1,0 +1,12 @@
+    attachment #7: trace (application/zip) ─────────────────────────────────────────────────────────
+    .work\test-results\e2e\media2-editor-4K-APNG-down-b6cc2-nd-keeps-its-original-asset-e2e\trace.zip
+    Usage:
+
+        npx playwright show-trace .work\test-results\e2e\media2-editor-4K-APNG-down-b6cc2-nd-keeps-its-original-asset-e2e\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [e2e] › tests\media2-editor.spec.ts:118:1 › 4K APNG downscales explicitly when ImageDecoder ignores desired dimensions and keeps its original asset 
+  60 skipped
+  257 passed (19.3m)

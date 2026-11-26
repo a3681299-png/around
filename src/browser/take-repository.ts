@@ -6,7 +6,7 @@ import { TAKE_MESSAGES } from '../assets/limits';
 import { oneOf } from '../validation';
 import { sameBackupData } from '../backup/data';
 
-export const TAKE_DATABASE = 'web-world-themes-signal-takes';
+export const TAKE_DATABASE = 'around-signal-takes';
 interface Row {
   id: string;
   chars: number;
@@ -19,7 +19,7 @@ async function open() {
     request.onupgradeneeded = () => request.result.createObjectStore('takes', { keyPath: 'id' });
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
-    request.onblocked = () => reject(new Error('テイク保存を使用中です。Studioを再読み込みしてください。'));
+    request.onblocked = () => reject(new Error('テイク保存を使用中です。エディターを再読み込みしてください。'));
   });
 }
 async function handle(data: Record<string, unknown>) {

@@ -1,50 +1,24 @@
-import {
-  DEFAULT_SETTINGS,
-  readSettings,
-  mergeSettings,
-  updateSettings,
-  watchSettings,
-  type UserSettings,
-  type SettingsPatch,
-} from '../storage/settings';
-import { PALETTE_CHANNELS, PALETTE_PRESETS, type PaletteChannel } from '../themes/retro/palette';
+import { DEFAULT_SETTINGS, mergeSettings, type UserSettings, type SettingsPatch } from '../storage/settings';
+import { readSettings, updateSettings, watchSettings } from '../browser/settings-store';
+import { extensionPageUrl } from '../browser/side-panel';
 import { mountSafetyControls } from './safety-controls';
 
 /** Both the extension popup and the in-page panel share this storage binding. */
 export function bindSettingsForm(root: ParentNode): () => void {
-  const safetyRoot = root.querySelector<HTMLElement>('.ww-editor-body');
+  const safetyRoot = root.querySelector<HTMLElement>('.around-editor-body');
   const unmountSafety = safetyRoot ? mountSafetyControls(safetyRoot) : undefined;
   const backup = root.querySelector<HTMLAnchorElement>('.backup-open');
-  if (backup) backup.href = chrome.runtime.getURL('backup/index.html');
+  if (backup) backup.href = extensionPageUrl('backup/index.html');
   function required<T extends HTMLElement>(selector: string): T {
     const element = root.querySelector<T>(selector);
     if (!element) throw new Error(`Missing settings element: ${selector}`);
     return element;
   }
 
-  const enabled = required<HTMLInputElement>('#theme-enabled');
+  const enabled = required<HTMLInputElement>('#show-artwork');
   const creatorMode = required<HTMLInputElement>('#creator-mode');
-  const strength = required<HTMLInputElement>('#effect-strength');
-  const themeState = required<HTMLOutputElement>('#theme-state');
-  const strengthValue = required<HTMLOutputElement>('#strength-value');
-  const noise = required<HTMLInputElement>('#noise-strength');
-  const noiseValue = required<HTMLOutputElement>('#noise-strength-value');
-  const paletteControls = PALETTE_CHANNELS.map((channel) => ({
-    channel,
-    input: required<HTMLInputElement>(`#palette-${channel}`),
-    output: required<HTMLOutputElement>(`#palette-${channel}-value`),
-  }));
-  const presetButtons = root.querySelectorAll<HTMLButtonElement>('[data-palette-preset]');
-  const featureControls = root.querySelectorAll<HTMLInputElement>('input[data-feature-id]');
-  const controls = [
-    creatorMode,
-    enabled,
-    strength,
-    noise,
-    ...paletteControls.map(({ input }) => input),
-    ...presetButtons,
-    ...featureControls,
-  ];
+  const enabledState = required<HTMLOutputElement>('#show-artwork-state');
+  const controls = [creatorMode, enabled];
   const setDisabled = (disabled: boolean) =>
     controls.forEach((control) => {
       control.disabled = disabled;
@@ -64,26 +38,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
   const render = () => {
     creatorMode.checked = settings.creatorMode;
     enabled.checked = settings.enabled;
-    strength.value = String(settings.strength);
-    themeState.value = settings.enabled ? 'ON' : 'OFF';
-    strengthValue.value = `${settings.strength}%`;
-    noise.value = String(settings.noiseStrength);
-    noiseValue.value = `${settings.noiseStrength}%`;
-    paletteControls.forEach(({ channel, input, output }) => {
-      input.value = String(settings.palette[channel]);
-      output.value = `${settings.palette[channel]}${channel === 'hue' ? '°' : '%'}`;
-    });
-    presetButtons.forEach((button) => {
-      const preset = PALETTE_PRESETS[button.dataset.palettePreset as keyof typeof PALETTE_PRESETS];
-      button.setAttribute(
-        'aria-pressed',
-        String(Boolean(preset) && PALETTE_CHANNELS.every((channel) => settings.palette[channel] === preset[channel])),
-      );
-    });
-    featureControls.forEach((control) => {
-      const id = control.dataset.featureId;
-      control.checked = id ? settings.features[id] === true : false;
-    });
+    enabledState.value = settings.enabled ? 'ON' : 'OFF';
   };
   setDisabled(true);
   setStatus('設定を読み込んでいます…');
@@ -91,7 +46,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
   const unwatch = watchSettings(
     (stored) => {
       storageRevision++;
-      // Keep the current slider gesture stable while its writes are completing.
+      // Keep the current gesture stable while its writes are completing.
       if (savesInFlight === 0) {
         settings = stored;
         render();
@@ -144,36 +99,8 @@ export function bindSettingsForm(root: ParentNode): () => void {
   };
   const onToggle = () => commit({ enabled: enabled.checked });
   const onCreatorMode = () => commit({ creatorMode: creatorMode.checked });
-  const onStrength = () => commit({ strength: Number(strength.value) });
-  const onNoise = () => commit({ noiseStrength: Number(noise.value) });
-  const onPalette = (event: Event) => {
-    const input = event.currentTarget as HTMLInputElement;
-    const channel = input.dataset.paletteChannel as PaletteChannel;
-    if (PALETTE_CHANNELS.includes(channel)) commit({ palette: { [channel]: Number(input.value) } });
-  };
-  const onPreset = (event: Event) => {
-    const button = event.currentTarget as HTMLButtonElement;
-    const preset = PALETTE_PRESETS[button.dataset.palettePreset as keyof typeof PALETTE_PRESETS];
-    if (preset) commit({ palette: preset });
-  };
-  const onFeature = (event: Event) => {
-    const input = event.currentTarget as HTMLInputElement;
-    const id = input.dataset.featureId;
-    if (id) commit({ features: { [id]: input.checked } });
-  };
-  const focusButtons = root.querySelectorAll<HTMLButtonElement>('[data-settings-focus]');
-  const onFocusControl = (event: Event) => {
-    const target = (event.currentTarget as HTMLButtonElement).dataset.settingsFocus;
-    if (target) root.querySelector<HTMLInputElement>(`#${target}`)?.focus();
-  };
   enabled.addEventListener('change', onToggle);
   creatorMode.addEventListener('change', onCreatorMode);
-  strength.addEventListener('input', onStrength);
-  noise.addEventListener('input', onNoise);
-  paletteControls.forEach(({ input }) => input.addEventListener('input', onPalette));
-  presetButtons.forEach((button) => button.addEventListener('click', onPreset));
-  featureControls.forEach((control) => control.addEventListener('change', onFeature));
-  focusButtons.forEach((button) => button.addEventListener('click', onFocusControl));
 
   return () => {
     unmountSafety?.();
@@ -181,11 +108,5 @@ export function bindSettingsForm(root: ParentNode): () => void {
     unwatch();
     enabled.removeEventListener('change', onToggle);
     creatorMode.removeEventListener('change', onCreatorMode);
-    strength.removeEventListener('input', onStrength);
-    noise.removeEventListener('input', onNoise);
-    paletteControls.forEach(({ input }) => input.removeEventListener('input', onPalette));
-    presetButtons.forEach((button) => button.removeEventListener('click', onPreset));
-    featureControls.forEach((control) => control.removeEventListener('change', onFeature));
-    focusButtons.forEach((button) => button.removeEventListener('click', onFocusControl));
   };
 }

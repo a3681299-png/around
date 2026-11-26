@@ -1,0 +1,141 @@
+======== before scrollFar (557b978=before, 4d3f39b=g12head; ui1 wrapper build)
+extension stacks total (incl. native under ext): 328.2 ms
+
+# inclusive per function
+    314.0  (anon)
+    232.7  paint
+    112.7  applyLayout
+     77.5  sample
+     69.7  capture
+     69.0  draw
+     41.4  update
+     38.6  reconcile
+     25.4  commit
+     24.3  sampleScroll
+     23.1  syncSources
+     20.1  overlaySlot
+     19.4  verifiedOverlaySlot
+     16.9  fixedContainingBlock
+     16.7  configure
+     16.0  evaluatePreparedWorld
+     14.2  pump
+     13.8  scrollBox
+     10.6  publish
+      9.6  evaluateTransforms
+      8.4  above
+      7.9  rank2
+      7.9  guardPaint
+      7.0  stepProximity
+      7.0  style
+
+# outermost extension entry
+======== before scrollNear (557b978=before, 4d3f39b=g12head; ui1 wrapper build)
+extension stacks total (incl. native under ext): 359.0 ms
+
+# inclusive per function
+    351.9  (anon)
+    264.3  paint
+    121.3  applyLayout
+     84.5  draw
+     83.3  sample
+     69.1  capture
+     57.6  overlaySlot
+     55.3  verifiedOverlaySlot
+     44.8  fixedContainingBlock
+     35.5  update
+     33.8  reconcile
+     16.3  commit
+     15.3  scrollBox
+     15.3  syncSources
+     14.9  evaluatePreparedWorld
+     14.0  sampleScroll
+      9.4  configure
+      8.3  evaluateTransforms
+      7.7  nearestScroller
+      7.0  publish
+      6.8  stepProximity
+      6.7  fixedAncestor
+      6.7  scrolls
+      6.7  above
+      6.6  pump
+
+# outermost extension entry
+======== g12head scrollFar (557b978=before, 4d3f39b=g12head; ui1 wrapper build)
+extension stacks total (incl. native under ext): 465.0 ms
+
+# inclusive per function
+    456.9  (anon)
+    375.1  paint
+    154.5  applyLayout
+    114.3  sample
+     96.8  capture
+     68.3  draw
+     67.5  verifiedOverlaySlot
+     67.5  overlaySlot
+     64.5  fixedContainingBlock
+     37.9  update
+     36.9  commit
+     36.7  reconcile
+     29.9  rank2
+     29.9  above
+     19.0  syncSources
+     15.5  handle
+     15.2  evaluatePreparedWorld
+     14.8  sampleScroll
+     14.5  relevant
+     12.2  configure
+     12.2  step
+     10.5  scrollBox
+     10.3  guardPaint
+     10.3  stepApproach
+     10.1  publish
+
+# outermost extension entry
+======== g12head scrollNear (557b978=before, 4d3f39b=g12head; ui1 wrapper build)
+extension stacks total (incl. native under ext): 387.2 ms
+
+# inclusive per function
+    375.5  (anon)
+    315.5  paint
+    126.8  sample
+    115.5  applyLayout
+     98.8  capture
+     60.2  draw
+     34.7  above
+     34.1  rank2
+     32.2  fixedContainingBlock
+     28.7  update
+     28.0  reconcile
+     25.9  evaluatePreparedWorld
+     24.0  verifiedOverlaySlot
+     23.9  overlaySlot
+     20.0  commit
+     16.9  syncSources
+     16.2  sampleScroll
+     15.6  evaluateTransforms
+     15.6  step
+     12.8  stepApproach
+     11.7  pump
+     10.3  configure
+      7.8  evaluateEffects
+      7.5  publish
+      6.0  ruleSubscriptions
+
+# outermost extension entry
+======== g12head scrollFar applyLayout lines
+applyLayout: 149 ticks ≈ 102.1 ms
+   24.0 ms  L53965  Object.assign(entry.controls.style, size, {
+   21.9 ms  L53960  Object.assign(entry.node.style, size, {
+   18.5 ms  L54094  const id2 = entry.controls.dataset.frameId, parentId = layout.layers.find((l) => l.layer.id === id2)?.parentId
+    7.5 ms  L54083  if (container.children[index3] !== node) container.insertBefore(node, container.children[index3] ?? null);
+    5.5 ms  L54151  const record5 = JSON.stringify({ stopped: safety.snapshot().stopped, issues: safety.snapshot().issues });
+    4.8 ms  L54160  if (entry.node.style.visibility !== (stopped ? "hidden" : ""))
+    2.7 ms  L54164  if (entry.node.style.pointerEvents !== (stopped ? "none" : ""))
+    2.1 ms  L54166  if (stopped) entry.controls.hidden = true;
+    2.1 ms  L54096  if (entry.controls.parentNode !== root) root.append(entry.controls);
+    2.1 ms  L54152  if (record5 !== writtenSafety || host.dataset.aroundSafety !== record5) {
+    1.4 ms  L53956  if (!entry || !layer.frame || !layer.position || !layer.localPosition) continue;
+    1.4 ms  L54118  const blocked = safety.commit(
+    1.4 ms  L53955  const entry = nodes.get(layer.layer.id);
+    1.4 ms  L53961  left: `${local.x}px`,
+    0.7 ms  L54157  const entry = nodes.get(layer.layer.id);

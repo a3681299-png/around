@@ -30,7 +30,7 @@ export function sampleTake(): { take: SignalTake; scene: WorldScene } {
   return {
     scene,
     take: parseSignalTake({
-      format: 'ww-signal-take',
+      format: 'around-signal-take',
       formatVersion: 1,
       runtimeVersion: WORLD_RUNTIME_VERSION,
       id: 'take-test',

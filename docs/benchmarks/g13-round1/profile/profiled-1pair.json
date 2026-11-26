@@ -1,0 +1,354 @@
+{
+  "date": "2026-11-03T09:36:49.635Z",
+  "builds": {
+    "g12head": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-g12head\\.work\\g13-perf",
+    "r1": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13r1-perf"
+  },
+  "pairs": [
+    {
+      "pair": 0,
+      "order": ["g12head", "r1"],
+      "g12head": {
+        "label": "g12head",
+        "build": {
+          "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-g12head",
+          "revision": "4d3f39b8707db63de81466d7cba4f833dde979d9",
+          "dirtySource": false,
+          "probe": "isolated-world-v3",
+          "asyncContinuations": "lowered-promises",
+          "busyMs": 0,
+          "busyAfterAwait": false,
+          "disableInk": false
+        },
+        "browser": "143.0.7499.4",
+        "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "model": false,
+        "phases": {
+          "startup": {
+            "cpuMs": {
+              "n": 377,
+              "median": 0.6000000014901161,
+              "p95": 4.600000001490116,
+              "max": 30.400000002235174
+            },
+            "intervalMs": {
+              "n": 377,
+              "median": 7,
+              "p95": 38.899999998509884,
+              "max": 441.1000000014901
+            },
+            "callbacks": 2210,
+            "kinds": {
+              "load": 1,
+              "promise": 267,
+              "microtask": 437,
+              "MutationObserver": 935,
+              "raf": 521,
+              "ResizeObserver": 13,
+              "event": 12,
+              "setTimeout": 19,
+              "event-property": 2,
+              "chrome-event": 3
+            }
+          },
+          "steady": {
+            "cpuMs": {
+              "n": 866,
+              "median": 0.5,
+              "p95": 0.6999999992549419,
+              "max": 1.4000000022351742
+            },
+            "intervalMs": {
+              "n": 866,
+              "median": 6.900000002235174,
+              "p95": 7.400000002235174,
+              "max": 10.600000001490116
+            },
+            "callbacks": 1730,
+            "kinds": {
+              "raf": 865,
+              "microtask": 865
+            }
+          },
+          "scrollFar": {
+            "cpuMs": {
+              "n": 394,
+              "median": 0.6000000014901161,
+              "p95": 2.800000000745058,
+              "max": 12.100000005215406
+            },
+            "intervalMs": {
+              "n": 394,
+              "median": 7,
+              "p95": 8.699999999254942,
+              "max": 17.300000000745058
+            },
+            "callbacks": 1185,
+            "kinds": {
+              "raf": 470,
+              "microtask": 440,
+              "event": 160,
+              "MutationObserver": 31,
+              "setTimeout": 20,
+              "promise": 64
+            },
+            "point": {
+              "x": 240,
+              "y": 10
+            },
+            "visibility": {
+              "frames": 400,
+              "shown": 7,
+              "approachFrames": 0
+            }
+          },
+          "scrollNear": {
+            "cpuMs": {
+              "n": 375,
+              "median": 0.5999999977648258,
+              "p95": 2.300000000745058,
+              "max": 11.00000000372529
+            },
+            "intervalMs": {
+              "n": 375,
+              "median": 7,
+              "p95": 12.599999997764826,
+              "max": 20.799999997019768
+            },
+            "callbacks": 1330,
+            "kinds": {
+              "raf": 466,
+              "microtask": 420,
+              "event": 160,
+              "MutationObserver": 200,
+              "setTimeout": 20,
+              "promise": 64
+            },
+            "point": {
+              "x": 36,
+              "y": 540
+            },
+            "visibility": {
+              "frames": 382,
+              "shown": 7,
+              "approachFrames": 0
+            }
+          },
+          "spa": {
+            "cpuMs": {
+              "n": 740,
+              "median": 0.6000000014901161,
+              "p95": 2.400000002235174,
+              "max": 26.300000000745058
+            },
+            "intervalMs": {
+              "n": 740,
+              "median": 6.900000002235174,
+              "p95": 9,
+              "max": 174.90000000223517
+            },
+            "callbacks": 2013,
+            "kinds": {
+              "raf": 780,
+              "microtask": 722,
+              "event": 18,
+              "MutationObserver": 402,
+              "ResizeObserver": 12,
+              "setTimeout": 15,
+              "promise": 64
+            }
+          }
+        },
+        "networkErrors": [
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          },
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          }
+        ],
+        "rest": {
+          "x": 116,
+          "y": 431
+        }
+      },
+      "r1": {
+        "label": "r1",
+        "build": {
+          "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor",
+          "revision": "710651c81ae1b6da757b31fb865a52e153f13fd7",
+          "dirtySource": true,
+          "probe": "isolated-world-v3",
+          "asyncContinuations": "lowered-promises",
+          "busyMs": 0,
+          "busyAfterAwait": false,
+          "disableInk": false
+        },
+        "browser": "143.0.7499.4",
+        "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "model": false,
+        "phases": {
+          "startup": {
+            "cpuMs": {
+              "n": 373,
+              "median": 0.6999999992549419,
+              "p95": 5.800000000745058,
+              "max": 34.99999999254942
+            },
+            "intervalMs": {
+              "n": 373,
+              "median": 7,
+              "p95": 36,
+              "max": 377.5
+            },
+            "callbacks": 2059,
+            "kinds": {
+              "load": 1,
+              "promise": 141,
+              "event": 10,
+              "microtask": 413,
+              "MutationObserver": 980,
+              "raf": 478,
+              "ResizeObserver": 17,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 14
+            }
+          },
+          "steady": {
+            "cpuMs": {
+              "n": 867,
+              "median": 0.5,
+              "p95": 0.6999999992549419,
+              "max": 1.3999999985098839
+            },
+            "intervalMs": {
+              "n": 867,
+              "median": 6.900000002235174,
+              "p95": 7.5,
+              "max": 9
+            },
+            "callbacks": 1732,
+            "kinds": {
+              "raf": 866,
+              "microtask": 866
+            }
+          },
+          "scrollFar": {
+            "cpuMs": {
+              "n": 411,
+              "median": 0.8999999985098839,
+              "p95": 3.199999999254942,
+              "max": 12.800000000745058
+            },
+            "intervalMs": {
+              "n": 411,
+              "median": 6.900000002235174,
+              "p95": 9.199999999254942,
+              "max": 17
+            },
+            "callbacks": 1230,
+            "kinds": {
+              "raf": 493,
+              "microtask": 463,
+              "event": 160,
+              "MutationObserver": 32,
+              "promise": 62,
+              "setTimeout": 20
+            },
+            "point": {
+              "x": 240,
+              "y": 10
+            },
+            "visibility": {
+              "frames": 418,
+              "shown": 412,
+              "approachFrames": 0
+            }
+          },
+          "scrollNear": {
+            "cpuMs": {
+              "n": 393,
+              "median": 0.7000000029802322,
+              "p95": 3.199999999254942,
+              "max": 13.699999999254942
+            },
+            "intervalMs": {
+              "n": 393,
+              "median": 6.900000002235174,
+              "p95": 12.600000001490116,
+              "max": 22
+            },
+            "callbacks": 1651,
+            "kinds": {
+              "raf": 496,
+              "microtask": 454,
+              "event": 160,
+              "MutationObserver": 202,
+              "promise": 318,
+              "setTimeout": 21
+            },
+            "point": {
+              "x": 36,
+              "y": 540
+            },
+            "visibility": {
+              "frames": 398,
+              "shown": 330,
+              "approachFrames": 0
+            }
+          },
+          "spa": {
+            "cpuMs": {
+              "n": 657,
+              "median": 0.6999999992549419,
+              "p95": 3.300000000745058,
+              "max": 37.899999998509884
+            },
+            "intervalMs": {
+              "n": 657,
+              "median": 6.900000002235174,
+              "p95": 16,
+              "max": 191.80000000074506
+            },
+            "callbacks": 1888,
+            "kinds": {
+              "raf": 726,
+              "microtask": 651,
+              "event": 18,
+              "MutationObserver": 393,
+              "ResizeObserver": 15,
+              "setTimeout": 21,
+              "promise": 64
+            }
+          }
+        },
+        "networkErrors": [
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          },
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          }
+        ],
+        "rest": {
+          "x": 116,
+          "y": 431
+        }
+      }
+    }
+  ],
+  "reference3d": []
+}

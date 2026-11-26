@@ -107,7 +107,11 @@ test('Studio retries an attach made before the first settings result and connect
     expect(client.state).toMatchObject({ enabled: true, active: true });
     expect(updates.at(-1)).toMatchObject({ connected: true, message: '接続中' });
     editor.setEnabled(false);
-    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+    next.send({ type: 'state', ...createStudioStateEncoder().encode(editor.snapshot(), editor.checkpoint()) });
+    await expect
+      .poll(() => updates.at(-1)?.message)
+      .toBe('「作品を表示する」がOFFです。ONにしてから接続してください。');
+    expect(editor.open()).toMatchObject({ ok: false, error: /「作品を表示する」がOFF/ });
     expect(editor.snapshot().active).toBe(false);
   } finally {
     client.destroy();

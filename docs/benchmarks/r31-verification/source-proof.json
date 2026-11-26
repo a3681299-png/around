@@ -1,0 +1,29 @@
+{
+  "target": "800373875d9a933b101e4e1cfdbfe7cfa40412e8",
+  "before": "8e63f0d451eeaf7811b7e0b5b60070d10b5233a9",
+  "productDiff": "",
+  "normalContentHash": "435532a57fbd8ca659aa663f97e48024dc7f905fc275581134a3d53091e8fa3c",
+  "normalHasCpuProbe": false,
+  "builds": {
+    "before": {
+      "source": "BASELINE",
+      "revision": "8e63f0d451eeaf7811b7e0b5b60070d10b5233a9",
+      "dirtySource": false,
+      "probe": "isolated-world-v3",
+      "asyncContinuations": "lowered-promises",
+      "busyMs": 0,
+      "busyAfterAwait": false,
+      "disableInk": false
+    },
+    "after": {
+      "source": "WORKTREE",
+      "revision": "800373875d9a933b101e4e1cfdbfe7cfa40412e8",
+      "dirtySource": false,
+      "probe": "isolated-world-v3",
+      "asyncContinuations": "lowered-promises",
+      "busyMs": 0,
+      "busyAfterAwait": false,
+      "disableInk": false
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "revision": "9432b7868239d9710524249f548c7fef81608d73",
+  "measuredAt": "2026-11-06T15:47:52.708Z",
+  "timeZone": "Asia/Tokyo",
+  "os": "Windows 11 Pro 25H2 (26200.9711)",
+  "browser": "Playwright Chromium 153.0.8010.12",
+  "profile": "Fresh signed-out persistent profile, headless",
+  "videoUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+  "viewport": {
+    "width": 1920,
+    "height": 1080,
+    "deviceScaleFactor": 1
+  },
+  "measurement": {
+    "mode": "steady",
+    "settleMs": 15000,
+    "forcedRedrawWarmupMs": 3000,
+    "sampleMs": 6000,
+    "guardEnabled": true,
+    "contentSha256": "27ec2517cc81a93136d305119ec3058752112727465d583e9582bf05bd088515",
+    "contentLoading": "Manifest-loaded bundle only; G11_CONTENT_FILE points to a no-op",
+    "scene": {
+      "layers": 32,
+      "groups": 16,
+      "asset": "tests/fixtures/motion/petal.png",
+      "baseThemeId": null
+    }
+  },
+  "pairs": [
+    {
+      "order": ["A", "B"],
+      "blocks": [
+        {
+          "label": "A",
+          "extensionRafFrames": 993,
+          "extensionRafCpuMedianMs": 1.8,
+          "extensionRafCpuP95Ms": 2.4,
+          "fullFrameCount": 990,
+          "fullFrameP95Ms": 15.537
+        },
+        {
+          "label": "B",
+          "extensionRafFrames": 992,
+          "extensionRafCpuMedianMs": 2.2,
+          "extensionRafCpuP95Ms": 3.2,
+          "fullFrameCount": 988,
+          "fullFrameP95Ms": 21.112
+        }
+      ],
+      "bMinusA": {
+        "extensionRafCpuMedianMs": 0.4,
+        "extensionRafCpuP95Ms": 0.8
+      }
+    },
+    {
+      "order": ["B", "A"],
+      "blocks": [
+        {
+          "label": "B",
+          "extensionRafFrames": 993,
+          "extensionRafCpuMedianMs": 1.9,
+          "extensionRafCpuP95Ms": 2.7,
+          "fullFrameCount": 991,
+          "fullFrameP95Ms": 15.489
+        },
+        {
+          "label": "A",
+          "extensionRafFrames": 956,
+          "extensionRafCpuMedianMs": 2.6,
+          "extensionRafCpuP95Ms": 4.8,
+          "fullFrameCount": 954,
+          "fullFrameP95Ms": 20.076
+        }
+      ],
+      "bMinusA": {
+        "extensionRafCpuMedianMs": -0.7,
+        "extensionRafCpuP95Ms": -2.1
+      }
+    }
+  ],
+  "validation": {
+    "acceptedBlocks": 4,
+    "rejectedBlocks": 0,
+    "earlierAttempt": "Exited before sampling due to redeclaration of the probe during content reinjection.",
+    "videoElementStable": true,
+    "playbackEventsDuringSamples": 0,
+    "droppedFramesDuringSamples": 0,
+    "operationRecapturesDuringSamples": 0,
+    "pageErrors": 0,
+    "networkErrorsAcrossRun": {
+      "HTTP 403": 18,
+      "net::ERR_ABORTED": 18,
+      "net::ERR_NAME_NOT_RESOLVED": 12
+    }
+  }
+}

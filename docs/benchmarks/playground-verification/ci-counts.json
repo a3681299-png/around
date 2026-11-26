@@ -1,0 +1,14 @@
+{
+  "unit": {
+    "passed": 523,
+    "skipped": 3
+  },
+  "e2e": {
+    "passed": 280,
+    "skipped": 61
+  },
+  "nativeEntry": {
+    "passed": 4,
+    "skipped": 0
+  }
+}

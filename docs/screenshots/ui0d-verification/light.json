@@ -1,0 +1,19 @@
+{
+  "scheme": "light",
+  "s-360": {
+    "width": 360,
+    "height": 900,
+    "title": "Around エディター"
+  },
+  "s-400": {
+    "width": 400,
+    "height": 900,
+    "title": "Around エディター"
+  },
+  "w": {
+    "width": 1440,
+    "height": 900,
+    "screenX": 0,
+    "screenY": 0
+  }
+}

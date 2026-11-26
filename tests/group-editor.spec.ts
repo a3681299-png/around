@@ -1,26 +1,26 @@
 import { exposeEditorControls, withCanvas, clickCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { CDPSession, Locator, Page } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { test, expect, launchExtension } from './fixtures';
+import { openEditor } from './helpers/editor';
 import type { DesignDocument, GroupLayer } from '../src/design/types';
 import { defaultCircleMask } from '../src/effects/types';
 
-const key = 'webWorldThemes.design.youtube',
-  overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube',
+  overlay = '#around-decorations';
 const presentation =
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
   images = `${presentation} [data-image-id]`,
   compositions = `${presentation} [data-group-id]`;
 const colors = ['#f04a50', '#3caf78', '#4276ed'],
   names = ['red.png', 'green.png', 'blue.png'];
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await showArtwork(popup);
   await page.bringToFront();
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
+  const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
   return panel;
 }
@@ -38,7 +38,7 @@ async function stored(popup: Page): Promise<DesignDocument> {
 }
 async function watch(page: Page) {
   await page.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible();
 }
 async function play(page: Page, action: 'Play' | 'Pause') {
   await page.locator(`#movie_player [aria-label="${action}"]`).evaluate((button: HTMLButtonElement) => button.click());
@@ -128,7 +128,7 @@ async function assetCount(popup: Page) {
   return popup.evaluate(
     () =>
       new Promise<number>((resolve, reject) => {
-        const request = indexedDB.open('web-world-themes-assets');
+        const request = indexedDB.open('around-assets');
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
           const db = request.result;
@@ -198,7 +198,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   await panel.getByLabel('円形マスクを使う').check();
   await number(panel, '光の半径', 120);
   await number(panel, '境界のぼかし', 25);
-  await panel.getByRole('button', { name: 'パネルを左へ', exact: true }).click();
+  // UI0-d: the editor is its own page; nothing needs moving off the artwork (was: パネルを左へ).
   const content = youtube.locator(`${compositions} .group-content`);
   for (const image of await youtube.locator(images).all()) {
     const rect = (await image.boundingBox())!,
@@ -230,7 +230,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 12,
+    schemaVersion: 18,
     groups: [{ name: '海の世界', effects: [{ radiusPx: 120, featherPx: 25 }] }],
   });
   expect(saved.decorations).toHaveLength(3);
@@ -453,12 +453,12 @@ test('mixed anchors and interleaved selection are refused; player groups follow 
   expect(await stored(popup)).toEqual(saved);
   await youtube.locator('#movie_player [aria-label="Play"]').click();
   await expect(youtube.locator('#movie_player video')).toHaveJSProperty('paused', false);
-  for (const boundary of ['off', 'zero']) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+  for (const boundary of ['off', 'emergency']) {
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    if (boundary === 'off') await showArtwork(popup);
+    else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await ready(youtube, 3);
   }
@@ -552,7 +552,7 @@ test('grouping, scoped drag ordering, ungrouping and effect edits undo/redo, dis
   await expect(second.locator(compositions)).toHaveCount(1);
   await youtube.bringToFront();
   await groupRow.locator('[data-reorder]').dragTo(row(panel, 'blue.png'), { targetPosition: { x: 10, y: 2 } });
-  await expect(panel.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(panel.locator('.dirty')).toHaveText('未保存');
   await panel.getByRole('button', { name: '元に戻す', exact: true }).click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   await panel.getByRole('button', { name: 'やり直す', exact: true }).click();
@@ -673,7 +673,7 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
   // G1 may still be restoring paint after a native geometry change. Measure
   // the stationary scene after that explicit Host transition has completed.
   const stopped = () =>
-    youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.wwSafety!).stopped);
+    youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.aroundSafety!).stopped);
   await expect.poll(stopped).toBe('');
   // A change just before that read may still be held for one coalescing window (200 ms).
   await youtube.waitForTimeout(300);
@@ -710,13 +710,13 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
     expression: 'delete document.hidden; document.dispatchEvent(new Event("visibilitychange"));',
   });
   await expect.poll(stats).toMatchObject({ pointer: 1, video: 5 });
-  for (const boundary of ['off', 'zero']) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+  for (const boundary of ['off', 'emergency']) {
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
     await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    if (boundary === 'off') await showArtwork(popup);
+    else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await ready(youtube, 32);
   }

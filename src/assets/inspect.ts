@@ -3,6 +3,7 @@ import { inspectAnimatedWebp, inspectGif } from './animated-raster';
 import { inspectLottie } from './lottie';
 import { inspectApng } from './apng';
 import { inspectWebm } from './webm';
+import { inspectVrma, isVrmaContainer } from './vrma';
 import { ASSET_LIMITS, inspectImage, type AssetInfo } from './validation';
 import { ASSET_MESSAGES } from './limits';
 
@@ -12,7 +13,9 @@ export function inspectAssetResources(data: Uint8Array, mime = ''): { info: Asse
     throw new Error(ASSET_MESSAGES.fileSizes);
   let info: AssetInfo;
   let gpuBytes: number | undefined;
-  if (model) {
+  if (model && isVrmaContainer(data))
+    info = { mime: 'model/gltf-binary', width: 1, height: 1, vrmAnimation: inspectVrma(data).info };
+  else if (model) {
     const result = inspectGlb(data);
     info = result.info;
     gpuBytes = result.gpuBytes;
@@ -25,9 +28,10 @@ export function inspectAssetResources(data: Uint8Array, mime = ''): { info: Asse
   )
     info = inspectLottie(data).info;
   else info = inspectApng(data) ?? inspectAnimatedWebp(data) ?? inspectImage(data, mime);
-  // Models have passed GLB/VRM structure validation; OS MIME labels vary by platform.
+  // Models and motions have passed glTF structure validation; OS MIME labels vary by platform.
   if (
     !info.model &&
+    !info.vrmAnimation &&
     mime &&
     mime !== info.mime &&
     !(info.mime === 'application/json' && mime === 'text/plain') &&

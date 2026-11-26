@@ -1,0 +1,44 @@
+{
+  "device": "Windows laptop, Intel Core i7-13650HX, headed and off screen",
+  "displayRefreshHz": 144,
+  "viewport": [1440, 1080],
+  "scenario": "With the resident. The same page: desktop closed, then open with two windows, 4 s each, two alternating pairs. A short look, not a verdict.",
+  "results": [
+    {
+      "pair": 1,
+      "kind": "closed",
+      "frames": 241,
+      "intervalMs": 16.65,
+      "worstIntervalMs": 28,
+      "bodyMs": 0.73,
+      "drawMs": 1.48
+    },
+    {
+      "pair": 1,
+      "kind": "open",
+      "frames": 228,
+      "intervalMs": 17.57,
+      "worstIntervalMs": 21.2,
+      "bodyMs": 0.82,
+      "drawMs": 1.39
+    },
+    {
+      "pair": 2,
+      "kind": "closed",
+      "frames": 235,
+      "intervalMs": 17.02,
+      "worstIntervalMs": 34.8,
+      "bodyMs": 0.71,
+      "drawMs": 1.47
+    },
+    {
+      "pair": 2,
+      "kind": "open",
+      "frames": 229,
+      "intervalMs": 17.59,
+      "worstIntervalMs": 27.8,
+      "bodyMs": 0.81,
+      "drawMs": 1.31
+    }
+  ]
+}

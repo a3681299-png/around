@@ -1,0 +1,566 @@
+{
+  "conclusion": "success",
+  "headSha": "d8d176f6467b72f3a0fc01beac1cf9e845a7fe12",
+  "jobs": [
+    {
+      "completedAt": "2026-11-03T06:03:49Z",
+      "conclusion": "success",
+      "databaseId": 125754504731,
+      "name": "e2e (4)",
+      "startedAt": "2026-11-03T05:57:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-03T05:57:53Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-03T05:57:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:01Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-03T05:57:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:04Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-03T05:58:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:51Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-03T05:58:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:09Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium --no-shell",
+          "number": 5,
+          "startedAt": "2026-11-03T05:58:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:12Z",
+          "conclusion": "success",
+          "name": "Run sudo apt-get install -y xdotool",
+          "number": 6,
+          "startedAt": "2026-11-03T05:59:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:15Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-11-03T05:59:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:15Z",
+          "conclusion": "skipped",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results",
+          "number": 8,
+          "startedAt": "2026-11-03T05:59:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:03:44Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=4/4",
+          "number": 9,
+          "startedAt": "2026-11-03T05:59:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:03:46Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "startedAt": "2026-11-03T06:03:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:03:46Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 19,
+          "startedAt": "2026-11-03T06:03:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:03:46Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 20,
+          "startedAt": "2026-11-03T06:03:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:03:46Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-03T06:03:46Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/around/actions/runs/41586931361/job/125754504731"
+    },
+    {
+      "completedAt": "2026-11-03T06:04:09Z",
+      "conclusion": "success",
+      "databaseId": 125754505080,
+      "name": "e2e (1)",
+      "startedAt": "2026-11-03T05:57:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-03T05:57:54Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-03T05:57:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:02Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-03T05:57:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:05Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-03T05:58:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:52Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-03T05:58:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:10Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium --no-shell",
+          "number": 5,
+          "startedAt": "2026-11-03T05:58:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:13Z",
+          "conclusion": "success",
+          "name": "Run sudo apt-get install -y xdotool",
+          "number": 6,
+          "startedAt": "2026-11-03T05:59:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:17Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-11-03T05:59:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:42Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results",
+          "number": 8,
+          "startedAt": "2026-11-03T05:59:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:04:04Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=1/4",
+          "number": 9,
+          "startedAt": "2026-11-03T05:59:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:04:06Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "startedAt": "2026-11-03T06:04:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:04:06Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 19,
+          "startedAt": "2026-11-03T06:04:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:04:06Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 20,
+          "startedAt": "2026-11-03T06:04:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:04:06Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-03T06:04:06Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/around/actions/runs/41586931361/job/125754505080"
+    },
+    {
+      "completedAt": "2026-11-03T05:59:35Z",
+      "conclusion": "success",
+      "databaseId": 125754505133,
+      "name": "unit",
+      "startedAt": "2026-11-03T05:57:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-03T05:57:53Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-03T05:57:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:03Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-03T05:57:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:05Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-03T05:58:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:43Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-03T05:58:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:11Z",
+          "conclusion": "success",
+          "name": "Run npm run lint",
+          "number": 5,
+          "startedAt": "2026-11-03T05:58:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:13Z",
+          "conclusion": "success",
+          "name": "Run npm run typecheck",
+          "number": 6,
+          "startedAt": "2026-11-03T05:59:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:31Z",
+          "conclusion": "success",
+          "name": "Run npm run test:unit",
+          "number": 7,
+          "startedAt": "2026-11-03T05:59:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:32Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 8,
+          "startedAt": "2026-11-03T05:59:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:32Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 15,
+          "startedAt": "2026-11-03T05:59:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:32Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 16,
+          "startedAt": "2026-11-03T05:59:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:32Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-11-03T05:59:32Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/around/actions/runs/41586931361/job/125754505133"
+    },
+    {
+      "completedAt": "2026-11-03T06:07:35Z",
+      "conclusion": "success",
+      "databaseId": 125754505157,
+      "name": "e2e (2)",
+      "startedAt": "2026-11-03T05:57:52Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-03T05:57:54Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-03T05:57:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:02Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-03T05:57:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:05Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-03T05:58:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:52Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-03T05:58:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:12Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium --no-shell",
+          "number": 5,
+          "startedAt": "2026-11-03T05:58:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:15Z",
+          "conclusion": "success",
+          "name": "Run sudo apt-get install -y xdotool",
+          "number": 6,
+          "startedAt": "2026-11-03T05:59:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:19Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-11-03T05:59:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:19Z",
+          "conclusion": "skipped",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results",
+          "number": 8,
+          "startedAt": "2026-11-03T05:59:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:07:30Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=2/4",
+          "number": 9,
+          "startedAt": "2026-11-03T05:59:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:07:32Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "startedAt": "2026-11-03T06:07:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:07:32Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 19,
+          "startedAt": "2026-11-03T06:07:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:07:33Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 20,
+          "startedAt": "2026-11-03T06:07:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:07:33Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-03T06:07:33Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/around/actions/runs/41586931361/job/125754505157"
+    },
+    {
+      "completedAt": "2026-11-03T06:02:50Z",
+      "conclusion": "success",
+      "databaseId": 125754505178,
+      "name": "e2e (3)",
+      "startedAt": "2026-11-03T05:57:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-03T05:57:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-03T05:57:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:04Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-03T05:57:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:06Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-03T05:58:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:34Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-03T05:58:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:58:58Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium --no-shell",
+          "number": 5,
+          "startedAt": "2026-11-03T05:58:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:00Z",
+          "conclusion": "success",
+          "name": "Run sudo apt-get install -y xdotool",
+          "number": 6,
+          "startedAt": "2026-11-03T05:58:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:03Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-11-03T05:59:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T05:59:03Z",
+          "conclusion": "skipped",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results",
+          "number": 8,
+          "startedAt": "2026-11-03T05:59:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:02:45Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=3/4",
+          "number": 9,
+          "startedAt": "2026-11-03T05:59:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:02:47Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "startedAt": "2026-11-03T06:02:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:02:47Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 19,
+          "startedAt": "2026-11-03T06:02:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:02:47Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 20,
+          "startedAt": "2026-11-03T06:02:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T06:02:47Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-03T06:02:47Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/around/actions/runs/41586931361/job/125754505178"
+    }
+  ],
+  "status": "completed"
+}

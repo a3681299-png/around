@@ -2,11 +2,23 @@ import { oneOf } from '../validation';
 import {
   CLOSE_SIDE_PANEL,
   OPEN_SIDE_PANEL,
-  OPEN_SIDE_PANEL_TOOLS,
   OPEN_STUDIO_WINDOW,
   PREPARE_SIDE_PANEL,
   type OpenEditorResponse,
 } from '../editor/messages';
+
+/** Ending an edit from the side panel closes Chrome's panel too (page side). */
+export function closeSidePanel(): void {
+  void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined);
+}
+/** From the side panel's own page: closes Chrome's panel for its tab (the same message as above,
+ * with the tab named; the host disables and re-enables the panel, which works in every Chrome
+ * this extension supports, without another permission). */
+export function closeOwnSidePanel(tabId: number): void {
+  void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL, tabId }).catch(() => undefined);
+}
+/** The URL of one of the extension's own pages (e.g. the backup page). */
+export const extensionPageUrl = (path: string): string => chrome.runtime.getURL(path);
 
 /** Chrome-only composition. Configure before a gesture: awaiting setOptions can lose it. */
 export function installSidePanelHost() {
@@ -36,15 +48,9 @@ export function installSidePanelHost() {
         path: 'studio/index.html?surface=sidepanel&target=' + tabId,
       });
     } else if (raw.type === OPEN_SIDE_PANEL) {
-      // No asynchronous work precedes open: retain the originating click's activation.
-      operation = chrome.sidePanel.open({ tabId }).then(async () => {
-        const result = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tabId, {
-          type: OPEN_SIDE_PANEL_TOOLS,
-        });
-        // Studio itself explains an OFF theme and offers display settings. Keep
-        // that entry usable instead of closing the only route back to settings.
-        if (!result?.ok) return;
-      });
+      // No asynchronous work precedes open: retain the originating click's activation. The panel's
+      // page connects to the tab itself and explains an OFF theme there.
+      operation = chrome.sidePanel.open({ tabId });
     } else {
       operation = chrome.windows
         .create({
@@ -59,7 +65,7 @@ export function installSidePanelHost() {
     void operation.then(
       () => respond({ ok: true }),
       (error: unknown) =>
-        respond({ ok: false, error: error instanceof Error ? error.message : 'Studioを開けませんでした。' }),
+        respond({ ok: false, error: error instanceof Error ? error.message : 'エディターを開けませんでした。' }),
     );
     return true;
   });
@@ -73,5 +79,5 @@ export async function requestStudioSurface(
     type,
     ...(tabId === undefined ? {} : { tabId }),
   })) as OpenEditorResponse;
-  if (!result?.ok) throw new Error(result?.error ?? 'Studioを開けませんでした。');
+  if (!result?.ok) throw new Error(result?.error ?? 'エディターを開けませんでした。');
 }

@@ -27,21 +27,21 @@
 
 ```powershell
 $env:PLAYWRIGHT_BROWSERS_PATH = (Resolve-Path '../../.work/browsers').Path
-$env:WW_TEST_EXTENSION_PATH = '.work/g-verified'
+$env:AROUND_TEST_EXTENSION_PATH = '.work/g-verified'
 $liveFlags = @(
-  'WW_LIVE_EDITOR_UX', 'WW_LIVE_YOUTUBE', 'WW_LIVE_3D', 'WW_LIVE_MEDIA',
-  'WW_LIVE_SIDE_PANEL', 'WW_LIVE_SIGNAL_MOTION', 'WW_LIVE_SIGNAL_TIMELINE',
-  'WW_LIVE_STUDIO', 'WW_LAYOUT_PILOT', 'WW_LIVE_STUDIO_WORKSPACE', 'WW_LIVE_VRM'
+  'AROUND_LIVE_EDITOR_UX', 'AROUND_LIVE_YOUTUBE', 'AROUND_LIVE_3D', 'AROUND_LIVE_MEDIA',
+  'AROUND_LIVE_SIDE_PANEL', 'AROUND_LIVE_SIGNAL_MOTION', 'AROUND_LIVE_SIGNAL_TIMELINE',
+  'AROUND_LIVE_STUDIO', 'AROUND_LAYOUT_PILOT', 'AROUND_LIVE_STUDIO_WORKSPACE', 'AROUND_LIVE_VRM'
 )
 foreach ($flag in $liveFlags) { Set-Item -LiteralPath "Env:$flag" -Value '1' }
-# WW_VRM_FILE は利用許諾のあるローカルVRMへ設定する。原本をリポジトリへ入れない。
+# AROUND_VRM_FILE は利用許諾のあるローカルVRMへ設定する。原本をリポジトリへ入れない。
 $liveSpecs = @(Get-ChildItem tests -Filter '*live*.spec.ts' | ForEach-Object { 'tests/' + $_.Name })
 npm run test:e2e -- @liveSpecs --output=.work/premerge-live-01
 ```
 
 VRMは57,185,776 bytesの指定された原本を使用した。原本・そのスクリーンショット・ブラウザープロファイルはコミットしていない。
 サイドパネルの動画再生とフェードは実際に検証できた。ウィンドウ幅1366 / 1920 / 1000も確認した。
-`WW_NATIVE_RESIZE` の手動パネル境界ドラッグ分岐は実行していない。これは人が境界をドラッグして完了ファイルを置く補助確認で、上の12テストの成功件数には影響しない。
+`AROUND_NATIVE_RESIZE` の手動パネル境界ドラッグ分岐は実行していない。これは人が境界をドラッグして完了ファイルを置く補助確認で、上の12テストの成功件数には影響しない。
 
 保存済みの普段の作品については、依頼者から「普段のChromeで確認済み」と回答を受けた。
 
@@ -90,7 +90,7 @@ structureは22回/分。MutationRecord自体の件数とは異なり、同じフ
 | ytd-video-owner-renderer 内のa                  | href属性の更新4                                |
 | #secondary-inner                                | 関連動画とdonation-shelfの追加/削除、それぞれ3 |
 
-採取範囲では、自分たちのUIを示す `web-world-themes-` の消失は記録されなかった。
+採取範囲では、自分たちのUIを示す `around-` の消失は記録されなかった。
 現在のAdapterは、所有領域の外の要素追加・削除や監視対象の属性変更を広くstructureへ分類するため、こうしたネイティブUI更新もrefreshを呼ぶ。
 
 「自分たちのUIが消えた場合だけ」に限定する案は今回は採用しなかった。
@@ -111,7 +111,7 @@ structureは22回/分。MutationRecord自体の件数とは異なり、同じフ
 
 ## マージと検証の範囲
 
-この記録とREADME以外の製品変更はない。対象ソースのCIは[unit / e2eとも成功](https://github.com/a3681299-png/web-world-themes/actions/runs/39723579648)している。
+この記録とREADME以外の製品変更はない。対象ソースのCIは[unit / e2eとも成功](https://github.com/a3681299-png/around/actions/runs/39723579648)している。
 記録追加後のローカル検証も、lint・型チェック・専用出力先へのビルドが成功した。
 unitは310件成功（Playwright 9.0秒、コマンド全体10.780秒）、`tests/page-change.spec.ts` の描画回帰は4件成功（15.7秒）。
 後者は小さなテキスト変更、表面とstyleの再取り付け、所有UIの復元、設定・作品・遷移・ダーク/ライト・全画面の新旧表示一致を含む。

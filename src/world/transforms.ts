@@ -3,7 +3,7 @@ import { centre, placementBounds, rotation, type Point } from './geometry';
 import { emptyMotionState, followMotion, type MotionState } from './motion';
 import { pointerMemory, signalValue } from './signals';
 import { clampUnit, sampleKeyframes } from './keyframes';
-import type { WorldInput, WorldLayout } from './types';
+import { yields, type WorldInput, type WorldLayout } from './types';
 import { SIGNAL_REGISTRY } from '../signals/registry';
 
 /** Authored transforms -> numeric offsets -> motion -> parent composition. */
@@ -26,10 +26,13 @@ export function evaluateTransforms(
   const state = emptyMotionState(),
     pointer = pointerMemory(previous?.pointer, input);
   if (pointer) state.pointer = pointer;
+  const held = (entry: (typeof entries)[number] | undefined, id: string) =>
+    yields(input.environment, id, entry && 'parentId' in entry ? entry.parentId : undefined);
   for (const rule of rules) {
-    if (!rule.enabled || input.environment.reducedMotion || input.environment.safeInteraction) continue;
-    const entry = byId.get(rule.target.layerId),
-      raw = signalValue(rule, input, prepared, pointer);
+    if (!rule.enabled || input.environment.reducedMotion) continue;
+    const entry = byId.get(rule.target.layerId);
+    if (held(entry, rule.target.layerId)) continue;
+    const raw = signalValue(rule, input, prepared, pointer);
     if (!entry || raw === undefined) continue;
     const amount = clampUnit(
       (raw - rule.source.inputRange[0]) / (rule.source.inputRange[1] - rule.source.inputRange[0]),
@@ -58,7 +61,7 @@ export function evaluateTransforms(
       base,
       visible && !input.environment.hidden && !input.environment.holdTransforms ? input.signals.pointer : undefined,
       input.deltaMs,
-      input.environment.reducedMotion || Boolean(input.environment.safeInteraction),
+      input.environment.reducedMotion || held(entry, entry.layer.id),
     );
     state.bodies[entry.layer.id] = followed.body;
     needsFrame ||= followed.needsFrame;
@@ -113,7 +116,7 @@ export function evaluateTransforms(
       (rule) =>
         rule.enabled &&
         !input.environment.reducedMotion &&
-        !input.environment.safeInteraction &&
+        !held(byId.get(rule.target.layerId), rule.target.layerId) &&
         SIGNAL_REGISTRY.needsFrame(rule.source.signal, {
           signals: input.signals,
           timeMs: input.timeMs,

@@ -1,0 +1,25 @@
+{
+  "what": "G1.2 ①②④ (operation-safety:850) on 447b2bf, the same 4-step leave path sent one step at a time; times in ms from sending step 1",
+  "build": "447b2bf, AROUND_BUILD_OUT=.work/rv-dist",
+  "account": { "left": 1047.98, "top": 12, "width": 32, "height": 32 },
+  "path": [
+    { "step": 1, "x": 963, "y": 164 },
+    { "step": 2, "x": 862, "y": 299 },
+    { "step": 3, "x": 761, "y": 435 },
+    { "step": 4, "x": 660, "y": 570 }
+  ],
+  "note": "Step 1 is already 120 px below the button, past the 72 px exit margin, so the 350 ms hysteresis starts at step 1. The original test starts its clock only after the whole mouse.move resolves.",
+  "runs": [
+    { "lastStepAcked": 33, "released": 600 },
+    { "lastStepAcked": 28, "released": 618 },
+    { "lastStepAcked": 32, "released": 525 },
+    { "lastStepAcked": 18, "released": 606 },
+    { "lastStepAcked": 20, "released": 626 }
+  ],
+  "sixthRun": "failed in setup: 作品を表示する check raced the popup's settings load (see r3-plan.md, R3-1 の修正の確認)",
+  "codexFailure": {
+    "source": "docs/benchmarks/r31-fix/windows-g12-timing.json",
+    "leaveMoveDurationMs": 277.35,
+    "releasedAfterMoveResolvedMs": 148
+  }
+}

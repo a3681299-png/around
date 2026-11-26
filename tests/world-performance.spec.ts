@@ -14,7 +14,7 @@ test('measure old/new browser callbacks with identical 32-media / 16-group point
   await image(panel, youtube);
   await save(panel);
   await watch(youtube);
-  const key = 'webWorldThemes.design.youtube';
+  const key = 'around.design.youtube';
   const original = await popup.evaluate(
     async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument,
     key,
@@ -54,10 +54,10 @@ test('measure old/new browser callbacks with identical 32-media / 16-group point
   await expect(youtube.locator(media)).toHaveCount(32);
   const runtime = await isolate(youtube, extensionId);
   await runtime.evaluate(`(() => {
-    globalThis.__wwPerfSamples = [];
-    globalThis.__wwPerfNativeFrame = window.requestAnimationFrame.bind(window);
-    window.requestAnimationFrame = callback => __wwPerfNativeFrame(time => {
-      const start = performance.now(); callback(time); __wwPerfSamples.push(performance.now() - start);
+    globalThis.__aroundPerfSamples = [];
+    globalThis.__aroundPerfNativeFrame = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = callback => __aroundPerfNativeFrame(time => {
+      const start = performance.now(); callback(time); __aroundPerfSamples.push(performance.now() - start);
     });
   })()`);
   const samples: Record<'legacy' | 'runtime', number[]> = { legacy: [], runtime: [] };
@@ -68,17 +68,17 @@ test('measure old/new browser callbacks with identical 32-media / 16-group point
     await expect(youtube.locator(`${media}[data-playback="still"]`)).toHaveCount(32);
     const values = await runtime.evaluate<number[]>(`(async () => {
       for (let i = -15; i < 80; i++) {
-        if (i === 0) __wwPerfSamples = [];
+        if (i === 0) __aroundPerfSamples = [];
         document.dispatchEvent(new PointerEvent('pointermove', { isPrimary: true, pointerId: 17, clientX: 80 + ((i + 15) * 13 % 900), clientY: 120 + ((i + 15) * 7 % 450) }));
-        await new Promise(resolve => __wwPerfNativeFrame(resolve));
+        await new Promise(resolve => __aroundPerfNativeFrame(resolve));
       }
-      return __wwPerfSamples;
+      return __aroundPerfSamples;
     })()`);
     expect(values.length).toBeGreaterThanOrEqual(80);
     expect(values.every((value) => Number.isFinite(value) && value >= 0)).toBe(true);
     samples[mode].push(...values);
     const painted = await youtube
-      .locator('#web-world-themes-decorations .group-content, #web-world-themes-decorations .media')
+      .locator('#around-decorations .group-content, #around-decorations .media')
       .evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).style.maskImage));
     expect(painted).toHaveLength(48);
     if (baseline) expect(painted).toEqual(baseline);

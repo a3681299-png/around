@@ -1,0 +1,14 @@
+[
+  {
+    "fault": "vrma",
+    "test": "mesh motion must be refused",
+    "failed": true,
+    "error": "Missing expected exception."
+  },
+  {
+    "fault": "facts",
+    "test": "measured duration must match asset",
+    "failed": true,
+    "error": "Missing expected exception."
+  }
+]

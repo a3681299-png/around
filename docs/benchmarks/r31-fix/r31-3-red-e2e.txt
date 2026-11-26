@@ -1,0 +1,65 @@
+
+> around@0.1.0 test:e2e
+> node scripts/test.mjs --project=e2e tests/character-editor.spec.ts
+
+
+Running 1 test using 1 worker
+
+(node:42392) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [e2e] › tests\character-editor.spec.ts:10:1 › reimporting the same historical VRM measures its existing record and layer, survives save and clears the advice (9.1s)
+
+
+  1) [e2e] › tests\character-editor.spec.ts:10:1 › reimporting the same historical VRM measures its existing record and layer, survives save and clears the advice
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: getByRole('dialog', { name: 'デザインエディター' }).locator('.character-body')
+    Expected substring: not "体型を測れていません"
+    Received string: "体型を測れていません。読み込み直すと測ります。それまでは、このキャラ専用の動作だけを使います。"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toContainText" getByRole('dialog', { name: 'デザインエディター' }).locator('.character-body') with timeout 5000ms
+      - waiting for getByRole('dialog', { name: 'デザインエディター' }).locator('.character-body')
+        14 × locator resolved to <p role="status" class="character-body model-help">体型を測れていません。読み込み直すと測ります。それまでは、このキャラ専用の動作だけを使います。</p>
+           - unexpected value "体型を測れていません。読み込み直すと測ります。それまでは、このキャラ専用の動作だけを使います。"
+
+
+      56 |   await panel.locator('.model-file').setInputFiles(input);
+      57 |   await expect(panel.locator('.layer')).toHaveCount(1);
+    > 58 |   await expect(panel.locator('.character-body')).not.toContainText('体型を測れていません');
+         |                                                      ^
+      59 |   await panel.locator('.undo').click();
+      60 |   await expect(panel.locator('.character-body')).toContainText('体型を測れていません');
+      61 |   await panel.locator('.redo').click();
+        at WORKTREE\tests\character-editor.spec.ts:58:54
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\character-editor-reimporti-c3974--save-and-clears-the-advice-e2e\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\character-editor-reimporti-c3974--save-and-clears-the-advice-e2e\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\character-editor-reimporti-c3974--save-and-clears-the-advice-e2e\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\character-editor-reimporti-c3974--save-and-clears-the-advice-e2e\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: .work\test-results\e2e\character-editor-reimporti-c3974--save-and-clears-the-advice-e2e\error-context.md
+
+    attachment #7: trace (application/zip) ─────────────────────────────────────────────────────────
+    .work\test-results\e2e\character-editor-reimporti-c3974--save-and-clears-the-advice-e2e\trace.zip
+    Usage:
+
+        npx playwright show-trace .work\test-results\e2e\character-editor-reimporti-c3974--save-and-clears-the-advice-e2e\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [e2e] › tests\character-editor.spec.ts:10:1 › reimporting the same historical VRM measures its existing record and layer, survives save and clears the advice

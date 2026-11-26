@@ -1,12 +1,11 @@
 import { BACKUP_MESSAGE, type BackupReply, type BackupSummary } from './protocol';
 import { BACKUP_LIMITS, BACKUP_MESSAGES } from './schema';
-import { DEFAULT_THEME, themes } from '../themes';
-import { mountPixelFont } from '../ui/pixel-font';
+import settingsStyles from '../settings/settings.css';
+import tokens from '../editor/studio-tokens.css';
 
-mountPixelFont(document);
-document.documentElement.dataset.wwUi = DEFAULT_THEME;
+// The same Around Studio sheet as the settings; here the page itself is the token host.
 const style = document.createElement('style');
-style.textContent = themes[DEFAULT_THEME].editorStylesheets.join('\n');
+style.textContent = tokens.replaceAll(':host', ':root') + settingsStyles;
 document.head.append(style);
 const get = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector)!;
 get('.identity').textContent = '拡張ID: ' + chrome.runtime.id + ' / 読み込み先: ' + chrome.runtime.getURL('');
@@ -88,11 +87,11 @@ get('#backup-export').addEventListener('click', () => {
     downloadURL = URL.createObjectURL(result.file);
     output.href = downloadURL;
     output.download =
-      'web-world-themes-' +
+      'around-' +
       chrome.runtime.id.slice(0, 8) +
       '-' +
       new Date().toISOString().replace(/[:.]/g, '-') +
-      '.wwbackup';
+      '.aroundbackup';
     output.hidden = false;
     output.textContent = '検証済みバックアップを保存（' + describe(result.summary) + '）';
     status.textContent = '書き出しが完了しました。「バックアップを保存」のリンクからファイルを保存してください。';
@@ -127,7 +126,7 @@ restore.addEventListener('click', () => {
     await request('restore', checkedFile);
     invalidate();
     status.textContent =
-      '読み込みが完了しました。YouTubeとStudioを再読み込みして、作品と保存テイクを確認してください。';
+      '読み込みが完了しました。YouTubeとエディターを再読み込みして、作品と保存テイクを確認してください。';
   });
 });
 window.addEventListener('pagehide', () => {

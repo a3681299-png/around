@@ -1,0 +1,1149 @@
+[
+  {
+    "phase": "before",
+    "t": 2548.7000000029802,
+    "x": 405,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2549.89999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2551.2999999970198,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2556.7000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2563.60000000149,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2570.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2577.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2584.2999999970198,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2591.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2598.2999999970198,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2605.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2612.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2620.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2626,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2633,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2639.89999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2647.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2654.2999999970198,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2661.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2669.89999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2675.10000000149,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2682.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2689.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2696.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2702.7000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2710.10000000149,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2716.2999999970198,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2723.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2731.10000000149,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2738,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2744.7000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/0be"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  }
+]

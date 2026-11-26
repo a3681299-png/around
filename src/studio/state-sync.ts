@@ -220,25 +220,29 @@ export function createStudioStateDecoder() {
     sequence = 0;
   return {
     accept(payload: StudioStatePayload): { state: EditorSnapshot; checkpoint: EditorCheckpoint } | undefined {
+      const full = payload.checkpoint ? unpackCheckpoint(payload.checkpoint) : undefined;
       let next = payload.state,
-        history = payload.checkpoint ? unpackCheckpoint(payload.checkpoint)?.history : undefined;
+        history = full?.history;
       let nextSequence = payload.sequence;
       if (payload.delta) {
         const delta = payload.delta;
         if (!state || !checkpoint || delta.base !== sequence || delta.sequence !== sequence + 1)
-          throw new Error('Studio差分の順序が一致しません。再接続してください。');
+          throw new Error('エディターの差分の順序が一致しません。再接続してください。');
         next = applyTreeChange(state, delta.state);
         if (delta.savedFromDocument) next = { ...next, saved: next.document };
         history = applyHistory(checkpoint.history, delta.history, state.document);
         nextSequence = delta.sequence;
       }
       if (!next) return;
-      if (!history || nextSequence === undefined) throw new Error('Studioの初期状態がありません。');
-      const nextCheckpoint: EditorCheckpoint = {
+      if (!history || nextSequence === undefined) throw new Error('エディターの初期状態がありません。');
+      const saved = next.draftBase ? next.draftBase.saved : next.saved;
+      const pending = next.recoveryPending ? (full ?? checkpoint) : undefined;
+      const nextCheckpoint: EditorCheckpoint = pending ?? {
         version: 1,
         siteId: next.document.siteId,
+        origin: { sessionId: next.sessionId, revision: next.checkpointRevision ?? next.revision },
         draft: next.document,
-        ...(next.saved ? { saved: next.saved } : {}),
+        ...(saved ? { saved } : {}),
         selectedIds: [...next.view.selectedIds],
         ...(next.selectedTarget ? { selectedTarget: next.selectedTarget } : {}),
         tool: next.view.tool ?? 'select',

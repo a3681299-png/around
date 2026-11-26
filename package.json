@@ -1,5 +1,5 @@
 {
-  "name": "web-world-themes",
+  "name": "around",
   "version": "0.1.0",
   "private": true,
   "description": "A theme-first Chrome extension for dressing existing websites in another world.",
@@ -10,11 +10,14 @@
   "scripts": {
     "dev": "node scripts/build.mjs --watch",
     "build": "npm run typecheck && node scripts/build.mjs",
+    "build:playground": "node scripts/build-playground.mjs",
+    "living": "node scripts/serve-living-room.mjs",
+    "build:deploy-probe": "node scripts/build-deploy-probe.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.world.json && tsc --noEmit -p tsconfig.editor-core.json",
     "test:setup": "node scripts/test.mjs --install",
     "test": "node scripts/test.mjs",
     "test:unit": "node scripts/test.mjs --project=unit",
-    "test:e2e": "node scripts/test.mjs --project=e2e",
+    "test:e2e": "node scripts/test.mjs --project=e2e --project=g1-other-way --workers=1",
     "check": "npm run lint && npm run build && npm test",
     "lint": "npm run format:check && node scripts/lint.mjs && eslint src tests playwright.config.ts --max-warnings=0",
     "format": "prettier . --write",
@@ -37,6 +40,7 @@
   },
   "dependencies": {
     "@pixiv/three-vrm": "3.5.5",
+    "@pixiv/three-vrm-animation": "3.5.5",
     "three": "0.186.1"
   }
 }

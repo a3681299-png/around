@@ -1,0 +1,51 @@
+{
+  "scenario": {
+    "name": "untouched-artwork",
+    "artwork": true,
+    "expected": true
+  },
+  "id": "pinngekjkfjnbhglabnaingjnimjfkdf",
+  "before": {
+    "around.design.youtube": {
+      "baseThemeId": "retro",
+      "decorations": [],
+      "id": "upgrade-artwork",
+      "rules": [
+        {
+          "kind": "surface-style",
+          "style": {
+            "backgroundColor": "#ddeeff",
+            "borderRadiusPx": 18
+          },
+          "target": "video-card"
+        }
+      ],
+      "schemaVersion": 13,
+      "siteId": "youtube"
+    }
+  },
+  "after": {
+    "around.design.youtube": {
+      "baseThemeId": "retro",
+      "decorations": [],
+      "id": "upgrade-artwork",
+      "rules": [
+        {
+          "kind": "surface-style",
+          "style": {
+            "backgroundColor": "#ddeeff",
+            "borderRadiusPx": 18
+          },
+          "target": "video-card"
+        }
+      ],
+      "schemaVersion": 13,
+      "siteId": "youtube"
+    },
+    "around.skinInk.v1": {
+      "febad9c3": {
+        "light": {}
+      }
+    }
+  }
+}

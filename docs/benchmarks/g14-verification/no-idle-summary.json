@@ -1,0 +1,30 @@
+{
+  "stats": {
+    "startTime": "2026-11-04T04:57:17.789Z",
+    "duration": 20286.897,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  },
+  "rows": [
+    {
+      "repeat": 1,
+      "workerIndex": 0,
+      "status": "failed",
+      "movedAt": 348.69999998807907,
+      "lastCoveredAge": 1078.5,
+      "firstSafeAge": 1085,
+      "maxFrameGap": 14.799999997019768,
+      "pixels": {
+        "x": 520,
+        "y": 245,
+        "width": 70,
+        "height": 40,
+        "pixels": 2800,
+        "different": 0,
+        "idleDifferent": 2800
+      }
+    }
+  ]
+}

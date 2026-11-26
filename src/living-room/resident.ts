@@ -1,0 +1,830 @@
+// The character in the living room: loads a local VRM and its motions, and runs its mind (the
+// director, director.ts), the behaviour (src/characters/approach.ts) and the body (src/renderers/
+// three/living-body.ts) on the page's clock. The character's files are not part of the repository
+// or of a public build: the build copies them only when AROUND_LIVING_CHARACTER names a local folder
+// (docs/living-body.md).
+//
+// Its life (docs/living-life.md, docs/living-mind.md): the director says where to be, what to
+// reach for, what the phone is for and how it feels; the chair gives (chair-give.ts), the bed
+// gives (soft-surface.ts), the phone's screen lights the room and the face (screen-glow.ts), the
+// cord hangs and swings (cord.ts), a bubble over its head says how it feels (emote.ts).
+import {
+  AmbientLight,
+  DirectionalLight,
+  DoubleSide,
+  Mesh,
+  MeshBasicMaterial,
+  PlaneGeometry,
+  SpotLight,
+  Vector3,
+  type Camera,
+  type Object3D,
+  type Scene,
+} from 'three';
+import { prepareVerifiedSource } from '../assets/verified-source';
+import { loadLivingBody, type LivingBody, type LivingBodyFacts } from '../renderers/three/living-body';
+import {
+  approachIntent,
+  startApproach,
+  stepApproach,
+  type ApproachState,
+  type BodyIntent,
+  type HandGoal,
+  type Mood,
+  type Seat,
+} from '../characters/approach';
+import {
+  phoneIntent,
+  startPhone,
+  stepPhone,
+  type HandAim,
+  type HandPlace,
+  type PhoneState,
+} from '../characters/phone-routine';
+import { makeCord, stepCord } from '../characters/cord';
+import type { MindEvent } from '../characters/mind';
+import type { SoftSurface, Press } from './soft-surface';
+import type { ScreenGlow } from './screen-glow';
+import { startChair, stepChair, type ChairState } from './chair-give';
+import { chairRig, type ChairRig } from './chair-rig';
+import { phoneProp, PHONE_SIZE } from './phone-prop';
+import { startDirector, stepDirector, type Orders, type StageAct, type StageView, type Stand } from './director';
+import { emoteBubble } from './emote';
+import type { Vec3 } from '../characters/two-bone-ik';
+import { nearestFloor, standPoint, walkable, type RoomLayout } from '../world/room-life';
+
+interface CharacterManifest {
+  vrm: string;
+  idle: string;
+  walk: string;
+  run?: string;
+  sitDown?: string;
+  sit?: string;
+  standUp?: string;
+  dance?: string;
+}
+
+/** A live going on in the room (docs/living-live.md): where it stands, what it watches, the music. */
+export interface LiveCue {
+  spot: Stand;
+  look: Vec3;
+  /** Where it lies on the floor when it is worn out: its chest, its head the way `heading` points
+   * (toward the screen, which it goes on watching). */
+  rest: Stand;
+  /** 0–1: how lively the music is; the beat clock (whole numbers on the beats) and the tempo. */
+  energy: number;
+  beat: number;
+  bpm: number;
+}
+
+export interface LivingResident {
+  /**
+   * One frame. `stage` is what the desktop offers it (windows to reach, to sit on, a ball);
+   * `live` is there while the room is in live mode. Returns what it does to the desktop this
+   * frame (turns it on, bats the ball…).
+   */
+  update(dt: number, camera: Camera, stage?: StageView, live?: LiveCue): StageAct[];
+  /** A point in the room's metres to notice, walk to and touch; undefined takes it away. */
+  setTarget(target: Vec3 | undefined): void;
+  /** A seat of the room by its id (sit_chair, sit_bed…) to go and sit on; undefined stands up. */
+  sit(spot: string | undefined): boolean;
+  /** How the next thing that appears is met: 'calm' walks over, 'interest' darts at it. */
+  setMood(mood: Mood): void;
+  /** The character's touch was answered (the thing was clicked): it is glad. */
+  cheer(): void;
+  /** The room's own light on it (1 as it is, less at a live: the house lights go down). */
+  houseLights(amount: number): void;
+  /** Its own life (the director) on or off. Off, it stays where `sit` puts it. */
+  live(on: boolean): void;
+  /** Something happened to it (petted, a window flew past…): the mind is told. */
+  notice(event: MindEvent): void;
+  /** How rested it is (1 … 0 worn out), set by hand: for the checks and the recordings. */
+  rested(energy: number): void;
+  /** It is up on the desktop (riding a window, or thrown off one): drawn in front of the UI. */
+  readonly front: boolean;
+  /** At a live, off its feet before the screen: sitting or lying (the view takes the floor in). */
+  readonly resting: 'sit' | 'lie' | undefined;
+  /** What of the scene is the resident (its body, its phone, its bubble). */
+  objects(): Object3D[];
+  /** Where its chest is (the room's metres): what a pointer or a flying window is near. */
+  chest(): Vec3;
+  /** What it is doing and how it is, in words and numbers (the desktop's own window shows it). */
+  readout(): {
+    says: string;
+    mood: string;
+    /** The mood's name in the code (the desktop colours its signs of the resident by it). */
+    feeling: string;
+    energy: number;
+    boredom: number;
+    curiosity: number;
+    social: number;
+  };
+  state(): ApproachState & { target: Vec3 | undefined };
+  /** What the life is doing (the test hook and the recordings). */
+  life(): {
+    step: string;
+    phone: PhoneState['phase'];
+    body: string;
+    chair: ChairState;
+    lit: boolean;
+    /** Where the phone and the head are (the room's metres), the screen's facing. */
+    phoneAt: Vec3;
+    screenFacing: Vec3;
+    head: Vec3;
+  };
+  facts(): LivingBodyFacts;
+  metrics(): { arm: number; shoulderHeight: number; walkSpeed: number; height: number };
+  /**
+   * For measuring the motion (the test hook): starts keeping, each frame, the time, the phase,
+   * where the main joints are and how far the planted feet have slid; returns what was kept since
+   * the last call.
+   */
+  trace(): TraceFrame[];
+}
+export interface TraceFrame {
+  t: number;
+  phase: string;
+  speed: number;
+  slide: number;
+  ground: number;
+  feet: LivingBodyFacts['feet'];
+  joints: ReturnType<LivingBody['joints']>;
+}
+
+/** What of the room the life needs: its scene (for the `pose_` empties and the chair) and the
+ * glow of small screens on its baked surfaces. */
+export interface ResidentRoom {
+  root: Object3D;
+  glow: ScreenGlow;
+}
+
+const bytes = async (url: URL) => {
+  const response = await fetch(url, { credentials: 'omit' });
+  if (!response.ok) throw new Error(`キャラクターの素材を読み込めませんでした：${url.pathname}`);
+  return new Uint8Array(await response.arrayBuffer());
+};
+
+/** How bright the phone's screen lights the character (its spot) and the room (screen-glow). */
+const GLOW = { face: 1.0, room: 0.35 };
+const MOODS = {
+  sleepy: 'ねむい',
+  grumpy: 'ふきげん',
+  surprised: 'びっくり',
+  confused: 'こんらん',
+  happy: 'ごきげん',
+  calm: 'おだやか',
+};
+/** What the page remembers of the viewer between visits: numbers only. */
+const MEMORY_KEY = 'around-living-resident';
+
+const v = (p: readonly number[]) => new Vector3(p[0], p[1], p[2]);
+const tuple = (p: Vector3): Vec3 => [p.x, p.y, p.z];
+
+function remembered(): { affinity: number; visits: number } {
+  try {
+    const saved = JSON.parse(localStorage.getItem(MEMORY_KEY) ?? '{}') as { affinity?: unknown; visits?: unknown };
+    const affinity = typeof saved.affinity === 'number' && Number.isFinite(saved.affinity) ? saved.affinity : 0;
+    const visits = typeof saved.visits === 'number' && Number.isFinite(saved.visits) ? saved.visits : 0;
+    return { affinity: Math.min(1, Math.max(-1, affinity)), visits: Math.max(0, Math.trunc(visits)) };
+  } catch {
+    return { affinity: 0, visits: 0 };
+  }
+}
+function remember(affinity: number, visits: number) {
+  try {
+    localStorage.setItem(MEMORY_KEY, JSON.stringify({ affinity: Math.round(affinity * 100) / 100, visits }));
+  } catch {
+    // (Private browsing: it simply does not remember.)
+  }
+}
+
+export async function loadLivingResident(
+  scene: Scene,
+  base: URL,
+  layout: RoomLayout,
+  soft: SoftSurface,
+  room: ResidentRoom,
+): Promise<LivingResident> {
+  const folder = new URL('character/', base);
+  const manifest = (await (
+    await fetch(new URL('character.json', folder), { credentials: 'omit' })
+  ).json()) as CharacterManifest;
+  const file = (name: string) => {
+    if (!/^[\w.-]{1,80}$/.test(name)) throw new Error('キャラクターの素材の名前が正しくありません。');
+    return new URL(name, folder);
+  };
+  const maybe = (name: string | undefined) => (name ? bytes(file(name)) : undefined);
+  const [vrm, idle, walk, run, sitDown, sit, standUp, dance] = await Promise.all([
+    bytes(file(manifest.vrm)),
+    bytes(file(manifest.idle)),
+    bytes(file(manifest.walk)),
+    maybe(manifest.run),
+    maybe(manifest.sitDown),
+    maybe(manifest.sit),
+    maybe(manifest.standUp),
+    maybe(manifest.dance),
+  ]);
+  const prepared = prepareVerifiedSource(vrm, 'model/gltf-binary');
+  if (!prepared.modelBuffer) throw new Error('キャラクターのモデルを検証できませんでした。');
+  const body = await loadLivingBody(prepared.modelBuffer, {
+    idle,
+    walk,
+    ...(run ? { run } : {}),
+    ...(sitDown ? { sitDown } : {}),
+    ...(sit ? { sit } : {}),
+    ...(standUp ? { standUp } : {}),
+    ...(dance ? { dance } : {}),
+  });
+  scene.add(body.root);
+  // The room's light is baked into unlit materials, so these reach only the character: a cool
+  // night fill and a warmer key from the desk lamp's side.
+  const fill = new AmbientLight(0xb9b4ff, 1.5);
+  const key = new DirectionalLight(0xffe2d0, 1.6);
+  key.position.set(-1.5, 3, 2.5);
+  scene.add(fill, key, key.target);
+
+  // The thing to notice by hand (the test hook): a small lit panel. It always faces the viewer.
+  const marker = new Mesh(
+    new PlaneGeometry(0.14, 0.09),
+    new MeshBasicMaterial({ color: 0x9fe8ff, side: DoubleSide, transparent: true, opacity: 0.9 }),
+  );
+  marker.visible = false;
+  marker.renderOrder = 2;
+  scene.add(marker);
+  const bubble = emoteBubble();
+  scene.add(bubble.object);
+
+  // --- the places of its life -----------------------------------------------------------------
+  const scale = body.metrics.height / 1.19;
+  const pose = (name: string) => {
+    const o = room.root.getObjectByName(name);
+    if (!o) return undefined;
+    o.updateWorldMatrix(true, false);
+    const at = o.getWorldPosition(new Vector3());
+    const forward = new Vector3(0, 0, 1).transformDirection(o.matrixWorld);
+    return { at, heading: Math.atan2(forward.x, forward.z) };
+  };
+  const seatOf = (id: string): Seat | undefined => {
+    const spot = layout.spots.find((s) => s.id === id && s.kind === 'sit');
+    return spot && { x: spot.x, y: spot.y, z: spot.z, heading: spot.heading, stand: standPoint(layout, spot) };
+  };
+  const lieOn = pose('pose_lie_bed');
+  const chairSeat = seatOf('sit_chair');
+  const bedSeat = seatOf('sit_bed');
+  const floorSeat = seatOf('sit_floor');
+  const bedLie: Seat | undefined =
+    bedSeat && lieOn
+      ? { ...bedSeat, lie: { x: lieOn.at.x, y: lieOn.at.y, z: lieOn.at.z, heading: lieOn.heading } }
+      : undefined;
+  // The phone lives on the bed (the desk has the computer).
+  const rest = pose('pose_phone_bed');
+  const front = layout.spots.find((s) => s.id === 'stand_front') ?? layout.spots.find((s) => s.kind === 'stand');
+  const lifeReady = Boolean(chairSeat && bedLie && floorSeat && rest && front);
+
+  // --- the chair --------------------------------------------------------------------------
+  const chairMesh = room.root.getObjectByName('tex_chair') as Mesh | undefined;
+  const chair: ChairRig | undefined = chairMesh?.isMesh ? chairRig(chairMesh) : undefined;
+  let chairState = startChair();
+
+  // --- the phone, its earphones and the cord ---------------------------------------------------
+  const phone = phoneProp();
+  scene.add(phone.root);
+  let phoneState = startPhone();
+  const cord = makeCord([0, 1, 0], { main: 0.42 * scale, branch: 0.3 * scale });
+  // The screen's light on the face, the hands and the hair (the character is lit by lamps). A
+  // point light at the screen itself would burn out the hands holding it (they are a few
+  // centimetres away) long before it reached the face: the light starts a little behind the phone
+  // and shines out through it, in a wide cone, so the hands and the face get about the same.
+  const screenLight = new SpotLight(0xb8c8ff, 0, 2.4, 0.75, 1, 2);
+  scene.add(screenLight, screenLight.target);
+
+  // --- its mind -----------------------------------------------------------------------------
+  // Each visit is another day (the seed), and it remembers how it was treated (the affinity).
+  const memory = remembered();
+  remember(memory.affinity, memory.visits + 1);
+  let director = startDirector(1 + memory.visits, memory.affinity);
+  let savedAffinity = memory.affinity;
+  let living = lifeReady;
+  let orders: Orders | undefined;
+  const pending: MindEvent[] = [];
+  const NOTHING: StageView = { open: false };
+
+  const center = layout.spots.find((spot) => spot.id === 'stand_center') ?? layout.spots[0];
+  const [x, z] = center ? standPoint(layout, center) : [0, 0];
+  let state = startApproach(x, z, center?.heading ?? 0);
+  let target: Vec3 | undefined;
+  let seat: Seat | undefined;
+  let mood: Mood = 'calm';
+  let cheers = 0,
+    tumbles = 0;
+  let tracing = false;
+  const frames: TraceFrame[] = [];
+  let seated = 0,
+    landed = 0,
+    wasHolding = false,
+    lookTo = 0,
+    lookAt: Vec3 | undefined,
+    lastThumb = 0,
+    smileUntil = 0,
+    smileDraws = 0,
+    clock = 0;
+  // An eager dart is a share of the run, not the run itself: the room is a few steps across.
+  const measures = { ...body.metrics, runSpeed: Math.min(body.metrics.runSpeed, body.metrics.walkSpeed * 2.9) };
+
+  const p1 = new Vector3(),
+    p2 = new Vector3(),
+    p3 = new Vector3();
+  const up = new Vector3(0, 1, 0);
+  const budAt = { left: new Vector3(), right: new Vector3() };
+
+  /** A place a hand goes to, with the way its palm and fingers point there. */
+  const placeOf = (place: HandPlace, intent: BodyIntent): { at: Vector3; palm: Vector3; fingers: Vector3 } => {
+    const head = body.head();
+    const headAt = v(head.at);
+    const ahead = new Vector3(Math.sin(intent.heading), 0, Math.cos(intent.heading));
+    const leftward = new Vector3(Math.cos(intent.heading), 0, -Math.sin(intent.heading));
+    const lying = intent.lie > 0.5;
+    switch (place) {
+      case 'rest': {
+        const at = (rest?.at.clone() ?? headAt.clone()).add(p1.set(0, 0.03, 0));
+        // Down onto it, the fingers the way from the body to it.
+        const fingers = at.clone().sub(headAt).setY(0);
+        if (fingers.lengthSq() < 1e-6) fingers.copy(ahead);
+        return { at, palm: new Vector3(0, -1, 0), fingers: fingers.normalize() };
+      }
+      case 'view':
+      case 'grip': {
+        // In front of the face, a little low: sitting, at the chest. Lying on the front, ahead of
+        // the face near the bed. On the back, held up over the face, its top past the head.
+        const onBack = lying ? intent.roll : 0;
+        const before = lying
+          ? headAt
+              .clone()
+              .addScaledVector(ahead, 0.2 * scale)
+              .setY(Math.max(headAt.y - 0.1 * scale, (intent.lieAt?.[1] ?? 0) + 0.08 * scale))
+          : headAt
+              .clone()
+              .addScaledVector(ahead, 0.25 * scale)
+              .addScaledVector(up, -0.17 * scale);
+        // On the back: over the chin, a forearm's height up, the elbows bent at the sides.
+        const above = headAt
+          .clone()
+          .addScaledVector(up, 0.17 * scale)
+          .addScaledVector(ahead, -0.14 * scale);
+        const at = before.lerp(above, onBack);
+        // The right hand a little right, the second hand beside it. (On the back, the body's
+        // left is the other way round as seen from above: `leftward` is the standing body's.)
+        at.addScaledVector(leftward, (place === 'grip' ? 0.035 : -0.012) * scale * (1 - 2 * onBack));
+        const palm = headAt.clone().sub(at).normalize();
+        // (On the back the phone's top points past the head and tips up a little toward the eyes.)
+        const fingers = up
+          .clone()
+          .addScaledVector(ahead, lying ? 0.15 : 0.35)
+          .normalize()
+          .lerp(ahead.clone().addScaledVector(up, 0.45).normalize(), onBack)
+          .normalize();
+        return { at, palm, fingers };
+      }
+      case 'budL':
+      case 'budR': {
+        const at = (place === 'budL' ? budAt.left : budAt.right).clone();
+        return { at, palm: headAt.clone().sub(at).normalize(), fingers: up.clone() };
+      }
+      case 'earL':
+      case 'earR': {
+        const s = place === 'earL' ? 1 : -1;
+        const ear = headAt
+          .clone()
+          .addScaledVector(v(head.left), s * 0.058 * scale)
+          .addScaledVector(v(head.up), 0.005);
+        // The hand just outside the ear, palm in.
+        const at = ear.clone().addScaledVector(v(head.left), s * 0.03 * scale);
+        return { at, palm: v(head.left).multiplyScalar(-s), fingers: v(head.up) };
+      }
+      case 'free':
+        // (Never weighted in: a free hand is the motion's own.)
+        return { at: headAt, palm: new Vector3(0, -1, 0), fingers: ahead };
+    }
+  };
+  const goalOf = (aim: HandAim, intent: BodyIntent): HandGoal | undefined => {
+    if (aim.weight <= 1e-3) return undefined;
+    const a = placeOf(aim.from, intent),
+      b = placeOf(aim.to, intent);
+    const k = aim.k * aim.k * (3 - 2 * aim.k);
+    // On the way between two places the hand passes a little up (an arc, not a slide).
+    const arc = Math.sin(Math.PI * k) * (aim.from === aim.to ? 0 : 0.05);
+    const at = a.at.lerp(b.at, k).addScaledVector(up, arc);
+    return {
+      at: tuple(at),
+      weight: aim.weight,
+      palm: tuple(a.palm.lerp(b.palm, k).normalize()),
+      fingers: tuple(a.fingers.lerp(b.fingers, k).normalize()),
+      grip: aim.grip,
+    };
+  };
+  /** The bed's top and the floor: what the cord comes to rest on. */
+  const groundAt = (gx: number, gz: number) => {
+    let y = layout.floorY;
+    if (lieOn) {
+      const dx = gx - lieOn.at.x,
+        dz = gz - lieOn.at.z;
+      const along = dx * Math.sin(lieOn.heading) + dz * Math.cos(lieOn.heading),
+        across = dx * Math.cos(lieOn.heading) - dz * Math.sin(lieOn.heading);
+      if (Math.abs(across) < 0.68 && along > -1.45 && along < 0.95) y = Math.max(y, lieOn.at.y - 0.02);
+    }
+    return y;
+  };
+  /** Where it knocks on the screen from inside: out from the front of the room, toward the viewer. */
+  let glass: Vec3 | undefined;
+  const knockAt = (camera: Camera): Vec3 => {
+    if (glass) return glass;
+    const stand = front ? standPoint(layout, front) : ([0, 0] as [number, number]);
+    const toward = p1.set(camera.position.x - stand[0], 0, camera.position.z - stand[1]).normalize();
+    // The glass is just past the last of the floor on the way to the viewer: the only places a
+    // hand reaches it from are on the room's side of it, so it knocks facing out.
+    let edge = 0;
+    while (edge < 4 && walkable(layout, stand[0] + toward.x * (edge + 0.1), stand[1] + toward.z * (edge + 0.1)))
+      edge += 0.1;
+    const out = edge + body.metrics.arm * 0.55;
+    glass = [stand[0] + toward.x * out, layout.floorY + body.metrics.shoulderHeight * 1.04, stand[1] + toward.z * out];
+    return glass;
+  };
+
+  return {
+    update(dt, camera, stage = NOTHING, live) {
+      clock += dt;
+      // Its mind: what it is at, what it reaches for, what the phone is for, how it feels.
+      const holding = state.phase === 'hold';
+      let touch: Vec3 | undefined;
+      let acts: StageAct[] = [];
+      if (living) {
+        const stepped = stepDirector(director, {
+          dt,
+          body: state.phase,
+          phone: phoneState.phase,
+          stage,
+          landed: holding && !wasHolding && !target,
+          events: pending.splice(0),
+          knockAt: knockAt(camera),
+          ...(live ? { live: { spot: live.spot, look: live.look, energy: live.energy } } : {}),
+        });
+        director = stepped.state;
+        orders = stepped.orders;
+        acts = orders.acts;
+        touch = orders.touch;
+        if (orders.tumble) tumbles++;
+        if (orders.cheer) cheers++;
+        const place = orders.seat;
+        // (A place to stand is the nearest floor to where it was asked to: the room has things on it.)
+        const asked = orders.stand;
+        const floor = asked && nearestFloor(layout, asked.x, asked.z);
+        const stand = asked && floor ? { ...asked, x: floor[0], z: floor[1] } : undefined;
+        // At a live, off its feet (docs/living-live.md): sitting on the floor where it stood, the
+        // screen before it; or lying on its front, a step back from the screen. It comes to the
+        // lying place from the viewer's side, so that it drops forward toward the screen.
+        const spot = live && nearestFloor(layout, live.spot.x, live.spot.z);
+        const from = live && nearestFloor(layout, live.rest.x, live.rest.z + 0.8 * scale);
+        const liveSeat: Seat | undefined =
+          !live || !orders.rest
+            ? undefined
+            : orders.rest === 'sit'
+              ? spot && {
+                  x: spot[0],
+                  y: floorSeat?.y ?? layout.floorY + 0.14,
+                  z: spot[1],
+                  heading: live.spot.heading,
+                  stand: spot,
+                }
+              : from && {
+                  x: from[0],
+                  y: layout.floorY,
+                  z: from[1],
+                  heading: live.rest.heading,
+                  stand: from,
+                  lie: {
+                    x: live.rest.x,
+                    // (On the rug, not in it.)
+                    y: layout.floorY + 0.03,
+                    z: live.rest.z,
+                    heading: live.rest.heading,
+                    prone: true,
+                  },
+                };
+        seat =
+          target || touch || orders.perch
+            ? undefined
+            : liveSeat
+              ? liveSeat
+              : stand
+                ? {
+                    x: stand.x,
+                    y: layout.floorY,
+                    z: stand.z,
+                    // It watches the screen; dancing, it turns to whoever is watching it.
+                    heading:
+                      orders.music?.move === 'dance'
+                        ? Math.atan2(camera.position.x - stand.x, camera.position.z - stand.z)
+                        : stand.heading,
+                    stand: [stand.x, stand.z],
+                    standing: true,
+                  }
+                : place === 'bed'
+                  ? bedLie
+                  : place === 'chair'
+                    ? chairSeat
+                    : place === 'floor' && floorSeat
+                      ? // Sulking, it sits with its back to the room's open side.
+                        { ...floorSeat, heading: floorSeat.heading + (orders.backTurned ? Math.PI : 0) }
+                      : undefined;
+        // How it was treated is kept for the next visit.
+        if (Math.abs(director.mind.affinity - savedAffinity) > 0.02) {
+          savedAffinity = director.mind.affinity;
+          remember(savedAffinity, memory.visits + 1);
+        }
+      } else {
+        orders = undefined;
+        pending.length = 0;
+      }
+      wasHolding = holding;
+      const goal = target ?? touch;
+      phoneState = stepPhone(phoneState, {
+        dt,
+        use: !target && orders?.phone === 'use',
+        buds: true,
+        // (A thing put before it by hand comes first: the phone is lowered, not put away.)
+        hold: Boolean(target) || orders?.phone === 'hold',
+      });
+      const held = phoneIntent(phoneState);
+      state = stepApproach(state, {
+        dt,
+        layout,
+        body: measures,
+        mood: target ? mood : orders?.eager ? 'interest' : 'calm',
+        cheer: cheers,
+        tumble: tumbles,
+        ...(goal ? { target: goal } : {}),
+        ...(seat ? { seat } : {}),
+        ...(!target && orders?.perch ? { perch: orders.perch } : {}),
+      });
+      const intent = approachIntent(state, goal);
+      // Music in the body (a live): the dance, and the beat it moves on.
+      if (orders?.music && live)
+        intent.music = { dance: orders.music.dance, groove: orders.music.groove, beat: live.beat, bpm: live.bpm };
+      // The eyes go to what has its attention before the body does. (Dancing with its back to the
+      // screen, it does not crane round at it.)
+      const watching = orders?.look && orders.music?.move !== 'dance' ? orders.look : undefined;
+      if (watching) lookAt = watching;
+      lookTo += ((watching ? 1 : 0) - lookTo) * (1 - Math.exp(-5 * dt));
+      if (lookAt && lookTo > intent.lookWeight) {
+        intent.look = lookAt;
+        intent.lookWeight = lookTo;
+      }
+      // How it feels, and sleep (asleep, nothing swings and nothing is looked at).
+      const asleep = orders?.asleep ? 1 : 0;
+      if (orders) {
+        intent.feel = orders.feel;
+        intent.sleep = asleep;
+        intent.joy = Math.max(intent.joy, orders.feel.joy * 0.85);
+        if (asleep) intent.kickLegs = 0;
+      }
+      const onChair = Boolean(
+        seat && chairSeat && !seat.lie && Math.hypot(seat.x - chairSeat.x, seat.z - chairSeat.z) < 0.05,
+      );
+
+      // The chair under a seated body: a drop onto it kicks it; the body rides its seat.
+      if (chair) {
+        const drop = onChair && intent.seated > 0.55 && seated <= 0.55;
+        chairState = stepChair(chairState, {
+          dt,
+          seated: onChair ? intent.seated : 0,
+          ...(drop ? { impact: 1.4 } : {}),
+          lean: onChair ? 0.35 : 0.2,
+        });
+        chair.update(chairState);
+      }
+      // The bed under a body that sits on it or lies on it.
+      let sunk = 0;
+      const perched = intent.seat !== undefined && !seat;
+      if (intent.lieAt && intent.lie > 0.01) {
+        if (intent.landed > 0.5 && landed <= 0.5) soft.kick(3.4);
+        const at = intent.lieAt;
+        const d = [Math.sin(intent.heading), Math.cos(intent.heading)] as const,
+          s = [Math.cos(intent.heading), -Math.sin(intent.heading)] as const;
+        const along = (k: number, side = 0): Press['at'] => [
+          at[0] + d[0] * k * scale + s[0] * side * scale,
+          at[1],
+          at[2] + d[1] * k * scale + s[1] * side * scale,
+        ];
+        // The legs swing up from the knees: a lifted knee presses less.
+        const knee = 0.55 * (1 - 0.4 * intent.kickLegs);
+        const contacts: Press[] = [
+          { at: along(0) },
+          { at: along(-0.16) },
+          { at: along(-0.3), share: 0.9 },
+          { at: along(-0.45), share: 0.6 },
+          { at: along(-0.58), share: knee },
+          { at: along(0.17, 0.13), share: 0.45 },
+          { at: along(0.17, -0.13), share: 0.45 },
+        ];
+        sunk = soft.press(contacts, intent.lie, dt);
+        intent.lieAt = [at[0], at[1] - sunk, at[2]];
+      } else if (!onChair && !perched) {
+        if (intent.seated > 0.55 && seated <= 0.55) soft.kick(2.2);
+        sunk = soft.press(intent.seat, intent.seated, dt);
+      } else soft.press(undefined, 0, dt);
+      landed = intent.landed;
+      seated = intent.seated;
+      // The room's marker is on the seat's surface; the hip joints rest a little above it (the
+      // body sits on the surface, not in it), less what the surface has given.
+      if (intent.seat) {
+        const at: Vec3 = [intent.seat[0], intent.seat[1] + body.metrics.height * 0.06 - sunk, intent.seat[2]];
+        intent.seat = onChair && chair ? chair.carry([at[0], at[1] - chairState.drop, at[2]]) : at;
+      }
+
+      // The phone in the hands: where each hand goes, the thumb, the eyes on the screen.
+      const hold: NonNullable<BodyIntent['hold']> = {};
+      const leftGoal = goalOf(held.left, intent),
+        rightGoal = goalOf(held.right, intent);
+      if (leftGoal) hold.left = leftGoal;
+      if (rightGoal) hold.right = rightGoal;
+      // (While a thing in the room is being touched, the arm is the touch's: the phone waits.)
+      if (!(intent.reach && intent.reachWeight !== 0)) intent.hold = hold;
+      intent.thumb = held.thumb;
+      if (held.look > intent.lookWeight && phone.frame.at.lengthSq() > 0) {
+        intent.look = tuple(phone.frame.at);
+        intent.lookWeight = held.look;
+      }
+      // Now and then something on the screen makes it smile (and its tail wag).
+      const tapped = held.thumb > 0.5 && lastThumb <= 0.5;
+      lastThumb = held.thumb;
+      if (tapped && (smileDraws++ * 0.618) % 1 < 0.3) smileUntil = clock + 1.6;
+      if (clock < smileUntil) intent.joy = Math.max(intent.joy, 0.75);
+
+      body.update(intent, dt, layout.floorY, [camera.position.x, camera.position.y, camera.position.z]);
+      const head = body.head();
+      bubble.update(orders?.emote, p1.set(head.at[0], head.at[1], head.at[2]), body.metrics.height, dt);
+
+      // The phone where it is: in the right hand, or on its rest.
+      if (held.phone === 'hand') {
+        const hand = body.hand('right');
+        const fingers = v(hand.fingers),
+          palm = v(hand.palm);
+        phone.place(
+          v(hand.wrist)
+            .addScaledVector(fingers, PHONE_SIZE.height * 0.5)
+            .addScaledVector(palm, 0.011 * scale),
+          fingers,
+          palm,
+        );
+      } else if (rest)
+        phone.place(
+          p1.copy(rest.at).add(p2.set(0, PHONE_SIZE.depth / 2 + 0.002, 0)),
+          p3.set(Math.sin(rest.heading), 0, Math.cos(rest.heading)),
+          up,
+        );
+      // The buds: on the phone, in the left hand's fingers, or in the ears.
+      for (const [side, holder] of [
+        [1, held.budL],
+        [-1, held.budR],
+      ] as const) {
+        const at = side > 0 ? budAt.left : budAt.right;
+        let out: Vector3;
+        if (holder === 'ear') {
+          at.copy(v(head.at))
+            .addScaledVector(v(head.left), side * 0.056 * scale)
+            .addScaledVector(v(head.up), 0.005);
+          out = v(head.left).multiplyScalar(side);
+        } else if (holder === 'hand') {
+          const hand = body.hand('left');
+          at.copy(v(hand.wrist))
+            .addScaledVector(v(hand.fingers), 0.07 * scale)
+            .addScaledVector(v(hand.palm), 0.012);
+          out = v(hand.palm).negate();
+        } else {
+          phone.budHome(side, at);
+          out = phone.frame.facing.clone();
+        }
+        phone.placeBud(side, at, out);
+      }
+      stepCord(
+        cord,
+        dt,
+        new Map([
+          [cord.jack, tuple(phone.jack(p1))],
+          [cord.budL, tuple(budAt.left)],
+          [cord.budR, tuple(budAt.right)],
+        ]),
+        groundAt,
+      );
+      phone.drawCord(cord);
+
+      // The screen's light: on the character (a lamp) and on the room's baked surfaces.
+      const light = phone.screen(held.screen, tapped, dt);
+      if (light.power > 0.01) {
+        const at = p1.copy(phone.frame.at).addScaledVector(phone.frame.facing, 0.03);
+        screenLight.position.copy(phone.frame.at).addScaledVector(phone.frame.facing, -0.4);
+        screenLight.target.position.copy(phone.frame.at).addScaledVector(phone.frame.facing, 1);
+        screenLight.target.updateMatrixWorld();
+        screenLight.color.copy(light.color);
+        screenLight.intensity = GLOW.face * light.power;
+        room.glow.set(0, at, phone.frame.facing, light.color, GLOW.room * light.power);
+      } else {
+        screenLight.intensity = 0;
+        room.glow.off(0);
+      }
+
+      if (tracing && frames.length < 20000)
+        frames.push({
+          t: state.t,
+          phase: state.phase,
+          speed: state.mover.speed,
+          slide: body.facts().slide,
+          ground: body.facts().groundSlide,
+          feet: body.facts().feet,
+          joints: body.joints(),
+        });
+      marker.visible = Boolean(target);
+      if (target) {
+        marker.position.set(target[0], target[1], target[2]);
+        marker.quaternion.copy(camera.quaternion);
+      }
+      return acts;
+    },
+    setTarget(next) {
+      target = next && next.every(Number.isFinite) ? [next[0], next[1], next[2]] : undefined;
+    },
+    sit(id) {
+      living = false;
+      const spot = id ? layout.spots.find((s) => s.id === id && s.kind === 'sit') : undefined;
+      seat =
+        spot && sit
+          ? { x: spot.x, y: spot.y, z: spot.z, heading: spot.heading, stand: standPoint(layout, spot) }
+          : undefined;
+      if (id === 'lie_bed' && bedLie) seat = bedLie;
+      return Boolean(seat);
+    },
+    live(on) {
+      // Stopped, it is left where it is, standing: not sent on to the place its mind had chosen.
+      if (living && !on) seat = undefined;
+      living = on && lifeReady;
+    },
+    notice(event) {
+      if (living && pending.length < 8) pending.push(event);
+    },
+    rested(energy) {
+      director = { ...director, mind: { ...director.mind, energy: Math.min(1, Math.max(0, energy)) } };
+    },
+    get resting() {
+      return living ? orders?.rest : undefined;
+    },
+    get front() {
+      return (
+        state.phase === 'perchUp' || state.phase === 'perch' || state.phase === 'perchDown' || state.phase === 'tumble'
+      );
+    },
+    objects: () => [body.root, phone.root, bubble.object],
+    chest() {
+      const head = body.head().at;
+      return [head[0], head[1] - body.metrics.height * 0.22, head[2]];
+    },
+    readout() {
+      const mind = director.mind;
+      return {
+        says: orders?.says ?? 'じっとしている',
+        mood: orders ? MOODS[orders.mood] : '',
+        feeling: orders?.mood ?? 'calm',
+        energy: mind.energy,
+        boredom: mind.boredom,
+        curiosity: mind.curiosity,
+        social: mind.social,
+      };
+    },
+    setMood(next) {
+      mood = next === 'interest' ? 'interest' : 'calm';
+    },
+    houseLights(amount) {
+      fill.intensity = 1.5 * amount;
+      key.intensity = 1.6 * amount;
+    },
+    cheer() {
+      cheers++;
+    },
+    state: () => ({ ...state, target }),
+    life: () => ({
+      step: orders?.activity ?? 'manual',
+      phone: phoneState.phase,
+      body: state.phase,
+      chair: { ...chairState },
+      lit: room.glow.lit,
+      phoneAt: tuple(phone.frame.at),
+      screenFacing: tuple(phone.frame.facing),
+      head: body.head().at,
+    }),
+    facts: () => body.facts(),
+    trace() {
+      tracing = true;
+      return frames.splice(0);
+    },
+    metrics: () => ({ ...body.metrics }),
+  };
+}

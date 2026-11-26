@@ -15,15 +15,19 @@ import {
 } from '../src/assets/studio-transfer-protocol';
 
 async function openStudio(context: BrowserContext, popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  // check() reads the state before it waits; until settings load the popup shows a disabled,
+  // unchecked placeholder (then ON), so a check() started early would turn it OFF.
+  const showArtwork = popup.getByRole('switch', { name: '作品を表示する' });
+  await expect(showArtwork).toBeEnabled();
+  await showArtwork.check();
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
-  await popup.locator('#creator-studio-open').evaluate((button: HTMLButtonElement) => button.click());
+  await popup.locator('#creator-editor-window').evaluate((button: HTMLButtonElement) => button.click());
   const studio = await opened;
   await studio.setViewportSize({ width: 1440, height: 1000 });
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-  return { studio, panel: studio.locator('#web-world-themes-creator') };
+  return { studio, panel: studio.locator('#around-creator') };
 }
 async function authorize(studio: Page, sizes: number[]) {
   const session = 'studio-upload-' + crypto.randomUUID();
@@ -33,7 +37,7 @@ async function authorize(studio: Page, sizes: number[]) {
       return {
         ownerTabId,
         response: await chrome.runtime.sendMessage({
-          type: 'web-world-themes:assets',
+          type: 'around:assets',
           action,
           session,
           ownerTabId,
@@ -47,7 +51,7 @@ async function authorize(studio: Page, sizes: number[]) {
 }
 async function release(studio: Page, session: string) {
   const result = await studio.evaluate(
-    (session) => chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'release', session }),
+    (session) => chrome.runtime.sendMessage({ type: 'around:assets', action: 'release', session }),
     session,
   );
   expect(result.ok).toBe(true);
@@ -81,7 +85,7 @@ async function rawTransfer(
           if (value.type === 'challenge') {
             void chrome.runtime
               .sendMessage({
-                type: 'web-world-themes:assets',
+                type: 'around:assets',
                 action: args.confirm,
                 session: args.session,
                 ownerTabId: args.ownerTabId,
@@ -184,7 +188,7 @@ test('non-Studio pages cannot authorize or consume a Studio binary grant; owner 
   expect(upload.response.ok).toBe(true);
   const outside = await popup.evaluate(
     ({ session, ownerTabId, action, size }) =>
-      chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action, session, ownerTabId, sizes: [size] }),
+      chrome.runtime.sendMessage({ type: 'around:assets', action, session, ownerTabId, sizes: [size] }),
     { session: upload.session, ownerTabId: upload.ownerTabId, action: STUDIO_TRANSFER_AUTHORIZE, size: bytes.length },
   );
   expect(outside.ok).toBe(false);
@@ -195,7 +199,7 @@ test('non-Studio pages cannot authorize or consume a Studio binary grant; owner 
   expect(tooMany.response.ok).toBe(false);
   const wrongOwner = await studio.evaluate(
     ({ session, ownerTabId, action, size }) =>
-      chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action, session, ownerTabId, sizes: [size] }),
+      chrome.runtime.sendMessage({ type: 'around:assets', action, session, ownerTabId, sizes: [size] }),
     {
       session: 'studio-upload-' + crypto.randomUUID(),
       ownerTabId: upload.ownerTabId + 10000,
@@ -262,7 +266,7 @@ for (const stage of ['before save', 'after save before reply'] as const)
       expect(await uploadLeases(popup)).toHaveLength(1);
     }
     await stopWorker(context, studio);
-    await expect(youtube.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(1);
+    await expect(youtube.locator('#around-decorations [data-image-id]')).toHaveCount(1);
     await expect.poll(() => uploadLeases(popup)).toEqual([]);
     const probe = await studio.evaluate(() => (globalThis as any).__studioImportProbe as StudioImportProbe);
     expect(probe.fileReads).toBe(2);
@@ -288,7 +292,7 @@ test('Studio uses the existing JSON importer when native transfer is unavailable
     Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: undefined }),
   );
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
-  await expect(youtube.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(1);
+  await expect(youtube.locator('#around-decorations [data-image-id]')).toHaveCount(1);
   await expect.poll(() => uploadLeases(popup)).toEqual([]);
   const probe = await studio.evaluate(() => (globalThis as any).__studioImportProbe as StudioImportProbe);
   expect(probe.nativeTransfers).toEqual([]);
@@ -343,5 +347,5 @@ test('large fallback still stores through bounded chunks and releases on interru
   await studio.getByRole('button', { name: '接続を解除', exact: true }).click();
   await expect.poll(() => uploadLeases(popup)).toEqual([]);
   await studio.evaluate(() => (globalThis as any).__studioImportProbe.resume());
-  await expect(youtube.locator('#web-world-themes-decorations .model-media')).toHaveCount(0);
+  await expect(youtube.locator('#around-decorations .model-media')).toHaveCount(0);
 });

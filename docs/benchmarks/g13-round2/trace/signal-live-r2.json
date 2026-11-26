@@ -1,0 +1,319 @@
+{
+  "completed": false,
+  "checks": {
+    "stage": "wheel scroll",
+    "gifRuleEditedAndSaved": true,
+    "pointer": {
+      "point": {
+        "x": 36,
+        "y": 456.5
+      },
+      "gif": {
+        "x": 563.4375,
+        "y": 313.34375,
+        "width": 260,
+        "height": 195
+      },
+      "gifId": "image-2646cfe1-abd4-4c96-b14a-0ae3252c2c2c",
+      "under": [
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.25,
+          "hit": "div",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "hidden",
+            "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.75,
+          "hit": "div",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "div",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "img#img",
+          "control": "button#author-thumbnail-button",
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "div#primary",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "div#author-thumbnail",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": null,
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        }
+      ]
+    },
+    "scrollSpeedAndDirectionIndependent": true,
+    "wheel": {
+      "events": 24,
+      "frames": 150,
+      "hidden": 125,
+      "unexplained": 125,
+      "explainedSpans": [],
+      "traced": false,
+      "stops": ["ページの操作部品が動いている間は、絵の表示を止めています。", ""],
+      "near": [
+        [],
+        [
+          [16, 393, 36, 39],
+          [68, 393, 63, 20],
+          [60, 439, 32, 32],
+          [52, 483, 115, 40]
+        ],
+        [
+          [60, 371, 32, 32],
+          [16, 419, 36, 39],
+          [68, 419, 40, 20],
+          [60, 465, 32, 32]
+        ],
+        [
+          [16, 393, 36, 39],
+          [68, 393, 63, 20],
+          [60, 439, 32, 32],
+          [52, 483, 115, 40]
+        ],
+        [],
+        []
+      ],
+      "samples": [
+        {
+          "t": 10766.7,
+          "scrollY": 90,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 10870.8,
+          "scrollY": 180,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 11030.6,
+          "scrollY": 270,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 11218,
+          "scrollY": 450,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 11357,
+          "scrollY": 540,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 11481.9,
+          "scrollY": 720,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 11634.7,
+          "scrollY": 810,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 11752.7,
+          "scrollY": 900,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 11898.6,
+          "scrollY": 1080,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 12037.3,
+          "scrollY": 990,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 12176.2,
+          "scrollY": 900,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 12329,
+          "scrollY": 720,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 12440.2,
+          "scrollY": 630,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 12606.7,
+          "scrollY": 450,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 13009.5,
+          "scrollY": 270,
+          "visible": false,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        }
+      ]
+    }
+  },
+  "browser": "143.0.7499.4"
+}

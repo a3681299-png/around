@@ -1,17 +1,19 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openSidePanelFromIcon } from './helpers/editor';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
 import { declinePromotion } from './helpers/youtube-live';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
 import type { DesignDocument } from '../src/design/types';
 
 test('real YouTube: official Studio configures GIF pursuit, records/replays/loads motion and preserves native controls', async () => {
-  test.skip(process.env.WW_LIVE_SIGNAL_MOTION !== '1', 'Explicit real YouTube v2 verification.');
+  test.skip(process.env.AROUND_LIVE_SIGNAL_MOTION !== '1', 'Explicit real YouTube v2 verification.');
   test.setTimeout(180_000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-motion-live-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-motion-live-')), false, {
     headed: true,
     width: 1920,
   });
@@ -31,7 +33,7 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     stage('launch');
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((node) => (node as HTMLElement & { data?: { id: string } }).data?.id ?? node.id);
     await manager.close();
@@ -40,14 +42,13 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-    await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-    const local = page.locator('#web-world-themes-creator');
-    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
+    await openSidePanelFromIcon(popup, page);
+    const local = page.locator('#around-creator');
     const panel = await sidePanelDriver(context, page, id),
-      ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+      ui = 'document.querySelector("#around-creator").shadowRoot';
     stage('GIF pursuit');
     await panel.files([path.resolve('tests/fixtures/motion/petal.gif')], '.animation-file');
     await expect.poll(() => panel.text('.selected-count')).toBe('1個選択中');
@@ -59,10 +60,7 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     await panel.click('.save');
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     const design = await popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
     expect(design.decorations[0]!.motion).toMatchObject({
       maxSpeed: 360,
@@ -71,7 +69,7 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
       orientToMovement: true,
     });
     const image = page.locator(
-      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .image',
+      ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) .image',
     );
     // Screen coordinates: style.left/top are exact CSS values relative to the paint container
     // holding the layer (the player for the player-local plane), so add that container's origin.
@@ -123,10 +121,10 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     await panel.click('.take-store');
     await expect.poll(() => panel.text('.take-saved')).toBe('テイク保存済み');
     const library = await panel.evaluate<{ id: string }[]>(
-      'chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"list",siteId:"youtube"}).then(r=>r.value)',
+      'chrome.runtime.sendMessage({type:"around:signal-takes",action:"list",siteId:"youtube"}).then(r=>r.value)',
     );
     const take = await panel.evaluate<SignalTake>(
-      `chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"get",siteId:"youtube",id:${JSON.stringify(library[0]!.id)}}).then(r=>r.value)`,
+      `chrome.runtime.sendMessage({type:"around:signal-takes",action:"get",siteId:"youtube",id:${JSON.stringify(library[0]!.id)}}).then(r=>r.value)`,
     );
     expect(take.inputs.length).toBeGreaterThan(20);
     expect(JSON.stringify(take)).not.toMatch(/https?:|cookie|authorization|asset-|decorations|signalRules/);
@@ -200,7 +198,7 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
       const aim = await page.locator('#movie_player').evaluate((player, from) => {
         const r = player.getBoundingClientRect();
         const controls = [...document.querySelectorAll('button, a[href], [role="button"], [role="slider"], input')]
-          .filter((e) => !e.closest('[id^="web-world-themes"]') && getComputedStyle(e).visibility !== 'hidden')
+          .filter((e) => !e.closest('[id^="around"]') && getComputedStyle(e).visibility !== 'hidden')
           .map((e) => e.getBoundingClientRect())
           .filter((b) => b.width > 0 && b.height > 0);
         const gap = (x: number, y: number) =>
@@ -238,10 +236,10 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
       await player.locator('.ytp-settings-button').click();
     }
     report.checks.windowWidthsAndSettingsClicks = [1366, 1920, 1000];
-    await popup.locator('#effect-strength').fill('0');
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
       ),
     ).toHaveCount(0);
     await expect(local).toHaveCount(0);

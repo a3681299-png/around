@@ -35,7 +35,7 @@ export function createSharedModelPool(maxBytes = 224 * 1024 * 1024) {
     e.bitmaps.forEach((b) => b.close());
   }
   const texturesOf = (gltf: GLTF) => {
-    const textures = new Set<Texture>(gltf.userData['wwTextures'] ?? []);
+    const textures = new Set<Texture>(gltf.userData['aroundTextures'] ?? []);
     gltf.scene.traverse((n) => {
       if (!(n instanceof Mesh)) return;
       for (const m of Array.isArray(n.material) ? n.material : [n.material]) {
@@ -110,7 +110,7 @@ export function createSharedModelPool(maxBytes = 224 * 1024 * 1024) {
           });
           const replaced = new Set<ImageBitmap>();
           for (const t of texturesOf(gltf)) {
-            const index = t.userData['wwTextureIndex'];
+            const index = t.userData['aroundTextureIndex'];
             if (!Number.isSafeInteger(index)) continue;
             const found = entry.sources.get(index);
             if (found) {

@@ -1,0 +1,188 @@
+/* 表示設定 as a Around Studio around-panel: the same sheet in the action popup and in the panel the in-video
+   icon opens. Tokens come from editor/studio-tokens.css (declared on :host in the shadow root and on
+   :root in the popup). Ruled controls, cobalt the one accent, nothing below 12px. */
+.around-editor {
+  display: block;
+  font: 13px/20px var(--font-ui);
+  color: var(--ink);
+  background: var(--surface);
+}
+.around-editor *,
+.around-editor *::before,
+.around-editor *::after {
+  box-sizing: border-box;
+}
+.around-editor .around-titlebar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 52px;
+  padding: 0 var(--space-12) 0 var(--space-20);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.around-editor .around-titlebar h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 700;
+}
+.around-editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20) var(--space-20);
+}
+.around-editor button {
+  font: inherit;
+  font-size: 13px;
+  min-height: var(--control);
+  padding: 0 var(--space-12);
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color calc(var(--around-frame) * 2) steps(2, end);
+}
+.around-editor button:hover:not(:disabled) {
+  background: var(--cobalt-wash);
+}
+.around-editor button:disabled {
+  color: var(--ink-faint);
+  cursor: default;
+}
+.around-editor button.primary {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+  font-weight: 700;
+}
+.around-editor button.primary:disabled {
+  border-color: var(--line-control);
+  background: var(--surface-sunk);
+  color: var(--ink-faint);
+}
+.around-editor .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control);
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-muted);
+}
+.around-editor :focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
+}
+.around-editor .creator-entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-bottom: var(--space-12);
+  border-bottom: 1px solid var(--line);
+}
+.around-editor .editor-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+}
+.around-editor .status {
+  margin: 0;
+  min-height: 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.around-editor .status:empty {
+  display: none;
+}
+.around-editor .control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  min-height: var(--control);
+}
+.around-editor .toggle-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.around-editor output {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+.around-editor fieldset {
+  margin: 0;
+  padding: 0 0 var(--space-12);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+.around-editor legend {
+  padding: 0;
+  margin-bottom: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+.around-editor .feature-description {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+/* around-toggle: a ruled track, cobalt when on, a knob that steps across in 3 frames. */
+.around-editor input[type='checkbox'][role='switch'] {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 20px;
+  margin: 0;
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunk);
+  cursor: pointer;
+}
+.around-editor input[type='checkbox'][role='switch']::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+  transition: transform calc(var(--around-frame) * 3) steps(3, end);
+}
+.around-editor input[type='checkbox'][role='switch']:checked {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+}
+.around-editor input[type='checkbox'][role='switch']:checked::after {
+  background: var(--on-cobalt);
+  transform: translateX(12px);
+}
+.around-editor input[type='checkbox'][role='switch']:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.around-editor a {
+  color: var(--cobalt);
+}
+.around-editor details summary {
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .around-editor button,
+  .around-editor input[type='checkbox'][role='switch']::after {
+    transition: none;
+  }
+}

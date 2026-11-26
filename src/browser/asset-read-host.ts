@@ -46,7 +46,7 @@ export function createAssetReadHost(doc: Document) {
     next.hidden = true;
     next.tabIndex = -1;
     next.setAttribute('aria-hidden', 'true');
-    next.dataset.wwAssetReader = '';
+    next.dataset.aroundAssetReader = '';
     next.src = chrome.runtime.getURL(ASSET_READ_FRAME);
     loading = new Promise<HTMLIFrameElement>((resolve, reject) => {
       let loaded = false;

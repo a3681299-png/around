@@ -71,7 +71,7 @@ CtrlまたはShiftを押してクリックすると、選択への追加・解�
 ## 責務
 
 - `sites/youtube-cards.ts`: 通常動画の対象識別。ホーム、検索結果、おすすめの旧／新コンポーネントを扱う。Shorts、チャンネル、プレイリスト、案内、識別できる広告枠は除外する。
-- `sites/youtube.ts`: `data-ww-surface~="video-card"` を付与する。SPA、リンクの遅延追加・再利用、削除に追従し、入れ子のカードを重複して編集対象にしない。
+- `sites/youtube.ts`: `data-around-surface~="video-card"` を付与する。SPA、リンクの遅延追加・再利用、削除に追従し、入れ子のカードを重複して編集対象にしない。
 - `design/types.ts` / `schema.ts`: バージョン付きのデータ形式と検証。任意CSS、セレクタ、JavaScript、外部URLを受け付けない。
 - `design/renderer.ts`: 登録済みsurfaceと検証済み値からCSSを生成する。背景は既存グラデーションを置き換え、枠線は寸法を変えない内側の影で描く。角丸はカードの外枠に適用し、画像の寸法や操作部分のクリップは変更しない。
 - `design/image-renderer.ts`: 素材共通の配置、独立した選択枠、操作ハンドル、ガイドとポインター操作。
@@ -89,7 +89,7 @@ CtrlまたはShiftを押してクリックすると、選択への追加・解�
 
 ## 保存形式
 
-保存キーはサイト別の `webWorldThemes.design.youtube`。初期検証は1サイト1文書とし、テーマ一覧や素材ライブラリはまだ作らない。
+保存キーはサイト別の `around.design.youtube`。初期検証は1サイト1文書とし、テーマ一覧や素材ライブラリはまだ作らない。
 
 ```json
 {
@@ -172,4 +172,4 @@ Manifestの権限は従来の `storage` のみ。素材をYouTubeの保存領域
 
 `tests/motion-data.spec.ts` と `tests/motion-editor.spec.ts` は3形式の入力、Lottieの安全性、実フレームの描画、再生設定、保存・再起動、停止・復帰、複数素材の負荷を検証する。
 
-専用worktreeではテスト用ブラウザーを `PLAYWRIGHT_BROWSERS_PATH`、短いプロファイル保存先を `WW_TEST_PROFILE_ROOT` で指定できる。通常のChromeプロファイルを指定しない。
+専用worktreeではテスト用ブラウザーを `PLAYWRIGHT_BROWSERS_PATH`、短いプロファイル保存先を `AROUND_TEST_PROFILE_ROOT` で指定できる。通常のChromeプロファイルを指定しない。

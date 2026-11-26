@@ -8,11 +8,17 @@ import {
   ATMOSPHERE_ALPHA_CAP,
   initialProximity,
   stepProximity,
+  stepApproach,
+  initialApproach,
+  approachLayers,
+  approachRectOf,
   editorClaims,
+  type ApproachState,
   type OperationSnapshot,
   type OperationSurface,
   type PaintFootprint,
 } from '../src/world/operations';
+import type { Point } from '../src/world/geometry';
 import { SIGNAL_REGISTRY } from '../src/signals/registry';
 import { parseEditCommand } from '../src/studio/protocol';
 import { parseDesign, emptyDesign } from '../src/design/schema';
@@ -272,6 +278,211 @@ test('proximity uses original coordinates, the pointer path and hysteresis, incl
     stepProximity({ safe: false, clearSince: 0 }, snapshot([focused]), { timeMs: 1000, interacting: false }).safe,
   ).toBe(true);
 });
+const away = surface({
+  id: 'like',
+  kind: 'click',
+  shape: { left: 700, top: 200, width: 60, height: 30 },
+  protectedEnvelope: { left: 696, top: 196, width: 68, height: 38 },
+});
+const dynamicPaint = (id: string, left: number, top: number, patch: Partial<PaintFootprint> = {}) =>
+  paint({ id, dynamic: true, bounds: { left, top, right: left + 50, bottom: top + 20 }, ...patch });
+const heldRoots = (state: ApproachState) => [...state.held.keys()].sort();
+test('G1.2: each approached control keeps its own hysteresis (40px to enter, 72px to stay, 350ms)', () => {
+  const s = snapshot([surface(), away]);
+  const step = (state: ApproachState, timeMs: number, point?: { x: number; y: number }) =>
+    stepApproach(state, s, { timeMs, keyed: false, ...(point ? { point } : {}) }, []);
+  // The seek band is 100..300 x 200..230. 50px above it is outside the entering margin.
+  let state = step(initialApproach(), 0, { x: 200, y: 150 });
+  expect([...state.near.keys()]).toEqual([]);
+  state = step(state, 10, { x: 200, y: 165 });
+  expect([...state.near.keys()]).toEqual(['seek']);
+  // Inside the staying margin it stays near; the far control never joins.
+  state = step(state, 20, { x: 200, y: 140 });
+  expect(state.near.get('seek')).toMatchObject({ clearSince: null });
+  state = step(state, 30, { x: 200, y: 100 });
+  expect(state.near.get('seek')).toMatchObject({ clearSince: 30 });
+  expect(step(state, 379, { x: 200, y: 100 }).near.has('seek')).toBe(true);
+  expect(step(state, 380, { x: 200, y: 100 }).near.has('seek')).toBe(false);
+  expect(state.near.has('like')).toBe(false);
+});
+test('G1.2: only dynamic roots painted over a near control are held, as root units', () => {
+  const s = snapshot([surface(), away]);
+  const paints = [
+    dynamicPaint('over-seek', 120, 205),
+    dynamicPaint('far', 400, 500),
+    dynamicPaint('still', 120, 205, { dynamic: false }),
+    dynamicPaint('child-a', 600, 600, { root: 'group' }),
+    dynamicPaint('child-b', 250, 210, { root: 'group' }),
+    // Overlap only (D3): touching the edge is not overlapping.
+    dynamicPaint('beside', 300, 205),
+  ];
+  const state = stepApproach(initialApproach(), s, { timeMs: 0, keyed: false, point: { x: 200, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual(['group', 'over-seek']);
+  // D11: the seek band, narrowed to 72px around the pointer.
+  const area = { left: 128, top: 200, width: 144, height: 30 };
+  expect(approachRectOf(surface())).toEqual({ left: 100, top: 200, width: 200, height: 30 });
+  expect(approachLayers(state)).toEqual({ layers: { 'over-seek': [area], group: [area] } });
+  expect(approachLayers(initialApproach())).toBeUndefined();
+});
+test('G1.2: a held root stays held until its control clears, even after it moves away', () => {
+  const s = snapshot([surface(), away]);
+  let paints = [dynamicPaint('mover', 120, 205)];
+  let state = stepApproach(initialApproach(), s, { timeMs: 0, keyed: false, point: { x: 200, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual(['mover']);
+  // Back at its resting place, far from the control: still held while the control is near.
+  paints = [dynamicPaint('mover', 500, 500)];
+  state = stepApproach(state, s, { timeMs: 100, keyed: false, point: { x: 200, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual(['mover']);
+  state = stepApproach(state, s, { timeMs: 200, keyed: false, point: { x: 200, y: 500 } }, paints);
+  state = stepApproach(state, s, { timeMs: 549, keyed: false, point: { x: 200, y: 500 } }, paints);
+  expect(heldRoots(state)).toEqual(['mover']);
+  state = stepApproach(state, s, { timeMs: 550, keyed: false, point: { x: 200, y: 500 } }, paints);
+  expect(heldRoots(state)).toEqual([]);
+  // A layer that moves onto a near control later is held from that frame on.
+  state = stepApproach(state, s, { timeMs: 600, keyed: false, point: { x: 720, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual([]);
+  paints = [dynamicPaint('mover', 690, 200)];
+  state = stepApproach(state, s, { timeMs: 616, keyed: false, point: { x: 720, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual(['mover']);
+  expect(state.held.get('mover')).toEqual(['like']);
+});
+test('G1.2 (D11): near one end of a long control, only layers near the pointer are held', () => {
+  // A link 900px wide; the pointer comes near its left end only.
+  const long = surface({
+    id: 'long-link',
+    kind: 'click',
+    shape: { left: 100, top: 400, width: 900, height: 20 },
+    protectedEnvelope: { left: 96, top: 396, width: 908, height: 28 },
+  });
+  const s = snapshot([long]);
+  const paints = [
+    dynamicPaint('near-end', 130, 405),
+    dynamicPaint('far-end', 900, 405),
+    dynamicPaint('edge', 150, 405),
+  ];
+  let state = stepApproach(initialApproach(), s, { timeMs: 0, keyed: false, point: { x: 80, y: 410 } }, paints);
+  expect([...state.near.keys()]).toEqual(['long-link']);
+  // 72px around the pointer reaches x=152: the layers there are held, the far end is not.
+  expect(heldRoots(state)).toEqual(['edge', 'near-end']);
+  expect(state.near.get('long-link')!.rect).toEqual({ left: 100, top: 400, width: 52, height: 20 });
+  // While it clears, the narrowed area stays where the pointer was.
+  state = stepApproach(state, s, { timeMs: 10, keyed: false, point: { x: 80, y: 600 } }, paints);
+  expect(state.near.get('long-link')).toMatchObject({ clearSince: 10 });
+  expect(heldRoots(state)).toEqual(['edge', 'near-end']);
+  // A path along the link narrows to the swept area: from x=80 to x=500, and 72px beyond.
+  state = stepApproach(
+    initialApproach(),
+    s,
+    { timeMs: 0, keyed: false, previousPoint: { x: 80, y: 380 }, point: { x: 500, y: 380 } },
+    [...paints, dynamicPaint('middle', 520, 405)],
+  );
+  expect(heldRoots(state)).toEqual(['edge', 'middle', 'near-end']);
+  // Focus, drag, capture, keys and presses keep the whole control.
+  const focused = { ...long, availability: { ...long.availability, focused: true } };
+  state = stepApproach(
+    initialApproach(),
+    snapshot([focused]),
+    { timeMs: 0, keyed: false, point: { x: 80, y: 410 } },
+    paints,
+  );
+  expect(heldRoots(state)).toEqual(['edge', 'far-end', 'near-end']);
+});
+test('G1.2: the banded candidate index finds exactly the controls a full scan finds', () => {
+  let seed = 12;
+  const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  // Every visible, uncoverable control whose approach box the path passes within the margin.
+  const reference = (snap: OperationSnapshot, from: Point, to: Point, near: ReadonlySet<string>) =>
+    snap.surfaces
+      .filter((s) => s.availability.visible && s.policy.occlusion !== 'allow')
+      .filter((s) => {
+        const r = approachRectOf(s),
+          m = near.has(s.id) ? 72 : 40;
+        if (r.width <= 0 || r.height <= 0) return false;
+        let low = 0,
+          high = 1;
+        for (const [a, d, min, max] of [
+          [from.x, to.x - from.x, r.left - m, r.left + r.width + m],
+          [from.y, to.y - from.y, r.top - m, r.top + r.height + m],
+        ] as const) {
+          if (d === 0) {
+            if (a < min || a > max) return false;
+          } else {
+            const s1 = (min - a) / d,
+              s2 = (max - a) / d;
+            low = Math.max(low, Math.min(s1, s2));
+            high = Math.min(high, Math.max(s1, s2));
+            if (low > high) return false;
+          }
+        }
+        return true;
+      })
+      .map((s) => s.id)
+      .sort();
+  for (let run = 0; run < 300; run++) {
+    const surfaces = Array.from({ length: 1 + Math.floor(random() * 60) }, (_, i) => {
+      const left = random() * 2000 - 200,
+        top = random() * 12000 - 4000,
+        width = random() < 0.1 ? 3000 : 4 + random() * 400,
+        height = random() < 0.1 ? 9000 : 4 + random() * 200;
+      return surface({
+        id: `c${i}`,
+        shape: { left, top, width, height },
+        protectedEnvelope: { left: left - 4, top: top - 4, width: width + 8, height: height + 8 },
+        availability: { ...surface().availability, visible: random() > 0.2 },
+        ...(random() < 0.1
+          ? {
+              policy: { transform: 'fixed-plane' as const, occlusion: 'allow' as const, input: 'native-only' as const },
+            }
+          : {}),
+      });
+    });
+    const snap = snapshot(surfaces),
+      from = { x: random() * 1800, y: random() * 1000 },
+      to = random() < 0.5 ? from : { x: random() * 1800, y: random() * 1000 };
+    const first = stepApproach(
+      initialApproach(),
+      snap,
+      { timeMs: 0, keyed: false, previousPoint: from, point: to },
+      [],
+    );
+    expect([...first.near.keys()].sort(), `run ${run}`).toEqual(reference(snap, from, to, new Set()));
+    // The staying margin for controls already near.
+    const second = stepApproach(first, snap, { timeMs: 1, keyed: false, point: to }, []);
+    expect(
+      [...second.near.entries()]
+        .filter(([, entry]) => entry.clearSince === null)
+        .map(([id]) => id)
+        .sort(),
+      `run ${run}`,
+    ).toEqual(reference(snap, to, to, new Set(first.near.keys())));
+  }
+});
+test('G1.2: an approach without a pointer holds the layers over its control (D2)', () => {
+  const player = { left: 16, top: 145, width: 1050, height: 590 };
+  const video = surface({
+    id: 'player.video',
+    kind: 'gesture',
+    shape: player,
+    protectedEnvelope: player,
+    policy: { transform: 'fixed-plane', occlusion: 'allow', input: 'native-only' },
+  });
+  const seek = surface({ shape: { left: 100, top: 900, width: 200, height: 30 } });
+  seek.protectedEnvelope = { left: 96, top: 896, width: 208, height: 38 };
+  const paints = [dynamicPaint('on-seek', 120, 905), dynamicPaint('on-video', 500, 400), dynamicPaint('far', 1500, 50)];
+  const held = (surfaces: OperationSurface[], input: Partial<Parameters<typeof stepApproach>[2]>) =>
+    heldRoots(stepApproach(initialApproach(), snapshot(surfaces), { timeMs: 0, keyed: false, ...input }, paints));
+  const focused = { ...seek, availability: { ...seek.availability, focused: true } };
+  const dragging = { ...seek, availability: { ...seek.availability, dragging: true } };
+  expect(held([video, focused], {})).toEqual(['on-seek']);
+  expect(held([video, dragging], {})).toEqual(['on-seek']);
+  // A key typed with focus on a control holds only that control's layers.
+  expect(held([video, focused], { keyed: true })).toEqual(['on-seek']);
+  // A key on the page (YouTube's k, j, l) goes to the player: the layers over the player.
+  expect(held([video, seek], { keyed: true })).toEqual(['on-video']);
+  // A press away from every control holds what is painted within 40px of the press.
+  expect(held([video, seek], { pressed: { x: 1490, y: 30 } })).toEqual(['far']);
+  expect(held([video, seek], { pressed: { x: 1400, y: 30 } })).toEqual([]);
+});
 test('idle is a registry numeric host sample, and artwork cannot change Host protection or emergency state', () => {
   expect(SIGNAL_REGISTRY.numericSource('user.idle.duration', 'page', 'y')).toBe(true);
   expect(
@@ -310,6 +521,96 @@ test('reduced motion and native approach return transforms to authored values wi
     expect(result.frame.needsFrame).toBe(false);
   }
   expect(JSON.stringify(scene)).toBe(before);
+});
+
+test('G1.2: an approach that holds every root equals the whole-page restriction for rules and follow motion', () => {
+  const { scene, inputs } = worldScenario(8);
+  scene.signalRules = scene.decorations.map((layer) => defaultScrollOpacityRule(layer.id));
+  scene.decorations = scene.decorations.map((layer, i) =>
+    i % 2 ? { ...layer, motion: { ...defaultFollowMotion(), mode: 'direct' as const } } : layer,
+  );
+  const roots = evaluateWorld(scene, initialWorldState(), inputs[0]!).frame.layout.roots;
+  let all = initialWorldState(),
+    whole = initialWorldState();
+  for (const input of inputs.slice(0, 40)) {
+    const signals = { ...input.signals, scroll: { x: 0, y: input.timeMs % 900, maxX: 0, maxY: 1000 } };
+    const a = evaluateWorld(scene, all, {
+      ...input,
+      signals,
+      environment: { ...input.environment, approach: { layers: Object.fromEntries(roots.map((id) => [id, []])) } },
+    });
+    const b = evaluateWorld(scene, whole, {
+      ...input,
+      signals,
+      environment: { ...input.environment, safeInteraction: true },
+    });
+    expect(a.frame.layout).toEqual(b.frame.layout);
+    expect(a.state.motion).toEqual(b.state.motion);
+    all = a.state;
+    whole = b.state;
+  }
+});
+
+test('G1.2: only held roots return their rules to authored values; other layers keep their signal values', () => {
+  const { scene, inputs } = worldScenario(4);
+  scene.groups = [{ ...scene.groups![0]!, children: ['image-0', 'image-1'] }];
+  scene.decorations = scene.decorations.map((layer) => ({ ...layer, visible: true, opacity: 0.75 }));
+  scene.signalRules = [
+    defaultScrollOpacityRule('image-0'),
+    defaultScrollOpacityRule('group-0'),
+    defaultScrollOpacityRule('image-2'),
+    defaultScrollOpacityRule('image-3'),
+  ];
+  const input = {
+    ...inputs[0]!,
+    signals: { ...inputs[0]!.signals, scroll: { x: 0, y: 250, maxX: 0, maxY: 1000 } },
+  };
+  const free = evaluateWorld(scene, initialWorldState(), input).frame.layout;
+  const held = evaluateWorld(scene, initialWorldState(), {
+    ...input,
+    environment: {
+      ...input.environment,
+      approach: { layers: { 'group-0': [{ left: 0, top: 0, width: 10, height: 10 }], 'image-3': [] } },
+    },
+  }).frame.layout;
+  const opacity = (layout: typeof free, id: string) =>
+    [...layout.layers, ...layout.groups].find((entry) => entry.layer.id === id)!.layer.opacity;
+  // The group is held: its own rule and its children's rules return to the authored values.
+  expect(opacity(held, 'group-0')).toBe(scene.groups[0]!.opacity);
+  expect(opacity(held, 'image-0')).toBe(0.75);
+  expect(opacity(held, 'image-3')).toBe(0.75);
+  // A root that is not held keeps exactly the value it has without any approach.
+  expect(opacity(held, 'image-2')).toBe(opacity(free, 'image-2'));
+  expect(opacity(free, 'image-2')).not.toBe(0.75);
+});
+
+test('G1.2: a held follow layer stops where it is; a layer that is not held keeps following', () => {
+  const { scene, inputs } = worldScenario(2);
+  scene.groups = [];
+  scene.decorations = scene.decorations.map((layer) => ({
+    ...layer,
+    visible: true,
+    opacity: 1,
+    motion: { ...defaultFollowMotion(), mode: 'smooth' as const },
+  }));
+  let state = initialWorldState();
+  const at = (n: number, environment: object = {}) => ({
+    ...inputs[0]!,
+    timeMs: n * 16,
+    deltaMs: n ? 16 : 0,
+    signals: { ...inputs[0]!.signals, pointer: { x: 900, y: 600 } },
+    environment: { hidden: false, reducedMotion: false, ...environment },
+  });
+  for (let n = 0; n < 20; n++) state = evaluateWorld(scene, state, at(n)).state;
+  const moved = state.motion!.bodies['image-0']!.offset,
+    other = state.motion!.bodies['image-1']!.offset;
+  expect(Math.hypot(moved.x, moved.y)).toBeGreaterThan(1);
+  const held = evaluateWorld(scene, state, at(20, { approach: { layers: { 'image-0': [] } } })).state.motion!;
+  expect(held.bodies['image-0']!.offset).toEqual(moved);
+  expect(held.bodies['image-0']!.velocity).toEqual({ x: 0, y: 0 });
+  expect(
+    Math.hypot(held.bodies['image-1']!.offset.x - other.x, held.bodies['image-1']!.offset.y - other.y),
+  ).toBeGreaterThan(0);
 });
 
 test('guardPaint reuses per-snapshot envelopes without changing a single issue', () => {
@@ -437,12 +738,11 @@ test('atmosphere crosses protected surfaces but never takes input or skips verif
 });
 
 test('native-surface inspection runs only while artwork or the editor can paint', () => {
-  const on = { suspended: false, enabled: true, strength: 60, layers: 1, editing: false };
+  const on = { suspended: false, enabled: true, layers: 1, editing: false };
   expect(guardWanted(on)).toBe(true);
   expect(guardWanted({ ...on, layers: 0 })).toBe(false); // No artwork: nothing can cover a control.
   expect(guardWanted({ ...on, layers: 0, editing: true })).toBe(true); // The editor may add one at any time.
-  expect(guardWanted({ ...on, enabled: false })).toBe(false); // Theme OFF.
-  expect(guardWanted({ ...on, strength: 0 })).toBe(false); // Strength zero.
+  expect(guardWanted({ ...on, enabled: false })).toBe(false); // 作品を表示する OFF.
   expect(guardWanted({ ...on, suspended: true, editing: true })).toBe(false); // Emergency OFF / fullscreen suspend.
 });
 

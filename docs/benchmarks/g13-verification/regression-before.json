@@ -1,0 +1,1352 @@
+[
+  {
+    "phase": "before",
+    "t": 2520.39999999851,
+    "x": 405,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": true,
+    "computed": {
+      "opacity": "1",
+      "visibility": "visible",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/8c9"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2521,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": true,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      },
+      "img": "blob:https://www.youtube.com/8c9"
+    },
+    "safety": {
+      "stopped": "",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2527.7000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2533.8000000044703,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2541,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2547.8000000044703,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2554.7000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2561.60000000149,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2568.60000000149,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2575.5,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2582.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2589.3000000044703,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2596.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2603.10000000149,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2610.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2617.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2624.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2631.3000000044703,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2638.39999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2645.3000000044703,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2652.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2659.60000000149,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2666,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2673.5,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2680.3000000044703,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2686.7000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2693.5,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2700.8000000044703,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2707.89999999851,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2715.3000000044703,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  },
+  {
+    "phase": "after",
+    "t": 2722.2000000029802,
+    "x": 515,
+    "y": 270,
+    "hit": "g13-second",
+    "inDrawableClip": false,
+    "visible": false,
+    "computed": {
+      "opacity": "1",
+      "visibility": "hidden",
+      "rect": {
+        "x": 275,
+        "y": 190,
+        "width": 450,
+        "height": 160,
+        "top": 190,
+        "right": 725,
+        "bottom": 350,
+        "left": 275
+      }
+    },
+    "safety": {
+      "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+      "issues": [
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "control.6",
+          "severity": "enforced",
+          "action": "clip",
+          "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+          "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+        },
+        {
+          "layerId": "g13-witness",
+          "surfaceId": "host",
+          "severity": "enforced",
+          "action": "stop",
+          "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "remedy": "動きが落ち着くと、自動で表示に戻ります。"
+        }
+      ]
+    }
+  }
+]

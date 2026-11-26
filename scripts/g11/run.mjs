@@ -5,10 +5,22 @@ import { execFile } from 'node:child_process';
 import { workPath, extensionPath, browserPath, createProfile, revision } from './environment.mjs';
 
 const mode = process.argv[2];
-if (!['startup', 'spa', 'steady', 'minute', 'areas', 'smoke'].includes(mode))
-  throw new Error('Usage: node scripts/g11/run.mjs startup|spa|steady|minute|areas|smoke');
+if (!['startup', 'spa', 'steady', 'scroll', 'minute', 'areas', 'smoke'].includes(mode))
+  throw new Error('Usage: node scripts/g11/run.mjs startup|spa|steady|scroll|minute|areas|smoke');
 // spa: settle on the video, start recording, then follow a related-video link in the same document.
 const spa = mode === 'spa';
+// scroll (G1.2): every layer fades with the page scroll; the pointer rests where the page's links
+// scroll under it (the left edge of the column below the player) while the wheel scrolls down and up.
+const scroll = mode === 'scroll';
+// steady (G1.2): one layer moves all the time (its X follows the idle time, which grows every frame
+// while the pointer rests), with no scroll and no input, so the extension draws every frame.
+const steady = mode === 'steady';
+// The depth foundation (docs/depth-foundation.md): G11_DEPTH=room puts every layer and group of
+// the scene behind the UI (depth 'room') with the room G11_ROOM_FILE (a packed room .glb) under the
+// page; the guard then has nothing in front to protect, and its share should vanish.
+const roomDepth = process.env.G11_DEPTH === 'room';
+if (roomDepth && !process.env.G11_ROOM_FILE)
+  throw new Error('G11_DEPTH=room needs G11_ROOM_FILE (a packed room .glb).');
 process.env.G11_STARTUP = mode === 'startup' ? '1' : '0';
 process.env.G11_FRAMES_ONLY = mode === 'minute' ? '0' : '1';
 process.env.G11_PERF_ONLY = mode === 'areas' ? '0' : '1';
@@ -175,7 +187,8 @@ async function area(name) {
     regions,
   };
   result.areas.push(row);
-  await page.screenshot({ path: path.join(work, name + '.png') });
+  // caret 'initial': hiding the caret restyles inputs, which the guard answers by holding the art.
+  await page.screenshot({ path: path.join(work, name + '.png'), caret: 'initial' });
   await save();
   console.log(
     'AREA ' +
@@ -198,13 +211,13 @@ try {
   await popup.evaluate(
     async (reuse) =>
       chrome.storage.local.set({
-        'webWorldThemes.enabled': true,
-        'webWorldThemes.strength': 100,
-        'webWorldThemes.safety.emergencyOff': false,
+        'around.enabled': true,
+        'around.strength': 100,
+        'around.safety.emergencyOff': false,
         ...(reuse
           ? {}
           : {
-              'webWorldThemes.design.youtube': {
+              'around.design.youtube': {
                 schemaVersion: 11,
                 id: 'g11-baseline',
                 siteId: 'youtube',
@@ -311,27 +324,59 @@ try {
       await selectContext();
     }
     if (process.env.G11_REUSE_SCENE !== '1') {
-      await popup.locator('#creator-editor-open').evaluate((b) => b.click());
-      const editor = page.locator('#web-world-themes-creator');
+      // From UI0-d the editor is the extension's editor page connected to this tab, as in
+      // tests/helpers/editor.ts (openEditor); the popup no longer opens an in-page editor.
+      await page.bringToFront();
+      const tab = await popup.evaluate(
+        async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]?.id,
+      );
+      if (tab === undefined) throw new Error('No active YouTube tab to edit.');
+      const studio = await context.newPage();
+      await studio.setViewportSize({ width: 1440, height: 900 });
+      await studio.goto(`chrome-extension://${id}/studio/index.html?target=${tab}`);
+      await studio.locator('.connection-status[data-connected="true"]').waitFor();
+      const editor = studio.getByRole('dialog', { name: 'デザインエディター' });
+      await editor.waitFor();
+      await page.bringToFront();
       const split = editor.locator('.split');
-      if ((await split.getAttribute('aria-pressed')) !== 'true') await split.click();
-      await editor.getByRole('tab', { name: 'レイヤー', exact: true }).click();
+      if ((await split.isVisible()) && (await split.getAttribute('aria-pressed')) !== 'true') await split.click();
+      const layersTab = editor.getByRole('tab', { name: 'レイヤー', exact: true });
+      if (await layersTab.isVisible()) await layersTab.click();
       const guide = editor.getByRole('button', { name: '操作ガイドを閉じる', exact: true });
       if (await guide.isVisible()) await guide.click();
       await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+      if (roomDepth) {
+        await editor.locator('.model-file').setInputFiles(path.resolve(process.env.G11_ROOM_FILE));
+        await editor.locator('.layer').nth(1).waitFor({ timeout: 60000 });
+      }
       await editor.locator('.save').click();
       await editor.locator('.dirty').filter({ hasText: '保存済み' }).waitFor();
       await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+      await studio.close();
       const imported = await popup.evaluate(
-        async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+        async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
       );
-      const sample = imported.decorations[0];
+      const sample = imported.decorations.find((layer) => layer.kind === 'image');
       if (!sample?.assetId) throw new Error('Validated import was not saved');
+      const room = imported.decorations.find((layer) => layer.kind === 'model3d');
+      if (roomDepth && !room) throw new Error('The room was not imported.');
       const design = {
         ...imported,
         baseThemeId: null,
+        ...(roomDepth
+          ? {
+              space: {
+                room: { assetId: room.assetId },
+                lights: { sun_night: 1, room_desk: 1, room_pendant: 0.6, screen: 0.5, screen_monitor: 0.8 },
+                camera: { sway: 1, dolly: 0.6, follow: 0.8 },
+                glass: { blur: 0.7, refraction: 0.6, highlight: 0.6, tint: 0.5, shadow: 0.6 },
+                videoLight: 1,
+              },
+            }
+          : {}),
         decorations: Array.from({ length: 32 }, (_, i) => ({
           ...sample,
+          ...(roomDepth ? { depth: 'room' } : {}),
           id: `g11-layer-${i}`,
           name: `G1.1 measurement ${i}`,
           opacity: 0.8,
@@ -349,6 +394,7 @@ try {
         })),
         groups: Array.from({ length: 16 }, (_, i) => ({
           kind: 'group',
+          ...(roomDepth ? { depth: 'room' } : {}),
           id: `g11-group-${i}`,
           name: `G1.1 group ${i}`,
           opacity: 0.7,
@@ -357,15 +403,49 @@ try {
           locked: false,
           children: [`g11-layer-${2 * i}`, `g11-layer-${2 * i + 1}`],
         })),
+        // The same rule the editor's scroll preset makes (src/signals/keyframes.ts, defaultScrollOpacityRule).
+        ...(scroll
+          ? {
+              signalRules: Array.from({ length: 32 }, (_, i) => ({
+                id: `scroll-g11-layer-${i}`,
+                enabled: true,
+                source: { signal: 'page.scroll.progress', axis: 'y', space: 'page', inputRange: [0, 1] },
+                target: { layerId: `g11-layer-${i}`, property: 'opacity' },
+                keyframes: [
+                  { id: 'key-start', input: 0, value: 0, easing: 'linear' },
+                  { id: 'key-middle', input: 0.5, value: 1, easing: 'linear' },
+                  { id: 'key-end', input: 1, value: 0, easing: 'linear' },
+                ],
+                evaluation: { mode: 'follow', smoothing: { kind: 'none' } },
+                blend: { mode: 'replace', priority: 0 },
+              })),
+            }
+          : steady
+            ? {
+                // The editor's default transform rule (defaultSignalRule), on the idle time: 0..30s
+                // moves the layer -200..200px. The settle and the block end well inside 30s.
+                signalRules: [
+                  {
+                    id: 'position-x-g11-layer-0',
+                    enabled: true,
+                    source: { signal: 'user.idle.duration', axis: 'y', space: 'page', inputRange: [0, 30] },
+                    target: { layerId: 'g11-layer-0', property: 'position.x' },
+                    keyframes: [
+                      { id: 'key-start', input: 0, value: -200, easing: 'linear' },
+                      { id: 'key-end', input: 1, value: 200, easing: 'linear' },
+                    ],
+                    evaluation: { mode: 'follow', smoothing: { kind: 'none' } },
+                    blend: { mode: 'add', priority: 0 },
+                  },
+                ],
+              }
+            : {}),
       };
-      await popup.evaluate(
-        async (design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }),
-        design,
-      );
+      await popup.evaluate(async (design) => chrome.storage.local.set({ 'around.design.youtube': design }), design);
     }
     await page.locator('[data-image-id]').first().waitFor({ state: 'attached' });
     const sceneCount = await popup.evaluate(async () => {
-      const s = (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'];
+      const s = (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'];
       return { layers: s.decorations.length, groups: s.groups?.length ?? 0 };
     });
     if (sceneCount.layers !== 32 || sceneCount.groups !== 16)
@@ -469,7 +549,9 @@ try {
       'utf8',
     );
     for (let pair = result.pairs.length; pair < pairCount; pair++) {
-      const order = pair % 2 ? [true, false] : [false, true];
+      // steady: the idle time is a Host sample, so without the guard the layer stands still and the
+      // extension draws nothing. Only guarded blocks are measured (G1.2 compares builds, both guarded).
+      const order = steady ? [true] : pair % 2 ? [true, false] : [false, true];
       const row = { pair, order: order.map((v) => (v ? 'guarded' : 'unguarded')), blocks: [] };
       for (const guarded of order) {
         if (process.env.G11_FRAMES_ONLY === '1') {
@@ -535,7 +617,18 @@ try {
           });
           if (!navigation.to) throw new Error('No related video link for the SPA block.');
         }
-        await page.waitForTimeout(6000);
+        if (scroll) {
+          const point = await page.evaluate(() => {
+            const below = document.querySelector('ytd-watch-flexy #below').getBoundingClientRect();
+            return { x: below.left + 20, y: innerHeight / 2 };
+          });
+          await page.mouse.move(point.x, point.y, { steps: 4 });
+          // 6s, as the other blocks: 30 wheel steps down, then 30 back up.
+          for (let i = 0; i < 60; i++) {
+            await page.mouse.wheel(0, i < 30 ? 90 : -90);
+            await page.waitForTimeout(100);
+          }
+        } else await page.waitForTimeout(6000);
         const data = await evaluate('__g11Probe.end()');
         if (profiling) {
           const { profile } = await session.send('Profiler.stop');
@@ -582,7 +675,7 @@ try {
           throw new Error('Invalid playback state in comparison block.');
         const summary = summarize(data);
         const state = await evaluate(
-          '({guard:Boolean(__g11Probe.controller.safety),nodes:document.querySelectorAll("#web-world-themes-decorations").length})',
+          '({guard:Boolean(__g11Probe.controller.safety),nodes:document.querySelectorAll("#around-decorations").length})',
         );
         if (state.guard !== guarded || summary.extensionFrameCpuMs.count < 1)
           throw new Error('Invalid comparison block: ' + JSON.stringify({ state, summary }));
@@ -614,7 +707,7 @@ try {
           ).slice(0, 1800),
         }),
     );
-    await page.screenshot({ path: path.join(work, 'failure.png') }).catch(() => {});
+    await page.screenshot({ path: path.join(work, 'failure.png'), caret: 'initial' }).catch(() => {});
   }
   console.error(error.stack);
   process.exitCode = 1;
@@ -652,4 +745,6 @@ try {
     clearTimeout(timer);
   }
   console.log('SAVED ' + output);
+  // Over 20 GB, at most once a day: the oldest outputs go by the rules of scripts/clean-work.mjs.
+  (await import('../clean-work.mjs')).autoClean(path.resolve('.'));
 }

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { createStudioTransferService, type StudioTransferEvent } from '../src/background/studio-transfer';
-import { createStudioUploader } from '../src/assets/studio-upload';
+import { createStudioUploader } from '../src/browser/studio-upload';
 import { ASSET_LIMITS } from '../src/assets/limits';
 import {
   STUDIO_ASSET_TRANSFER,
@@ -79,7 +79,7 @@ for (const badSender of [
 ])
   test(`transfer grants reject untrusted Runtime sender ${JSON.stringify(badSender)}`, async () => {
     const h = workerHarness();
-    await expect(h.service.authorize(values, badSender)).rejects.toThrow(/Studio/);
+    await expect(h.service.authorize(values, badSender)).rejects.toThrow(/エディター/);
     expect(h.writes()).toBe(0);
   });
 

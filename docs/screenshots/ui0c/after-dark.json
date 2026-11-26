@@ -1,0 +1,34 @@
+{
+  "scheme": "dark",
+  "prefix": "after",
+  "dark-hover-hits-card": ["ASIDE#around-creator", true, true],
+  "dark-skin": "ok",
+  "dark-card": "ok",
+  "dark-studio-badge": "ok",
+  "dark-bright-url": "https://www.youtube.com/watch?v=5Vfni0QBn6Y",
+  "dark-bright-luminance": 135,
+  "dark-bright-video": "ok",
+  "dark-bright-open": "ok",
+  "dark-bright-handles": [
+    ["nw", 14, 14, true],
+    ["ne", 14, 14, true],
+    ["sw", 14, 14, true],
+    ["se", 14, 14, true],
+    ["rotate", 14, 14, true]
+  ],
+  "dark-bright-layers": "ok",
+  "dark-bright-protect": "ok",
+  "dark-dark-url": "https://www.youtube.com/watch?v=B5unCXpegAw",
+  "dark-dark-luminance": 53,
+  "dark-dark-video": "ok",
+  "dark-dark-open": "ok",
+  "dark-dark-handles": [
+    ["nw", 14, 14, true],
+    ["ne", 14, 14, true],
+    ["sw", 14, 14, true],
+    ["se", 14, 14, true],
+    ["rotate", 14, 14, true]
+  ],
+  "dark-dark-layers": "ok",
+  "dark-dark-protect": "ok"
+}

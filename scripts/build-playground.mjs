@@ -1,0 +1,90 @@
+// Builds the Playground (docs/playground-plan.md) as static files only. Separate from the
+// extension: scripts/build.mjs and dist/ are not touched.
+//   AROUND_PLAYGROUND_PRIVATE_ASSETS=<checkout> node scripts/build-playground.mjs → dist-playground/
+//   AROUND_PLAYGROUND_OUT=.work/x node scripts/build-playground.mjs
+//   AROUND_PLAYGROUND_TEST=1 adds the read-only test hook (window.__aroundPlayground) for e2e only.
+//   AROUND_PLAYGROUND_MIRDO_ROOT points at the external wwt-private-assets checkout.
+import { build } from 'esbuild';
+import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { playgroundOutputProblems } from './playground/check-output.mjs';
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const output = resolve(root, process.env.AROUND_PLAYGROUND_OUT ?? 'dist-playground');
+const inWork = relative(join(root, '.work'), output);
+if (
+  output !== join(root, 'dist-playground') &&
+  (inWork.startsWith('..') || inWork.includes('/') || inWork.includes('\\') || !inWork)
+)
+  throw new Error('AROUND_PLAYGROUND_OUT must be dist-playground or a direct .work child.');
+const test = process.env.AROUND_PLAYGROUND_TEST === '1';
+// Both names point at the same checkout root: the approved Mirdo merge used the first, the
+// Playground 3D branch the second. The files are hash-checked either way (playground/content.ts).
+const mirdoRoot = process.env.AROUND_PLAYGROUND_MIRDO_ROOT ?? process.env.AROUND_PLAYGROUND_PRIVATE_ASSETS;
+if (!test && !mirdoRoot) throw new Error('Set AROUND_PLAYGROUND_MIRDO_ROOT to the wwt-private-assets checkout.');
+const localRoom = process.env.AROUND_PLAYGROUND_LOCAL_ROOM;
+if ((localRoom || process.env.AROUND_PLAYGROUND_LOCAL_LAYOUT) && output === join(root, 'dist-playground'))
+  throw new Error('A local room or layout requires an explicit AROUND_PLAYGROUND_OUT under .work.');
+
+rmSync(output, { recursive: true, force: true });
+mkdirSync(join(output, 'content'), { recursive: true });
+await build({
+  absWorkingDir: root,
+  entryPoints: ['src/playground/index.ts'],
+  outfile: join(output, 'app.js'),
+  bundle: true,
+  format: 'iife',
+  target: 'chrome120',
+  charset: 'utf8',
+  legalComments: 'none',
+  minify: !test,
+  logLevel: 'warning',
+  loader: { '.css': 'text' },
+  dropLabels: ['AROUND_TEST_PAGE_CHANGE', 'AROUND_GUARD_TRACE'],
+  define: {
+    __AROUND_PAGE_CHANGE_LEGACY__: 'false',
+    __AROUND_WORLD_MODE__: '"runtime"',
+    __AROUND_WORLD_DEVTOOLS__: 'false',
+    __AROUND_ASSET_PROFILE__: 'false',
+    __AROUND_G11__: 'false',
+    __AROUND_PLAYGROUND_TEST__: String(test),
+    __AROUND_PLAYGROUND_MIRDO__: String(Boolean(mirdoRoot)),
+    // The same switch as the extension's (scripts/build.mjs): layering unless AROUND_LAYERING=0 (chunk 4).
+    __AROUND_LAYERING__: String(process.env.AROUND_LAYERING !== '0'),
+  },
+});
+copyFileSync(join(root, 'src/playground/index.html'), join(output, 'index.html'));
+copyFileSync(join(root, 'src/playground/style.css'), join(output, 'style.css'));
+copyFileSync(join(root, 'THIRD_PARTY_NOTICES.md'), join(output, 'THIRD_PARTY_NOTICES.md'));
+// The notices point at the full license texts; ship them with the bundle that contains the code.
+mkdirSync(join(output, 'assets/licenses'), { recursive: true });
+for (const file of ['three-MIT.txt', 'three-vrm-MIT.txt', 'lottie-web-MIT.txt'])
+  copyFileSync(join(root, 'assets/licenses', file), join(output, 'assets/licenses', file));
+
+// The content generator is TypeScript that imports the repository's own fixtures; run it once.
+const generator = join(root, '.work', 'playground-content.mjs');
+mkdirSync(dirname(generator), { recursive: true });
+await build({
+  absWorkingDir: root,
+  entryPoints: ['scripts/playground/content.ts'],
+  outfile: generator,
+  bundle: true,
+  platform: 'node',
+  format: 'esm',
+  packages: 'external',
+  logLevel: 'warning',
+});
+const { writeContent } = await import(pathToFileURL(generator).href + `?${Date.now()}`);
+try {
+  const { models } = writeContent(root, join(output, 'content'), mirdoRoot);
+  const problems = playgroundOutputProblems(
+    output,
+    models.map((file) => `content/${file}`),
+  );
+  if (problems.length) throw new Error('Playground output refused:\n' + problems.join('\n'));
+} catch (error) {
+  rmSync(output, { recursive: true, force: true });
+  throw error;
+}
+console.log(`Playground: ${relative(root, output) || '.'} (static files only${test ? ', test hook' : ''})`);

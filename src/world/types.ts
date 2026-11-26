@@ -13,6 +13,15 @@ export interface WorldGeometry {
   viewport: { width: number; height: number };
   /** Semantic IDs only; absence means the host cannot currently resolve an anchor. */
   anchors: Readonly<Record<string, PlacementFrame>>;
+  /** By anchor ID: the parts the site adapter reports shown in their reduced form (a video player's
+   * miniplayer), each with the height it last had when not reduced, the base its layers are drawn
+   * reduced against (layout.ts). The adapter decides the form; the world never infers it from a
+   * size, so a small regular part is never reduced. Recorded in World recordings (the input as
+   * evaluated); not in a take (takeInput drops it: takes are artwork data with their own format). */
+  reducedParts?: Readonly<Record<string, number>>;
+  /** By anchor ID: the part's edges a character may sit on, as the site adapter reports them (a
+   * kind of edge, never a site's name). Absent: none, and a character rests at its home point. */
+  seats?: Readonly<Record<string, readonly ('top' | 'bottom')[]>>;
 }
 export type WorldEvent =
   { type: 'video.play' | 'video.pause' | 'video.ended' | 'host.lifecycle' } | { type: 'pointer.click'; point: Point };
@@ -21,9 +30,31 @@ export interface WorldInput extends WorldGeometry {
   deltaMs: number;
   signals: SignalSnapshot;
   events: readonly WorldEvent[];
-  environment: { hidden: boolean; reducedMotion: boolean; holdTransforms?: boolean; safeInteraction?: boolean };
+  environment: {
+    hidden: boolean;
+    reducedMotion: boolean;
+    holdTransforms?: boolean;
+    /** Every layer yields to an approached control (the whole-page G1 rule, and old takes). */
+    safeInteraction?: boolean;
+    /** Host-owned, never artwork or a recording (G1.2): only these roots yield. */
+    approach?: WorldApproach;
+  };
   /** Reserved input, not a request to access a global random generator. */
   seed?: number;
+}
+/** The roots (groups or ungrouped layers) over an approached native control, each with that
+ * control's rectangles. G1.2 returns them to their resting state; the rectangles are reserved
+ * for a later avoiding motion and are not read yet. */
+export interface WorldApproach {
+  layers: Readonly<Record<string, readonly PlacementFrame[]>>;
+}
+/** Whether a layer, or the group it belongs to, yields to an approached control. */
+export function yields(environment: WorldInput['environment'], id: string, parentId?: string) {
+  const layers = environment.approach?.layers;
+  return Boolean(
+    environment.safeInteraction ||
+    (layers && (Object.hasOwn(layers, id) || (parentId !== undefined && Object.hasOwn(layers, parentId)))),
+  );
 }
 export interface LayerEvaluation {
   layer: Decoration;

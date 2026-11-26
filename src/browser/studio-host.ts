@@ -1,7 +1,7 @@
 import { createStudioStateEncoder } from '../studio/state-sync';
 import { unpackCheckpoint } from '../studio/checkpoint-codec';
 import type { EditorSnapshot } from '../editor-core/types';
-import type { CreatorEditor } from '../editor/controller';
+import type { CreatorEditor, EditorSurface } from '../editor/controller';
 import type { SiteAdapter } from '../sites/types';
 import {
   STUDIO_PORT,
@@ -13,8 +13,10 @@ import {
 import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { parseTimelineCommand } from '../timeline/types';
-import { loadAssetMetadata } from '../assets/client';
-import { isAssetId } from '../design/schema';
+import { loadAssetMetadata } from './asset-client';
+import { isAssetId, isDesignId } from '../design/schema';
+import { parseMotionLabels } from '../characters/manifest';
+import { SKIN_STATES, type SkinState } from '../design/types';
 import type { OperationGuardHost } from '../host/operation-guard';
 
 /** Authenticated extension Port; no window messages or page-script command bridge. */
@@ -50,7 +52,7 @@ export function connectStudioHost(
     if (port.name !== STUDIO_PORT || !trusted(port.sender) || (port.sender?.frameId && port.sender.frameId !== 0))
       return;
     let owner: string | undefined,
-      surface: string | undefined,
+      surface: EditorSurface | undefined,
       closed = false,
       attached = false,
       lastHistory = -1,
@@ -100,6 +102,9 @@ export function connectStudioHost(
     const unsubscribeSafety = safety?.subscribe((status) => {
       if (attached && owner) post({ type: 'safety', status });
     });
+    const unsubscribeSkinPage = editor.subscribeSkinPage((info) => {
+      if (attached && owner && activePort === port) post({ type: 'skin-page', info });
+    });
     function cleanup() {
       if (closed) return;
       closed = true;
@@ -107,6 +112,7 @@ export function connectStudioHost(
       unsubscribe();
       unsubscribeTimeline();
       unsubscribeSafety?.();
+      unsubscribeSkinPage();
       if (activePort === port) safety?.overlay(false);
       if (owner) editor.detachStudio(owner);
       ports.delete(port);
@@ -126,9 +132,7 @@ export function connectStudioHost(
           try {
             if (request.type === 'attach') {
               if (typeof request.owner !== 'string' || !/^studio-[\w-]{1,100}$/.test(request.owner))
-                throw new Error('Studioの識別子が不正です。');
-              if (request.visible !== undefined && typeof request.visible !== 'boolean')
-                throw new Error('Studioの表示状態が不正です。');
+                throw new Error('エディターの識別子が不正です。');
               if (owner && owner !== request.owner) throw new Error('接続の所有者が変わりました。');
               owner = request.owner;
               surface = new URL(port.sender!.url!).searchParams.get('surface') === 'sidepanel' ? 'sidepanel' : 'window';
@@ -139,6 +143,7 @@ export function connectStudioHost(
                 request.owner,
                 resume,
                 Boolean(previous && previous !== port && activeSurface !== surface),
+                surface,
               );
               activePort = port;
               activeSurface = surface;
@@ -151,10 +156,6 @@ export function connectStudioHost(
                 ports.get(previous)?.();
                 previous.disconnect();
               }
-              if (surface === 'sidepanel') {
-                editor.openSidePanel();
-                editor.setSidePanelVisible(owner, request.visible !== false);
-              }
               if (closed) {
                 editor.detachStudio(request.owner);
                 return;
@@ -165,19 +166,18 @@ export function connectStudioHost(
               if (update) post({ type: 'timeline', update });
               if (safety) post({ type: 'safety', status: safety.snapshot() });
             } else if (!owner) throw new Error('先に編集対象へ接続してください。');
-            else if (request.type === 'surface-visibility') {
-              if (!attached || activePort !== port || surface !== 'sidepanel' || typeof request.visible !== 'boolean')
-                throw new Error('Studioの表示状態が不正です。');
-              editor.setSidePanelVisible(owner, request.visible);
-              post({ type: 'reply', id: request.id, ok: true });
-            } else if (request.type === 'safety') {
+            else if (request.type === 'safety') {
               if (!attached || activePort !== port || typeof request.overlay !== 'boolean')
                 throw new Error('操作チェックの要求が不正です。');
               safety?.overlay(request.overlay);
               post({ type: 'reply', id: request.id, ok: true });
+            } else if (request.type === 'safety-resume') {
+              if (!attached || activePort !== port) throw new Error('操作チェックの要求が不正です。');
+              safety?.resume();
+              post({ type: 'reply', id: request.id, ok: true });
             } else if (request.type === 'timeline') {
               if (!attached || activePort !== port || typeof request.session !== 'string')
-                throw new Error('Studioへ再接続してください。');
+                throw new Error('エディターを編集対象へ接続し直してください。');
               await editor.timelineCommand(owner, request.session, parseTimelineCommand(request.command));
               post({ type: 'reply', id: request.id, ok: true });
             } else if (request.type === 'command') {
@@ -211,6 +211,47 @@ export function connectStudioHost(
                 length: items.length,
               });
               post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
+            } else if (request.type === 'import-skin') {
+              if (
+                !Array.isArray(request.assets) ||
+                !request.assets.length ||
+                request.assets.length > ASSET_LIMITS.batchCount ||
+                !request.assets.every(isAssetId)
+              )
+                throw new Error('素材IDが不正です。');
+              if (request.slot !== 'compact' && !SKIN_STATES.includes(request.slot as SkinState))
+                throw new Error('着せ替えの差し込み口が不正です。');
+              const items = await Promise.all(request.assets.map((id) => loadAssetMetadata(id)));
+              const state = await editor.importSkin(
+                owner,
+                request.session,
+                request.revision,
+                { kind: 'stored-assets', items, length: items.length },
+                request.slot,
+              );
+              post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
+            } else if (request.type === 'import-motions') {
+              if (
+                !Array.isArray(request.assets) ||
+                !request.assets.length ||
+                request.assets.length > ASSET_LIMITS.batchCount ||
+                !request.assets.every(isAssetId) ||
+                !isDesignId(request.layer) ||
+                (request.origin !== 'standard' && request.origin !== 'character')
+              )
+                throw new Error('動作の追加の指定が不正です。');
+              const labels = parseMotionLabels(request.labels);
+              const items = await Promise.all(request.assets.map((id) => loadAssetMetadata(id)));
+              const state = await editor.importMotions(
+                owner,
+                request.session,
+                request.revision,
+                { kind: 'stored-assets', items, length: items.length },
+                request.layer,
+                labels,
+                request.origin,
+              );
+              post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
             } else if (request.type === 'thumbnail') {
               if (
                 typeof request.layer !== 'string' ||
@@ -224,7 +265,7 @@ export function connectStudioHost(
               owner = undefined;
               attached = false;
               post({ type: 'reply', id: request.id, ok: true });
-            } else throw new Error('未対応のStudio操作です。');
+            } else throw new Error('エディターの操作に対応していません。');
           } catch (error) {
             post({
               type: 'reply',

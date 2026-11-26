@@ -27,7 +27,7 @@ test('an existing database with a missing store rejects immediately instead of h
     },
   } as unknown as IDBOpenDBRequest;
   const result = readAssetRows({
-    databases: async () => [{ name: 'web-world-themes-assets', version: 1 }],
+    databases: async () => [{ name: 'around-assets', version: 1 }],
     open: () => {
       queueMicrotask(() => request.onsuccess?.call(request, new Event('success')));
       return request;
@@ -47,7 +47,7 @@ test('a database disappearing after the catalog read aborts creation and reports
     },
   } as unknown as IDBOpenDBRequest;
   const result = readAssetRows({
-    databases: async () => [{ name: 'web-world-themes-assets', version: 1 }],
+    databases: async () => [{ name: 'around-assets', version: 1 }],
     open: () => {
       queueMicrotask(() => request.onupgradeneeded?.call(request, {} as IDBVersionChangeEvent));
       return request;

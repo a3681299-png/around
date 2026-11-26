@@ -1,4 +1,4 @@
-export const BACKUP_MESSAGE = 'web-world-themes:backup-v1';
+export const BACKUP_MESSAGE = 'around:backup-v1';
 export const BACKUP_PAGE = 'backup/index.html';
 export interface BackupSummary {
   createdAt: string;

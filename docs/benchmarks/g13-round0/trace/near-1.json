@@ -1,0 +1,6461 @@
+{
+  "label": "near-1",
+  "pointerMode": "near",
+  "point": {
+    "x": 36,
+    "y": 500
+  },
+  "far": {
+    "x": 481.25,
+    "y": 980
+  },
+  "frames": [
+    {
+      "t": 5125.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5132.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5139.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5153.2,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5174,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5194.8,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5215.7,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5229.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5243.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5257.4,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5271.2,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5292.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5306,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5319.8,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5333.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5347.6,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5361.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5382.3,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5396.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5403.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5410.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5417.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5424,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5437.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5451.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5465.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5472.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5486.5,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5493.4,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5500.4,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5507.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5514.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5528.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5535.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5542,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5549,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5555.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5562.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5569.8,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5576.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5583.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5590.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5597.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5611.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5618.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5626,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5632.5,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5639.3,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5646.2,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5653.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5660.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5667,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5674,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5687.9,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5694.7,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5708.6,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5715.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5722.6,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5729.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5736.6,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5743.4,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5750.4,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5757.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5764.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5771.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5778.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5785,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5798.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5805.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5812.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5819.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5826.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5833.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5840.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5847.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5854.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5861.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5868.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5875.3,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5889.2,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5903.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5910,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5916.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5923.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5930.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5937.8,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5944.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5951.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5958.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5965.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5972.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5979.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5986.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 5993.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6000.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6007.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6014.1,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6021.2,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6028.1,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6035,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6042.1,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6048.9,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6056,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6062.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6069.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6076.6,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6083.7,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6090.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6097.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6104.6,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6111.4,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6118.4,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6125.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6132.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6139.4,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6146.2,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6153.2,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6160.1,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6167,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6174,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6187.9,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6195.1,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6201.7,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6208.7,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6215.6,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6222.5,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6229.7,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6236.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6243.4,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6250.4,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6257.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6264.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6271.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6278.1,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6285.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6292.1,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6299,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6305.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6312.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6319.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6326.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6333.7,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6340.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6347.5,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6354.5,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6361.5,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6368.5,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6375.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6382.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6389.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6396.1,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6403.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6417.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6424,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6430.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6437.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6444.8,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6451.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 6458.8,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6465.5,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6472.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6479.4,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6486.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6493.3,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6500.3,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6514.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6521.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6528,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6535,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6542.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6548.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6556.2,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6562.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6569.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6576.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6583.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6590.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6597.6,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6604.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6611.4,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6618.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6625.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6632.4,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6639.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6646.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6653.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6660.6,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6667.1,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6674,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6680.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6687.8,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6694.8,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6708.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6715.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6722.5,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6729.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6736.5,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6743.3,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6750.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6757.2,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6764.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6771,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6778,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6791.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6799,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6805.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6812.8,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6819.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6826.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6840.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6847.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6854.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6861.2,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6868.2,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6882.1,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6889,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6896,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6903,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6916.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6923.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6930.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6937.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6944.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6951.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6958.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6972.4,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6986.3,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7000.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7014.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7021,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7027.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7041.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7048.7,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7062.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7076.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7090.4,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7097.4,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7111.2,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7125.2,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7132.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7139,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7152.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7159.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7180.7,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7194.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7208.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7222.4,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7236.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7250.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7264,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7277.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7291.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7305.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7326.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7340.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7347.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7361.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7375.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7382.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7389,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7396,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7402.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7409.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7416.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7423.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7430.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7437.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7444.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7451.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7458.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7465.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7479.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7486.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7493.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7500.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7507.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7514,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7521,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7527.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7534.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7541.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7548.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7555.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7562.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7569.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7576.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7583.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7590.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7597.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7604.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7611.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7618.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7625.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7632.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7639,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7646,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7652.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7660.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7666.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7673.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7680.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7688,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7694.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7701.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7708.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7715.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7722.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7736.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7743.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7750.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7757.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7764.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7771,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7777.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7784.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7791.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7799.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7805.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7812.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7819.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7826.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7833.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7840.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7847.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7854.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7861.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7868.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7875.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7882.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7889,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7895.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7902.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7909.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7916.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7923.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7930.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7937.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7944.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7951.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7958.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7965.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7972.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7979.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7986.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 7993.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8000.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8007.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8014.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8021,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8027.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8035,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8041.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8048.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8056,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8062.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8070,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8076.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8083.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8090.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8097.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8104.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8111.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8118.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": ""
+    },
+    {
+      "t": 8132,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8139.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8145.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8152.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8159.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8167.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8173.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8180.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8187.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8194.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8201.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8208.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8215.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8222.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8229.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8236.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8243.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8250.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8257,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8264.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8270.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8277.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8284.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8292.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8298.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8305.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8312.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8319.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8326.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8333.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8340.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8347.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8354.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8361.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8368.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8375.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8382.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8389,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8396.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8402.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8410,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8416.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8424,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8430.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8437.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8444.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8451.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8458.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8465.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8472.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8479.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8486.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8493.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8500,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8507.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8514,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    }
+  ],
+  "wheel": [
+    {
+      "t": 5158.400000002235,
+      "deltaY": 90
+    },
+    {
+      "t": 5245.60000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 5335.800000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 5439.70000000298,
+      "deltaY": 90
+    },
+    {
+      "t": 5530.300000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 5613,
+      "deltaY": 90
+    },
+    {
+      "t": 5710.10000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 5800.5,
+      "deltaY": 90
+    },
+    {
+      "t": 5896.20000000298,
+      "deltaY": 90
+    },
+    {
+      "t": 5967.5,
+      "deltaY": 90
+    },
+    {
+      "t": 6049.800000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 6140.70000000298,
+      "deltaY": 90
+    },
+    {
+      "t": 6237.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 6320.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 6405.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 6515.60000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 6599.10000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 6682,
+      "deltaY": -90
+    },
+    {
+      "t": 6793.900000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 6883.60000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 6974,
+      "deltaY": -90
+    },
+    {
+      "t": 7064.70000000298,
+      "deltaY": -90
+    },
+    {
+      "t": 7154.5,
+      "deltaY": -90
+    },
+    {
+      "t": 7252.5,
+      "deltaY": -90
+    }
+  ],
+  "geometry": [
+    {
+      "at": 1857,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {},
+      "mutated": [],
+      "visible": 17,
+      "added": 17,
+      "removed": 0,
+      "addedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "search.0"
+      ],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 2256,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "resize-observer": 1
+      },
+      "mutated": [],
+      "visible": 18,
+      "added": 5,
+      "removed": 4,
+      "addedIds": ["control.38", "control.43", "control.45", "control.49", "control.52"],
+      "removedIds": ["control.40", "control.44", "control.48", "control.50"],
+      "viewportMoved": 6,
+      "documentMoved": 6,
+      "documentMovedIds": ["control.30", "control.33", "control.34", "control.41", "control.42", "control.51"]
+    },
+    {
+      "at": 2270,
+      "change": "hold",
+      "wait": 184
+    },
+    {
+      "at": 2474,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 1,
+        "resize-observer": 1
+      },
+      "mutated": ["html(+1/-0)"],
+      "visible": 18,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 2475,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": ["control.38", "control.43", "control.45", "control.49", "control.52"],
+        "removed": ["control.40", "control.44", "control.48", "control.50"],
+        "changed": [
+          {
+            "id": "control.30",
+            "before": "[\"control.30\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,48,[36,581,766,56]]",
+            "after": "[\"control.30\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,48,[36,581,718,56]]"
+          },
+          {
+            "id": "control.33",
+            "before": "[\"control.33\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},84,48,[36,581,766,56]]",
+            "after": "[\"control.33\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},84,48,[36,581,718,56]]"
+          },
+          {
+            "id": "control.34",
+            "before": "[\"control.34\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},148,75.296875,[36,581,766,56]]",
+            "after": "[\"control.34\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},148,75.296875,[36,581,718,56]]"
+          },
+          {
+            "id": "control.41",
+            "before": "[\"control.41\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},850,56,null]",
+            "after": "[\"control.41\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},802,56,null]"
+          },
+          {
+            "id": "control.42",
+            "before": "[\"control.42\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},898,56,null]",
+            "after": "[\"control.42\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},850,56,null]"
+          },
+          {
+            "id": "control.51",
+            "before": "[\"control.51\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},986,72,4,48,null]",
+            "after": "[\"control.51\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},415,575,12,32,null]"
+          }
+        ],
+        "changedCount": 6
+      }
+    },
+    {
+      "at": 3027,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 25,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "head(+1/-0)",
+        "div#video-preview.style-scope.ytd-app(+1/-0)",
+        "ytd-video-preview-loader.ytdVideoPreviewLoaderHost[class]",
+        "ytd-video-preview-loader.ytdVideoPreviewLoaderHost[class]",
+        "ytd-video-preview-loader.ytdVideoPreviewLoaderHost(+1/-0)",
+        "ytd-player(+5/-0)",
+        "div#frosted-glass.none.style-scope.ytd-app[class]",
+        "ytd-page-manager#page-manager.style-scope.ytd-app(+1/-0)",
+        "ytd-watch-flexy.style-scope.ytd-page-manager.watch-root-element(+24/-0)",
+        "iron-media-query#two-column-query.style-scope.ytd-watch-flexy[style]",
+        "iron-media-query#small-window-query.style-scope.ytd-watch-flexy[style]",
+        "iron-media-query#large-window-query.style-scope.ytd-watch-flexy[style]"
+      ],
+      "visible": 32,
+      "added": 23,
+      "removed": 9,
+      "addedIds": ["navigation.0", "control.1", "control.2", "control.5", "control.7", "control.13"],
+      "removedIds": ["control.30", "control.33", "control.34", "control.38", "control.41", "control.42"],
+      "viewportMoved": 9,
+      "documentMoved": 9,
+      "documentMovedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "search.0"
+      ]
+    },
+    {
+      "at": 3027,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "navigation.0",
+          "control.1",
+          "control.2",
+          "control.5",
+          "control.7",
+          "control.13",
+          "control.48",
+          "control.53"
+        ],
+        "removed": [
+          "control.30",
+          "control.33",
+          "control.34",
+          "control.38",
+          "control.41",
+          "control.42",
+          "control.43",
+          "control.51"
+        ],
+        "changed": [
+          {
+            "id": "player.video",
+            "before": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.controls.bottom",
+            "before": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.controls.top",
+            "before": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.seek.0",
+            "before": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,980,null]"
+          },
+          {
+            "id": "player.seek.1",
+            "before": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,980,null]"
+          },
+          {
+            "id": "search.0",
+            "before": "[\"search.0\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},362,700,4,48,null]",
+            "after": "[\"search.0\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},362,648,4,48,null]"
+          },
+          {
+            "id": "control.4",
+            "before": "[\"control.4\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},481,76,null]",
+            "after": "[\"control.4\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},415,523,12,32,null]"
+          },
+          {
+            "id": "control.45",
+            "before": "[\"control.45\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},946,56,null]",
+            "after": "[\"control.45\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,572.25,676,56]]"
+          }
+        ],
+        "changedCount": 9
+      }
+    },
+    {
+      "at": 3114,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 19,
+        "focus": 1,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div#buttons.style-scope.ytd-masthead(+2/-0)",
+        "ytd-button-renderer.style-scope.ytd-masthead(+3/-0)",
+        "ytd-topbar-menu-button-renderer.style-scope.ytd-masthead.style-default(+7/-0)",
+        "div#button.style-scope.ytd-topbar-menu-button-renderer(+0/-1)",
+        "div#button.style-scope.ytd-topbar-menu-button-renderer(+1/-0)",
+        "yt-icon.style-scope.ytd-topbar-menu-button-renderer(+3/-0)",
+        "yt-icon-button#button.style-scope.ytd-topbar-menu-button-renderer.style-default(+0/-1)",
+        "yt-icon-button#button.style-scope.ytd-topbar-menu-button-renderer.style-default(+5/-0)",
+        "yt-interaction#interaction.circular.style-scope.yt-icon-button(+5/-0)",
+        "ytd-topbar-menu-button-renderer.style-scope.ytd-masthead.style-default[class]",
+        "yt-icon-button#button.style-scope.ytd-topbar-menu-button-renderer.style-default[class]",
+        "ytd-topbar-menu-button-renderer.style-scope.ytd-masthead.style-default[class]"
+      ],
+      "visible": 33,
+      "added": 15,
+      "removed": 14,
+      "addedIds": ["navigation.1", "control.8", "control.46", "control.50", "control.54", "control.59"],
+      "removedIds": ["control.13", "control.45", "control.48", "control.53", "control.55", "control.60"],
+      "viewportMoved": 6,
+      "documentMoved": 6,
+      "documentMovedIds": ["control.49", "control.56", "control.57", "control.58", "control.66", "control.67"]
+    },
+    {
+      "at": 3366,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 20,
+        "fonts": 1,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "yt-floating-button-view-model.ytFloatingButtonViewModelHost.style-scope.ytd-structured-description-content-renderer[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div#contents.style-scope.ytd-item-section-renderer(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)"
+      ],
+      "visible": 39,
+      "added": 6,
+      "removed": 0,
+      "addedIds": ["control.112", "control.114", "control.116", "control.118", "control.120", "control.122"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3366,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "navigation.1",
+          "control.8",
+          "control.46",
+          "control.50",
+          "control.54",
+          "control.59",
+          "control.61",
+          "control.64"
+        ],
+        "removed": [
+          "control.13",
+          "control.45",
+          "control.48",
+          "control.53",
+          "control.55",
+          "control.60",
+          "control.63",
+          "control.65"
+        ],
+        "changed": [
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,572.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,572.25,676,56]]"
+          },
+          {
+            "id": "control.56",
+            "before": "[\"control.56\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},800,56,null]",
+            "after": "[\"control.56\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},752,56,null]"
+          },
+          {
+            "id": "control.57",
+            "before": "[\"control.57\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},848,56,null]",
+            "after": "[\"control.57\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},800,56,null]"
+          },
+          {
+            "id": "control.58",
+            "before": "[\"control.58\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},896,56,null]",
+            "after": "[\"control.58\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},848,56,null]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,671.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 6
+      }
+    },
+    {
+      "at": 3565,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 21,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div#contents.style-scope.ytd-item-section-renderer(+3/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)"
+      ],
+      "visible": 49,
+      "added": 10,
+      "removed": 0,
+      "addedIds": ["control.124", "control.126", "control.128", "control.130", "control.132", "control.134"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3565,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.124",
+          "control.126",
+          "control.128",
+          "control.130",
+          "control.132",
+          "control.134",
+          "control.136",
+          "control.138"
+        ],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 3777,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 155,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 49,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3907,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 3907,
+      "change": "hold",
+      "wait": 66
+    },
+    {
+      "at": 3980,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 31
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "head(+0/-1)",
+        "span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTrailingLabel.ytListItemViewModelTrailing[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "yt-list-item-view-count-view-model.ytListItemViewCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]"
+      ],
+      "visible": 49,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3989,
+      "change": "hold",
+      "wait": 188
+    },
+    {
+      "at": 4226,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 28
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "span.yt-icon-shape.ytSpecIconShapeHost(+1/-0)",
+        "span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "span.yt-icon-shape.ytSpecIconShapeHost(+1/-0)",
+        "span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "span.yt-icon-shape.ytSpecIconShapeHost(+1/-0)"
+      ],
+      "visible": 70,
+      "added": 35,
+      "removed": 14,
+      "addedIds": ["comment.0", "control.87", "control.88", "control.92", "control.93", "control.94"],
+      "removedIds": ["control.106", "control.108", "control.112", "control.118", "control.122", "control.124"],
+      "viewportMoved": 5,
+      "documentMoved": 5,
+      "documentMovedIds": ["control.110", "control.114", "control.116", "control.120", "control.126"]
+    },
+    {
+      "at": 4226,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "comment.0",
+          "control.87",
+          "control.88",
+          "control.92",
+          "control.93",
+          "control.94",
+          "control.98",
+          "control.99"
+        ],
+        "removed": [
+          "control.106",
+          "control.108",
+          "control.112",
+          "control.118",
+          "control.122",
+          "control.124",
+          "control.128",
+          "control.130"
+        ],
+        "changed": [
+          {
+            "id": "control.110",
+            "before": "[\"control.110\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.110\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.114",
+            "before": "[\"control.114\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.114\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.116",
+            "before": "[\"control.116\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.116\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},160.1875,61.671875,null]"
+          },
+          {
+            "id": "control.120",
+            "before": "[\"control.120\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.120\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},48,123.46875,null]"
+          },
+          {
+            "id": "control.126",
+            "before": "[\"control.126\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.126\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.234375,40,null]"
+          }
+        ],
+        "changedCount": 5
+      }
+    },
+    {
+      "at": 4468,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 23,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div#contents.style-scope.ytd-item-section-renderer(+2/-0)",
+        "ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+9/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer(+3/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer[class]",
+        "yt-formatted-string.style-scope.ytd-comment-thread-renderer(+4/-0)",
+        "ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+0/-1)",
+        "ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+11/-0)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+0/-1)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+4/-0)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition[class]",
+        "ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1)",
+        "ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1)"
+      ],
+      "visible": 121,
+      "added": 56,
+      "removed": 5,
+      "addedIds": ["control.129", "control.133", "control.134", "control.135", "control.137", "control.141"],
+      "removedIds": ["control.150", "control.158", "control.166", "control.174", "control.182"],
+      "viewportMoved": 14,
+      "documentMoved": 14,
+      "documentMovedIds": ["control.148", "control.152", "control.154", "control.156", "control.160", "control.162"]
+    },
+    {
+      "at": 4468,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.129",
+          "control.133",
+          "control.134",
+          "control.135",
+          "control.137",
+          "control.141",
+          "control.142",
+          "control.143"
+        ],
+        "removed": ["control.150", "control.158", "control.166", "control.174", "control.182"],
+        "changed": [
+          {
+            "id": "control.148",
+            "before": "[\"control.148\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.148\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.152",
+            "before": "[\"control.152\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.152\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.154",
+            "before": "[\"control.154\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.154\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.234375,61.671875,null]"
+          },
+          {
+            "id": "control.156",
+            "before": "[\"control.156\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.156\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.160",
+            "before": "[\"control.160\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.160\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.162",
+            "before": "[\"control.162\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.162\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.234375,61.671875,null]"
+          },
+          {
+            "id": "control.164",
+            "before": "[\"control.164\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.164\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.168",
+            "before": "[\"control.168\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.168\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          }
+        ],
+        "changedCount": 14
+      }
+    },
+    {
+      "at": 4670,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 89,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div#contents.style-scope.ytd-item-section-renderer(+2/-0)",
+        "ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+9/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer(+3/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer[class]",
+        "yt-formatted-string.style-scope.ytd-comment-thread-renderer(+4/-0)"
+      ],
+      "visible": 138,
+      "added": 31,
+      "removed": 14,
+      "addedIds": ["control.234", "control.238", "control.239", "control.240", "control.242", "control.244"],
+      "removedIds": ["control.253", "control.257", "control.259", "control.261", "control.265", "control.267"],
+      "viewportMoved": 5,
+      "documentMoved": 5,
+      "documentMovedIds": ["control.255", "control.263", "control.285", "control.287", "control.289"]
+    },
+    {
+      "at": 4670,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.234",
+          "control.238",
+          "control.239",
+          "control.240",
+          "control.242",
+          "control.244",
+          "control.246",
+          "control.247"
+        ],
+        "removed": [
+          "control.253",
+          "control.257",
+          "control.259",
+          "control.261",
+          "control.265",
+          "control.267",
+          "control.269",
+          "control.271"
+        ],
+        "changed": [
+          {
+            "id": "control.255",
+            "before": "[\"control.255\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.255\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.234375,40,null]"
+          },
+          {
+            "id": "control.263",
+            "before": "[\"control.263\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.263\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.234375,40,null]"
+          }
+        ],
+        "changedCount": 2
+      }
+    },
+    {
+      "at": 4869,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 28,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5017,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 5024,
+      "change": "hold",
+      "wait": 40
+    },
+    {
+      "at": 5070,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 29
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5077,
+      "change": "hold",
+      "wait": 188
+    },
+    {
+      "at": 5280,
+      "change": "read",
+      "scroll": [0, 180],
+      "bumped": true,
+      "causes": {
+        "mutation": 21,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 5280,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,572.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,572.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,572.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,491.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 5484,
+      "change": "read",
+      "scroll": [0, 360],
+      "bumped": true,
+      "causes": {
+        "mutation": 46,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 5484,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,392.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,392.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,392.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,311.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 5686,
+      "change": "read",
+      "scroll": [0, 540],
+      "bumped": true,
+      "causes": {
+        "mutation": 27,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 5687,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,212.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,32.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,212.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,32.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,212.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,32.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,131.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,131.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,131.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,131.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,131.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 5896,
+      "change": "read",
+      "scroll": [0, 810],
+      "bumped": true,
+      "causes": {
+        "mutation": 28,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "span.ytp-time-current(+0/-1)",
+        "span.ytp-time-current(+1/-0)",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6097,
+      "change": "read",
+      "scroll": [0, 990],
+      "bumped": true,
+      "causes": {
+        "mutation": 32,
+        "scroll": 3
+      },
+      "mutated": [
+        "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadTopLevelThread[class]",
+        "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadTopLevelThread[class]",
+        "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadHovered[class]",
+        "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadHovered[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6097,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,32.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-417.75,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,32.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-417.75,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,32.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-417.75,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-318.25,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-318.25,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-318.25,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-318.25,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-318.25,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 6298,
+      "change": "read",
+      "scroll": [0, 990],
+      "bumped": false,
+      "causes": {
+        "mutation": 28,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 6447,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 6455,
+      "change": "hold",
+      "wait": 39
+    },
+    {
+      "at": 6503,
+      "change": "read",
+      "scroll": [0, 810],
+      "bumped": true,
+      "causes": {
+        "mutation": 29,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6503,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-417.75,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-237.75,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-417.75,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-237.75,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-417.75,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-237.75,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-318.25,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-138.25,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-318.25,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-138.25,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-318.25,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-138.25,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-318.25,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-138.25,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-318.25,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-138.25,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 6705,
+      "change": "read",
+      "scroll": [0, 540],
+      "bumped": true,
+      "causes": {
+        "mutation": 32,
+        "scroll": 3
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadTopLevelThread[class]",
+        "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadTopLevelThread[class]",
+        "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadHovered[class]",
+        "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadHovered[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6706,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-237.75,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,32.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-237.75,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,32.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-237.75,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,32.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,131.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,131.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,131.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,131.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,131.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 6905,
+      "change": "read",
+      "scroll": [0, 360],
+      "bumped": true,
+      "causes": {
+        "mutation": 26,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6906,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,32.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,32.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,32.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,131.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,311.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7114,
+      "change": "read",
+      "scroll": [0, 180],
+      "bumped": true,
+      "causes": {
+        "mutation": 50,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 7114,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,212.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,212.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,212.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,491.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7314,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 17,
+        "scroll": 2
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 7315,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,392.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,572.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,392.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,572.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,392.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,572.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,671.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7515,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 24
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-load-progress[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 7663,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 7670,
+      "change": "hold",
+      "wait": 40
+    },
+    {
+      "at": 7716,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 29
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 7723,
+      "change": "hold",
+      "wait": 187
+    },
+    {
+      "at": 7916,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 28
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 7924,
+      "change": "hold",
+      "wait": 188
+    },
+    {
+      "at": 8120,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 29
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 8128,
+      "change": "hold",
+      "wait": 186
+    },
+    {
+      "at": 8319,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 28
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 8326,
+      "change": "hold",
+      "wait": 188
+    },
+    {
+      "at": 8521,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 29
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    }
+  ],
+  "approach": [
+    {
+      "at": 3573,
+      "change": "approach",
+      "value": true,
+      "event": "pointermove",
+      "target": "div#contentContainer.style-scope.tp-yt-app-drawer",
+      "point": {
+        "x": 12,
+        "y": 166.6666717529297
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        }
+      ],
+      "near": ["player.controls.top"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 3608,
+      "change": "approach",
+      "value": true,
+      "event": "pointermove",
+      "target": "video.video-stream.html5-main-video",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "player.controls.top"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 3935,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        }
+      ],
+      "near": ["player.controls.bottom"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 5687,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.88",
+          "shape": {
+            "left": 16,
+            "top": 428.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.92",
+          "shape": {
+            "left": 60,
+            "top": 474.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.98",
+          "shape": {
+            "left": 52,
+            "top": 518.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.88", "control.92", "control.98", "player.controls.bottom"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 5831,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.88",
+          "shape": {
+            "left": 16,
+            "top": 428.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.92",
+          "shape": {
+            "left": 60,
+            "top": 474.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.98",
+          "shape": {
+            "left": 52,
+            "top": 518.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.88", "control.92", "control.98"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 5896,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div.thread-hitbox.style-scope.ytd-comment-thread-renderer",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.109",
+          "shape": {
+            "left": 52,
+            "top": 394.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.110",
+          "shape": {
+            "left": 16,
+            "top": 450.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.114",
+          "shape": {
+            "left": 60,
+            "top": 496.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.120",
+          "shape": {
+            "left": 52,
+            "top": 540.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.110", "control.114", "control.88", "control.92", "control.98"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6098,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.121",
+          "shape": {
+            "left": 16,
+            "top": 416.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.125",
+          "shape": {
+            "left": 60,
+            "top": 462.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.129",
+          "shape": {
+            "left": 16,
+            "top": 510.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.133",
+          "shape": {
+            "left": 60,
+            "top": 556.25,
+            "width": 32,
+            "height": 32
+          }
+        }
+      ],
+      "near": ["control.125", "control.129", "control.110", "control.114", "control.88", "control.92", "control.98"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6246,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.121",
+          "shape": {
+            "left": 16,
+            "top": 416.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.125",
+          "shape": {
+            "left": 60,
+            "top": 462.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.129",
+          "shape": {
+            "left": 16,
+            "top": 510.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.133",
+          "shape": {
+            "left": 60,
+            "top": 556.25,
+            "width": 32,
+            "height": 32
+          }
+        }
+      ],
+      "near": ["control.125", "control.129", "control.110", "control.114"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6447,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.121",
+          "shape": {
+            "left": 16,
+            "top": 416.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.125",
+          "shape": {
+            "left": 60,
+            "top": 462.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.129",
+          "shape": {
+            "left": 16,
+            "top": 510.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.133",
+          "shape": {
+            "left": 60,
+            "top": 556.25,
+            "width": 32,
+            "height": 32
+          }
+        }
+      ],
+      "near": ["control.125", "control.129"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6503,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.109",
+          "shape": {
+            "left": 52,
+            "top": 394.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.110",
+          "shape": {
+            "left": 16,
+            "top": 450.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.114",
+          "shape": {
+            "left": 60,
+            "top": 496.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.120",
+          "shape": {
+            "left": 52,
+            "top": 540.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.110", "control.114", "control.125", "control.129"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6706,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.88",
+          "shape": {
+            "left": 16,
+            "top": 428.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.92",
+          "shape": {
+            "left": 60,
+            "top": 474.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.98",
+          "shape": {
+            "left": 52,
+            "top": 518.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.88", "control.92", "control.98", "control.110", "control.114", "control.125", "control.129"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6852,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.88",
+          "shape": {
+            "left": 16,
+            "top": 428.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.92",
+          "shape": {
+            "left": 60,
+            "top": 474.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.98",
+          "shape": {
+            "left": 52,
+            "top": 518.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.88", "control.92", "control.98", "control.110", "control.114"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7054,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "comment.0",
+          "shape": {
+            "left": 16,
+            "top": 551.25,
+            "width": 980,
+            "height": 25
+          }
+        }
+      ],
+      "near": ["control.88", "control.92", "control.98"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7252,
+      "change": "approach",
+      "value": false,
+      "event": "wheel",
+      "target": "video.video-stream.html5-main-video",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": -112,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": -112,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "control.46",
+          "shape": {
+            "left": 28,
+            "top": 400.25,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.49",
+          "shape": {
+            "left": 80,
+            "top": 400.25,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": [],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7315,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        }
+      ],
+      "near": ["player.controls.bottom"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    }
+  ]
+}

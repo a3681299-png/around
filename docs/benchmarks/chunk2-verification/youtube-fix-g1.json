@@ -1,0 +1,34 @@
+{
+  "side": "fix",
+  "edge": {
+    "opaque": 6228,
+    "topBand": 1748,
+    "topBandAllowed": 0,
+    "canvasAllowed": 0,
+    "plane": "around-video-decorations",
+    "clip": "inset(64px 0px 112px)",
+    "pointerEvents": "none",
+    "player": {
+      "x": 16,
+      "y": 68,
+      "width": 1112,
+      "height": 625.5,
+      "top": 68,
+      "right": 1128,
+      "bottom": 693.5,
+      "left": 16
+    },
+    "canvas": {
+      "x": 897.3125,
+      "y": -27,
+      "width": 150,
+      "height": 190,
+      "top": -27,
+      "right": 1047.3125,
+      "bottom": 163,
+      "left": 897.3125
+    }
+  },
+  "nativePlayAndPause": true,
+  "completed": true
+}

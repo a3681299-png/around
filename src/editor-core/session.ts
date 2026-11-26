@@ -1,6 +1,8 @@
 import { parseEditCommand } from './commands';
 import { editorCapabilities } from './capabilities';
-import { defaultModelSettings, patchModel } from '../models/types';
+import { defaultModelSettings, patchModel, sameModelInfo } from '../models/types';
+import { applyCharacterPatch, modelClips } from '../characters/settings';
+import { draftMotions, type MotionLabel } from '../characters/manifest';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { emptyDesign, sameDesign } from '../design/schema';
 import { readDesign, editDesign, commitDesign, shareDesign, freezeTree } from '../design/immutable';
@@ -18,6 +20,8 @@ import {
 import { alignSamples, distributeSamples, type Alignment, type Distribution } from '../design/layout';
 import { createHistory } from '../editor/history';
 import { selectLayer } from '../editor/layers';
+import { CHARACTER_HOME } from '../characters/home';
+import { reassignBehaviours } from '../characters/auto-motions';
 import {
   deleteDocumentLayers,
   duplicateDocumentLayers,
@@ -26,7 +30,18 @@ import {
   reorderDocument,
   ungroupLayers,
 } from '../editor/groups';
-import type { EditCommand, EditorCheckpoint, EditorPorts, EditorSnapshot, EditorView, EditorTool } from './types';
+import {
+  EDITOR_TOOLS,
+  type EditCommand,
+  type EditorCheckpoint,
+  type EditorPorts,
+  type EditorSnapshot,
+  type EditorView,
+  type EditorTool,
+  type SkinPreview,
+} from './types';
+import { designAssetIds } from '../design/references';
+import { defaultSkinFrame, fitSkinScale, putSkin, skinAssetProblem, withSkinFrame, type SkinSlot } from './skins';
 import type { SignalRule } from '../signals/keyframes';
 
 /** Portable, authoritative edit session. All environment access comes through ports. */
@@ -38,8 +53,10 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const checkDesignAssets = storage.validate,
     saveDesign = storage.save;
   let saved: DesignDocument | undefined,
+    draftBase: DesignDocument | undefined,
     draft = readDesign(emptyDesign(ports.siteId, ports.baseThemeId)),
-    pendingSave: DesignDocument | undefined;
+    pendingSave: DesignDocument | undefined,
+    recovery: EditorCheckpoint | undefined;
   let active = false,
     enabled = false,
     settingsReceived = false,
@@ -49,6 +66,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const empty = draft;
   let tool: EditorTool = 'select';
   let selectedTarget: string | undefined,
+    skinPreview: SkinPreview = {},
     selectedImageIds: string[] = [],
     snapping = false;
   let dirty = false,
@@ -62,7 +80,8 @@ export function createEditorSession<Source extends { readonly length: number }>(
     assetSession: string | undefined,
     leased = '';
   let sessionId = '',
-    revision = 0;
+    revision = 0,
+    checkpointRevision = 0;
   let leaseQueue: Promise<void> = Promise.resolve();
   const deferredReleases = new Set<string>(),
     listeners = new Set<(state: EditorSnapshot) => void>();
@@ -73,6 +92,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const initial = () => saved ?? empty;
   const clearSelection = () => {
     selectedTarget = undefined;
+    skinPreview = {};
   };
   function view(): EditorView {
     const groups = draft.groups ?? [];
@@ -83,10 +103,14 @@ export function createEditorSession<Source extends { readonly length: number }>(
       : selectedImageIds.length === 1
         ? draft.decorations.find((layer) => layer.id === selectedImageIds[0])
         : undefined;
+    const rule = draft.rules.find((rule) => rule.target === selectedTarget);
     return {
       ...editorCapabilities(draft, selectedImageIds, saving || importing),
       selected: Boolean(selectedTarget),
-      style: draft.rules.find((rule) => rule.target === selectedTarget)?.style ?? {},
+      style: rule?.style ?? {},
+      ...(selectedTarget ? { target: selectedTarget } : {}),
+      ...(rule?.skin ? { skin: rule.skin } : {}),
+      skinPreview: { ...skinPreview },
       dirty,
       saving: saving || importing,
       status,
@@ -111,25 +135,32 @@ export function createEditorSession<Source extends { readonly length: number }>(
     return {
       sessionId,
       revision,
+      ...(checkpointRevision !== revision ? { checkpointRevision } : {}),
       active,
       enabled,
       view: freezeTree(view()),
       document: draft,
       ...(saved ? { saved } : {}),
+      ...(draftBase !== saved ? { draftBase: draftBase ? { saved: draftBase } : {} } : {}),
+      ...(recovery ? { recoveryPending: true } : {}),
       ...(selectedTarget ? { selectedTarget } : {}),
     };
   }
-  const render = () => {
+  const render = (checkpointChanged = true) => {
     revision++;
+    if (checkpointChanged) checkpointRevision = revision;
     const state = snapshot();
     listeners.forEach((listener) => listener(state));
   };
   const syncAssets = (): Promise<void> => {
     const session = assetSession;
     if (!session) return Promise.resolve();
-    const ids = [
-      ...new Set([draft, ...history.values()].flatMap((value) => value.decorations.map((image) => image.assetId))),
-    ];
+    const documents = [draft, ...history.values()];
+    if (recovery) {
+      documents.push(recovery.draft, ...recovery.history.past, ...recovery.history.future);
+      if (recovery.history.transaction) documents.push(recovery.history.transaction);
+    }
+    const ids = [...new Set(documents.flatMap(designAssetIds))];
     const key = ids.sort().join(',');
     leaseQueue = leaseQueue
       .catch(() => undefined)
@@ -154,6 +185,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (record) history.record(draft, parsed);
     draft = parsed;
     dirty = draft !== initial();
+    if (!dirty) draftBase = saved;
     status = dirty ? 'このタブでプレビュー中です。保存すると各タブに反映します。' : '保存済みの見た目です。';
     error = false;
     render();
@@ -189,6 +221,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     clearSelection();
     active = false;
     draft = initial();
+    draftBase = saved;
     dirty = false;
     render();
   };
@@ -260,25 +293,33 @@ export function createEditorSession<Source extends { readonly length: number }>(
       patch = { ...patch, placement: reanchorPlacement(current.placement, from, to, patch.placement.anchor) };
     }
     const next = editDesign(draft);
-    const { playback, model, ...properties } = patch;
+    const { playback, model, character, ...properties } = patch;
+    next.decorations = next.decorations.map((image) => {
+      if (image.id !== id || image.kind !== 'model3d') return image;
+      // A character's motions are the clip list; reshaping them first keeps model indices aligned.
+      const reshaped =
+        character && image.character
+          ? applyCharacterPatch({ source: image.source, character: image.character, model: image.model }, character)
+          : undefined;
+      const layer = reshaped ? { ...image, ...reshaped } : image;
+      return {
+        ...layer,
+        ...properties,
+        placement: { ...image.placement, ...patch.placement },
+        model: patchModel(layer.model, model, { ...image.source, clips: modelClips(layer) }),
+      };
+    });
     next.decorations = next.decorations.map((image) =>
-      image.id !== id
+      image.id !== id || image.kind === 'model3d'
         ? image
-        : image.kind === 'model3d'
+        : image.kind === 'animation'
           ? {
               ...image,
               ...properties,
               placement: { ...image.placement, ...patch.placement },
-              model: patchModel(image.model, model, image.source),
+              playback: { ...image.playback, ...playback },
             }
-          : image.kind === 'animation'
-            ? {
-                ...image,
-                ...properties,
-                placement: { ...image.placement, ...patch.placement },
-                playback: { ...image.playback, ...playback },
-              }
-            : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } },
+          : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } },
     );
     updateDraft(next);
   }
@@ -434,21 +475,46 @@ export function createEditorSession<Source extends { readonly length: number }>(
     try {
       const assets = await storage.import(files, importSession);
       if (epoch !== importEpoch || !active) return;
+      if (assets.some((asset) => asset.vrmAnimation))
+        throw new Error('動作（.vrma）は、VRMモデルの設定の「動作を追加」から読み込んでください。');
       before = draft;
       const next = editDesign(draft);
       let importedSelection: string | undefined;
       const { width, height, origin } = ports.geometry.importFrame(point);
       assets.forEach((asset, index) => {
+        const model = asset.model;
+        if (model?.vrm?.body) {
+          const existing = next.decorations.filter((layer) => layer.kind === 'model3d' && layer.assetId === asset.id);
+          // Re-reading a VRM is the advertised path to measure an old import: while any instance
+          // still lacks its body, refresh every instance (placement, settings, motions and
+          // identity kept) and add none. Once all are measured, reading the file again adds
+          // another instance, as before (Shota's decision, 2026-11-05).
+          if (existing.some((layer) => layer.kind === 'model3d' && !layer.source.vrm?.body)) {
+            next.decorations = next.decorations.map((layer) => {
+              if (layer.kind !== 'model3d' || layer.assetId !== asset.id) return layer;
+              if (!sameModelInfo(layer.source, model)) throw new Error('既存モデルと素材の情報が一致しません。');
+              return { ...layer, source: model };
+            });
+            importedSelection = existing[0]!.id;
+            return;
+          }
+        }
         const scale = Math.max(
           IMAGE_LIMITS.minSize / Math.min(asset.width, asset.height),
           Math.min(260 / asset.width, 200 / asset.height, (width * 0.28) / asset.width, (height * 0.3) / asset.height),
         );
         const id = ports.makeId('image');
+        // A character nobody dropped anywhere goes home: the player's corner under its bars, where
+        // it is seen while watching (CHARACTER_HOME). Without a player on the page, the viewport.
+        const home =
+          asset.model && !point && ports.geometry.frameFor(CHARACTER_HOME)
+            ? { ...CHARACTER_HOME, x: Math.max(0.05, CHARACTER_HOME.x - index * 0.12) }
+            : undefined;
         const common = {
           id,
           assetId: asset.id,
           name: asset.name,
-          placement: {
+          placement: home ?? {
             anchor: { kind: 'viewport' as const },
             x: Math.min(0.95, Math.max(0.05, origin.x / width + (index * 24) / width)),
             y: Math.min(0.95, Math.max(0.05, origin.y / height + (index * 24) / height)),
@@ -515,6 +581,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     history.reset();
     interactionEpoch++;
     draft = initial();
+    draftBase = saved;
     dirty = false;
     status = '変更を破棄しました。';
     error = false;
@@ -524,9 +591,180 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const change = (style: SurfaceStyle) => {
     if (!selectedTarget || saving || importing) return;
     const next = editDesign(draft);
+    // A part's UI skin survives colour edits; only an empty rule is removed.
+    const skin = next.rules.find((rule) => rule.target === selectedTarget)?.skin;
     next.rules = next.rules.filter((rule) => rule.target !== selectedTarget!);
-    if (Object.keys(style).length > 0) next.rules.push({ kind: 'surface-style', target: selectedTarget, style });
+    if (Object.keys(style).length > 0 || skin)
+      next.rules.push({ kind: 'surface-style', target: selectedTarget, style, ...(skin ? { skin } : {}) });
     updateDraft(next);
+  };
+  const skinTarget = () => {
+    const target = ports.targets.find((item) => item.id === selectedTarget);
+    if (!target) throw new Error('着せ替える部品を選んでください。');
+    if (!target.skin) throw new Error(`${target.label}は着せ替えに対応していません。`);
+    return target;
+  };
+  const refuse = (message: string) => {
+    status = message;
+    error = true;
+    render();
+  };
+  /** Uses the shared asset import, then stores the asset in one skin slot instead of a layer. */
+  const addSkinImage = async (files: Source, slot: SkinSlot) => {
+    if (!active || !assetSession || saving || importing || !files.length) return;
+    let target;
+    try {
+      target = skinTarget();
+    } catch (reason) {
+      return refuse(reason instanceof Error ? reason.message : '着せ替える部品を選んでください。');
+    }
+    if (files.length !== 1) return refuse('着せ替えの絵は1枚ずつ入れてください。');
+    const existing = draft.rules.find((rule) => rule.target === target.id)?.skin;
+    if (slot !== 'normal' && !existing) return refuse('先に通常状態の絵を入れてください。');
+    finishGesture();
+    const epoch = importEpoch,
+      importSession = ports.makeId('session');
+    let before: DesignDocument | undefined;
+    importing = true;
+    status = '着せ替えの絵を読み込んでいます…';
+    error = false;
+    render();
+    try {
+      const [asset] = await storage.import(files, importSession);
+      if (epoch !== importEpoch || !active) return;
+      if (!asset) throw new Error('画像を読み込めませんでした。');
+      const problem = skinAssetProblem(asset);
+      if (problem) throw new Error(problem);
+      before = draft;
+      // Keep the guides an author already placed when only the art of a slot changes.
+      const previous =
+        slot === 'compact'
+          ? existing?.compact?.kind === 'frame'
+            ? existing.compact.frame
+            : undefined
+          : existing?.states[slot];
+      const frame =
+        previous &&
+        previous.slices.left + previous.slices.right <= asset.width &&
+        previous.slices.top + previous.slices.bottom <= asset.height
+          ? { ...previous, assetId: asset.id }
+          : fitSkinScale(defaultSkinFrame(asset), target.skin?.sample);
+      const next = putSkin(draft, target.id, withSkinFrame(existing, slot, frame));
+      await checkDesignAssets(next, importSession);
+      if (epoch !== importEpoch || !active) return;
+      if (before !== draft) {
+        before = undefined;
+        throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
+      }
+      updateDraft(next, false);
+      leased = '';
+      await syncAssets();
+      if (epoch !== importEpoch || !active) return;
+      history.record(before, draft);
+      status = `${target.label}に絵を入れました。ガイドをドラッグして切り位置を調整できます。`;
+      settleAssets();
+    } catch (reason) {
+      if (epoch !== importEpoch || !active) return;
+      if (before && before !== draft) updateDraft(before, false);
+      status = reason instanceof Error ? reason.message : '画像を読み込めませんでした。';
+      error = true;
+      leased = '';
+      settleAssets();
+    } finally {
+      void releaseAssets(importSession).catch(() => undefined);
+      if (epoch === importEpoch) {
+        importing = false;
+        render();
+      }
+    }
+  };
+
+  /**
+   * .vrma motions join one VRM layer's character instead of becoming layers. The labels come
+   * from a manifest the panel read; every number stored comes from the imported files.
+   */
+  const addMotions = async (
+    layerId: string,
+    files: Source,
+    labels: ReadonlyMap<string, MotionLabel>,
+    origin: 'standard' | 'character',
+  ) => {
+    if (!active || !assetSession || saving || importing || !files.length) return;
+    const layer = draft.decorations.find((item) => item.id === layerId);
+    if (layer?.kind !== 'model3d' || !layer.source.vrm) return refuse('動作はVRMモデルのレイヤーに追加してください。');
+    finishGesture();
+    const epoch = importEpoch,
+      importSession = ports.makeId('session');
+    let before: DesignDocument | undefined;
+    importing = true;
+    status = '動作を読み込んでいます…';
+    error = false;
+    render();
+    try {
+      const assets = await storage.import(files, importSession);
+      if (epoch !== importEpoch || !active) return;
+      const motions = assets.map((asset) => {
+        if (!asset.vrmAnimation) throw new Error(`${asset.name} はVRMアニメーション（.vrma）ではありません。`);
+        return { id: asset.id, name: asset.name, vrmAnimation: asset.vrmAnimation };
+      });
+      before = draft;
+      const current = draft.decorations.find((item) => item.id === layerId);
+      if (current?.kind !== 'model3d') throw new Error('動作を追加するレイヤーが見つかりません。');
+      // A character made by this import moves on its own at once (reading motions is enough,
+      // docs/product-design-snapshot.md); an existing one keeps its autonomy switch as it was.
+      const character = current.character ?? { standardMotions: 'auto' as const, motions: [], autonomy: true };
+      const all = [...character.motions, ...draftMotions(character.motions, motions, labels, origin)];
+      const next = editDesign(draft);
+      next.decorations = next.decorations.map((item) =>
+        item.id === layerId && item.kind === 'model3d'
+          ? {
+              ...item,
+              character: {
+                ...character,
+                motions: all,
+                // Behaviours the author has not set get the best motion of their kind.
+                behaviourMotions: reassignBehaviours(character.motions, all, character.behaviourMotions),
+              },
+              // The clip list changes from the model's own clips to the motions on first use.
+              ...(current.character
+                ? {}
+                : {
+                    model: {
+                      ...item.model,
+                      clip: 0,
+                      locomotion: { ...item.model.locomotion, idle: null, walk: null, run: null },
+                    },
+                  }),
+            }
+          : item,
+      );
+      await checkDesignAssets(next, importSession);
+      if (epoch !== importEpoch || !active) return;
+      if (before !== draft) {
+        before = undefined;
+        throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
+      }
+      updateDraft(next, false);
+      leased = '';
+      await syncAssets();
+      if (epoch !== importEpoch || !active) return;
+      history.record(before, draft);
+      status = `${motions.length}個の動作を追加しました。`;
+      settleAssets();
+    } catch (reason) {
+      if (epoch !== importEpoch || !active) return;
+      if (before && before !== draft) updateDraft(before, false);
+      status = reason instanceof Error ? reason.message : '動作を読み込めませんでした。';
+      error = true;
+      leased = '';
+      settleAssets();
+    } finally {
+      void releaseAssets(importSession).catch(() => undefined);
+      if (epoch === importEpoch) {
+        importing = false;
+        render();
+      }
+    }
   };
 
   const accept = (incoming: DesignDocument | undefined) => {
@@ -541,6 +779,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     loadError = undefined;
     if (pendingSave && sameDesign(incoming, pendingSave)) {
       draft = initial();
+      draftBase = saved;
       dirty = false;
     } else if (!dirty) {
       if (!sameDesign(previous, incoming)) {
@@ -548,6 +787,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
         interactionEpoch++;
       }
       draft = initial();
+      draftBase = saved;
       if (active) {
         status = '保存済みのデザインを読み込みました。';
         error = false;
@@ -571,6 +811,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (!dirty || saving || importing || !assetSession) return;
     const saveSession = assetSession;
     const snapshot = draft;
+    const savedRevision = revision;
     pendingSave = snapshot;
     saving = true;
     status = '保存しています…';
@@ -580,7 +821,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       // Renew the session's complete draft/history lease before crossing the save boundary.
       leased = '';
       await syncAssets();
-      await saveDesign(snapshot, saveSession);
+      await saveDesign(snapshot, saveSession, savedRevision);
       const epoch = storageEpoch;
       const latest = await storage.read();
       if (!alive) return;
@@ -604,12 +845,13 @@ export function createEditorSession<Source extends { readonly length: number }>(
   };
 
   function open(): { ok: boolean; error?: string } {
-    if (!settingsReceived) return { ok: false, error: '表示設定を読み込み中です。少し待ってから開いてください。' };
-    if (!enabled) return { ok: false, error: 'テーマをONにし、強さを1%以上にしてから編集してください。' };
+    if (!settingsReceived) return { ok: false, error: '設定を読み込み中です。少し待ってから開いてください。' };
+    if (!enabled) return { ok: false, error: '「作品を表示する」がOFFです。ONにしてから編集してください。' };
     if (!loaded) return { ok: false, error: 'デザインを読み込み中です。少し待ってから開いてください。' };
     if (loadError) return { ok: false, error: loadError };
     if (active) return { ok: true };
     draft = initial();
+    draftBase = saved;
     history.reset();
     interactionEpoch++;
     selectedImageIds = [];
@@ -630,13 +872,27 @@ export function createEditorSession<Source extends { readonly length: number }>(
   async function execute(command: EditCommand): Promise<void> {
     command = parseEditCommand(command);
     if (!active) throw new Error('編集セッションが開かれていません。');
+    if (command.type === 'restore-draft') {
+      if (recovery) await restore(recovery, undefined, true);
+      return;
+    }
+    if (command.type === 'keep-saved') {
+      if (recovery) {
+        recovery = undefined;
+        discard();
+      }
+      return;
+    }
+    if (recovery && command.type !== 'close') throw new Error('先に作業中のコピーを復元するか選んでください。');
     if ((saving || importing) && command.type !== 'close' && command.type !== 'tool')
       throw new Error('処理中です。完了を待ってください。');
     switch (command.type) {
       case 'tool':
-        if (!['select', 'browse', 'card'].includes(command.tool)) throw new Error('未対応のツールです。');
+        if (!EDITOR_TOOLS.includes(command.tool)) throw new Error('未対応のツールです。');
         finishGesture(true);
         tool = command.tool;
+        // A forced preview belongs to the skin editor; other tools show the live page.
+        if (tool !== 'skin') skinPreview = {};
         render();
         break;
       case 'select':
@@ -647,6 +903,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
           throw new Error('編集できない対象です。');
         finishGesture(true);
         selectedImageIds = [];
+        if (selectedTarget !== command.target) skinPreview = {};
         selectedTarget = command.target;
         render();
         break;
@@ -675,6 +932,19 @@ export function createEditorSession<Source extends { readonly length: number }>(
         break;
       case 'style':
         change(command.style);
+        break;
+      case 'skin':
+        if (saving || importing) break;
+        updateDraft(putSkin(draft, skinTarget().id, command.skin));
+        settleAssets();
+        break;
+      case 'skin-preview':
+        if (!selectedTarget) break;
+        skinPreview = {
+          ...(command.state ? { state: command.state } : {}),
+          ...(command.compact ? { compact: true } : {}),
+        };
+        render(false);
         break;
       case 'placements':
         changePlacements(command.changes);
@@ -732,26 +1002,42 @@ export function createEditorSession<Source extends { readonly length: number }>(
     }
   }
   function checkpoint(): EditorCheckpoint {
-    return {
-      version: 1,
-      siteId: ports.siteId,
-      draft,
-      ...(saved ? { saved } : {}),
-      selectedIds: [...selectedImageIds],
-      tool,
-      ...(selectedTarget ? { selectedTarget } : {}),
-      snapping,
-      history: history.checkpoint(),
-    };
+    return (
+      recovery ?? {
+        version: 1,
+        siteId: ports.siteId,
+        origin: { sessionId, revision: checkpointRevision },
+        draft,
+        ...(draftBase ? { saved: draftBase } : {}),
+        selectedIds: [...selectedImageIds],
+        tool,
+        ...(selectedTarget ? { selectedTarget } : {}),
+        snapping,
+        history: history.checkpoint(),
+      }
+    );
   }
-  async function restore(value: EditorCheckpoint) {
+  function offerRecovery(value: EditorCheckpoint) {
+    recovery = value;
+    draft = initial();
+    draftBase = saved;
+    dirty = false;
+    history.reset();
+    interactionEpoch++;
+    selectedImageIds = [];
+    clearSelection();
+    status = '保存済みの作品を表示しています。';
+    error = false;
+    render();
+    settleAssets();
+  }
+  async function restore(value: EditorCheckpoint, savedThrough?: EditorCheckpoint['origin'], confirmed = false) {
     if (!active || saving || importing || value.version !== 1 || value.siteId !== ports.siteId)
       throw new Error('この編集セッションに復元できません。');
     const restoringSession = sessionId;
     const next = readDesign(value.draft),
       restoredSaved = value.saved === undefined ? undefined : readDesign(value.saved);
-    if (value.tool !== undefined && !['select', 'browse', 'card'].includes(value.tool))
-      throw new Error('復旧ツールが不正です。');
+    if (value.tool !== undefined && !EDITOR_TOOLS.includes(value.tool)) throw new Error('復旧ツールが不正です。');
     if (
       next.siteId !== ports.siteId ||
       !Array.isArray(value.selectedIds) ||
@@ -769,25 +1055,60 @@ export function createEditorSession<Source extends { readonly length: number }>(
     restored.restore(value.history);
     if (restored.values().some((doc) => doc.siteId !== ports.siteId))
       throw new Error('復旧データの対象が一致しません。');
-    const ids = [
-      ...new Set([next, ...restored.values()].flatMap((doc) => doc.decorations.map((layer) => layer.assetId))),
-    ];
+    const restoreSelection = () => {
+      selectedImageIds = normalizeSelection(value.selectedIds, draft.decorations, draft.groups ?? []);
+      selectedTarget = value.selectedTarget;
+      snapping = value.snapping;
+      tool = value.tool ?? 'select';
+    };
+    const origin = value.origin;
+    const hasOrigin =
+      origin &&
+      typeof origin.sessionId === 'string' &&
+      origin.sessionId.length > 0 &&
+      Number.isSafeInteger(origin.revision) &&
+      origin.revision >= 0;
+    if (
+      !confirmed &&
+      hasOrigin &&
+      savedThrough &&
+      origin.sessionId === savedThrough.sessionId &&
+      origin.revision <= savedThrough.revision
+    ) {
+      // Preserve editor context for IDs that still exist, without applying
+      // the superseded artwork or its Undo history.
+      restoreSelection();
+      render();
+      return;
+    }
+    const offerChoice = () => {
+      if (confirmed) return false;
+      const sameBase = sameDesign(restoredSaved, saved);
+      // Older checkpoints recorded the latest saved artwork, which could
+      // already have changed while their draft still had a different base.
+      if (sameBase && (hasOrigin || sameDesign(next, initial()))) return false;
+      // A clean old checkpoint, or a draft identical to the saved artwork,
+      // has no unsaved work. Its history belongs to a different baseline.
+      if (!sameDesign(next, restoredSaved ?? empty) && !sameDesign(next, initial())) offerRecovery(value);
+      return true;
+    };
+    if (offerChoice()) return;
+    const ids = [...new Set([next, ...restored.values()].flatMap(designAssetIds))];
     await retainAssets(assetSession!, ids);
     await checkDesignAssets(next, assetSession!);
     if (!active || restoringSession !== sessionId) return;
+    // Another tab can save while validation is in flight.
+    if (offerChoice()) return;
+    recovery = undefined;
     history.restore(restored.checkpoint());
     if (history.active) history.commit(next);
     draft = shareDesign(initial(), next);
-    selectedImageIds = normalizeSelection(value.selectedIds, draft.decorations, draft.groups ?? []);
-    selectedTarget = value.selectedTarget;
-    snapping = value.snapping;
-    tool = value.tool ?? 'select';
+    draftBase = saved;
+    restoreSelection();
     dirty = draft !== initial();
     interactionEpoch++;
-    error = !sameDesign(restoredSaved, saved);
-    status = error
-      ? '復旧中に保存済みデザインが変わりました。プレビューを保持しています。保存すると上書きし、破棄すると最新の保存値に戻ります。'
-      : '編集セッションとUndo履歴を復元しました。';
+    error = false;
+    status = '編集セッションとUndo履歴を復元しました。';
     render();
     settleAssets();
   }
@@ -798,7 +1119,12 @@ export function createEditorSession<Source extends { readonly length: number }>(
     snapshot,
     checkpoint,
     restore,
+    checkDetachedRecovery() {
+      if (!recovery && dirty && !sameDesign(draftBase, saved)) offerRecovery(checkpoint());
+    },
     import: addImages,
+    importSkin: addSkinImage,
+    importMotions: addMotions,
     subscribe(listener: (state: EditorSnapshot) => void) {
       listeners.add(listener);
       return () => listeners.delete(listener);

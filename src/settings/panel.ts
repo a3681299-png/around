@@ -1,56 +1,68 @@
-import { mountPixelFont } from '../ui/pixel-font';
 import type { SettingsEntry } from '../sites/types';
 import { bindSettingsForm } from './form';
 import panelStyles from './panel.css';
-import { DEFAULT_THEME, themes } from '../themes';
+import settingsStyles from './settings.css';
+import tokens from '../editor/studio-tokens.css';
+import { glyphButton } from '../editor/icons';
 import { SETTINGS_MARKUP } from './markup';
 import { initialSettingsPosition, SETTINGS_POSITION_KEY, type SettingsRect } from './position';
+import { readStoredPosition, saveStoredPosition } from '../browser/settings-store';
 
 export interface SettingsPanel extends SettingsEntry {
   open(): void;
+  /** Shows a message in the panel's editor area, opening the panel. */
+  report(message: string): void;
   destroy(): void;
+}
+export interface SettingsEditorEntry {
+  /** The side panel (S) or the editor's own window (W). */
+  open(surface: 'sidepanel' | 'window'): void;
+  /** 制作モード: the in-video icon opens the editor itself instead of these settings. */
+  creatorMode(): boolean;
 }
 
 /** Site-independent editor; Shadow DOM isolates its UI from the host site's CSS. */
-export function createSettingsPanel(doc: Document, openEditor?: () => void): SettingsPanel {
-  const unmountFont = mountPixelFont(doc);
+export function createSettingsPanel(doc: Document, editor?: SettingsEditorEntry): SettingsPanel {
   const button = doc.createElement('button');
   button.type = 'button';
-  button.dataset.wwSettingsButton = '';
-  button.title = 'Web World Themes の設定';
+  button.dataset.aroundSettingsButton = '';
+  button.title = 'Around の設定';
   button.setAttribute('aria-label', button.title);
   button.setAttribute('aria-haspopup', 'dialog');
   button.setAttribute('aria-expanded', 'false');
-  button.setAttribute('aria-controls', 'web-world-themes-panel');
+  button.setAttribute('aria-controls', 'around-panel');
   button.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;color:#fff;';
   // Temporary sliders icon, independent of a theme's eventual visual identity.
   button.innerHTML =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M8 3v6M16 9v6M10 15v6" stroke-width="4"/></g></svg>';
 
   const panel = doc.createElement('div');
-  panel.id = 'web-world-themes-panel';
-  panel.dataset.wwUi = DEFAULT_THEME;
+  panel.id = 'around-panel';
   panel.hidden = true;
   panel.lang = 'ja';
   panel.setAttribute('role', 'dialog');
-  panel.setAttribute('aria-label', 'Web World Themes の設定');
+  panel.setAttribute('aria-label', 'Around の設定');
   const shadow = panel.attachShadow({ mode: 'open' });
   const style = doc.createElement('style');
-  style.textContent = [...themes[DEFAULT_THEME].editorStylesheets, panelStyles].join('\n');
+  style.textContent = tokens + settingsStyles + panelStyles;
   shadow.append(style);
   const main = doc.createElement('div');
-  main.className = 'settings ww-editor';
+  main.className = 'settings around-editor';
   main.innerHTML = SETTINGS_MARKUP;
   shadow.append(main);
   const closeButton = main.querySelector<HTMLButtonElement>('.close')!;
-  const direct = main.querySelector<HTMLButtonElement>('#creator-editor-direct')!;
-  direct.disabled = !openEditor;
-  const onEditor = () => {
+  glyphButton(closeButton, 'close', '設定を閉じる');
+  const direct = main.querySelector<HTMLButtonElement>('#creator-editor-direct')!,
+    separate = main.querySelector<HTMLButtonElement>('#creator-editor-window')!,
+    launchStatus = main.querySelector<HTMLElement>('#creator-launch-status')!;
+  direct.disabled = separate.disabled = !editor;
+  const onEditor = (event: Event) => {
     close();
-    openEditor?.();
+    editor?.open(event.currentTarget === separate ? 'window' : 'sidepanel');
   };
   direct.addEventListener('click', onEditor);
-  const titlebar = main.querySelector<HTMLElement>('.ww-titlebar')!,
+  separate.addEventListener('click', onEditor);
+  const titlebar = main.querySelector<HTMLElement>('.around-titlebar')!,
     view = doc.defaultView!;
   let avoidRect: (() => SettingsRect | undefined) | undefined;
   let saved: { x: number; y: number } | undefined,
@@ -58,9 +70,9 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
     alive = true;
   let gesture: { x: number; y: number; left: number; top: number } | undefined;
   const place = (x: number, y: number, maxHeight: number) => {
-    panel.style.setProperty('--ww-settings-x', x + 'px');
-    panel.style.setProperty('--ww-settings-y', y + 'px');
-    panel.style.setProperty('--ww-settings-height', Math.max(80, maxHeight) + 'px');
+    panel.style.setProperty('--around-settings-x', x + 'px');
+    panel.style.setProperty('--around-settings-y', y + 'px');
+    panel.style.setProperty('--around-settings-height', Math.max(80, maxHeight) + 'px');
   };
   const clampSaved = () => {
     if (!saved) return;
@@ -84,10 +96,8 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
     }
     place(position.x, position.y, position.maxHeight);
   };
-  void chrome.storage.local
-    .get(SETTINGS_POSITION_KEY)
-    .then((values) => {
-      const value = values[SETTINGS_POSITION_KEY] as { x?: unknown; y?: unknown } | undefined;
+  void readStoredPosition(SETTINGS_POSITION_KEY)
+    .then((value) => {
       if (
         !alive ||
         positionTouched ||
@@ -121,7 +131,7 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
     if (!gesture) return;
     gesture = undefined;
     if (saved)
-      void chrome.storage.local.set({ [SETTINGS_POSITION_KEY]: saved }).catch(() => {
+      void saveStoredPosition(SETTINGS_POSITION_KEY, saved).catch(() => {
         main.querySelector('#save-status')!.textContent = '設定ウィンドウの位置を保存できませんでした。';
       });
   };
@@ -157,6 +167,8 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
   };
   const onClick = () => {
     if (!panel.hidden) close(true);
+    // 制作モード: the icon opens the editor within this click, so Chrome sees the person's gesture.
+    else if (editor?.creatorMode()) editor.open('sidepanel');
     else open();
   };
   const onKeyDown = (event: KeyboardEvent) => {
@@ -186,6 +198,10 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
     panel,
     close,
     open,
+    report(message) {
+      open();
+      launchStatus.textContent = message;
+    },
     reposition,
     setAvoidRect(get) {
       avoidRect = get;
@@ -193,13 +209,13 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
     destroy() {
       alive = false;
       close();
-      unmountFont();
       button.removeEventListener('click', onClick);
       button.removeEventListener('click', stopPropagation);
       button.removeEventListener('keydown', onButtonKey);
       button.removeEventListener('keyup', onButtonKey);
       closeButton.removeEventListener('click', onClose);
       direct.removeEventListener('click', onEditor);
+      separate.removeEventListener('click', onEditor);
       titlebar.removeEventListener('pointerdown', startDrag);
       titlebar.removeEventListener('pointermove', moveDrag);
       titlebar.removeEventListener('pointerup', finishDrag);

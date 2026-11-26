@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "bakedColor": true,
+  "lightScale": 2,
+  "lightmap": "lightmap.png",
+  "lightmapMesh": "static_lm",
+  "vertexLightMesh": "static_vc",
+  "texturedMesh": "tex_",
+  "camera": "camera_main",
+  "layers": {
+    "screen": "light-screen.png",
+    "ui": "light-ui.png"
+  },
+  "sensorWidth": 36,
+  "lens": 65,
+  "aspect": 1.3333333333333333
+}

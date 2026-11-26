@@ -1,0 +1,73 @@
+[
+  {
+    "extension": ".work/extension",
+    "arguments": ["--config=.work/verify-tools/config.ts", "playground-extra.spec.ts"],
+    "status": 0,
+    "label": "pg-normal"
+  },
+  {
+    "extension": ".work/extension",
+    "arguments": ["--config=.work/verify-tools/config.ts", "playground-extra.spec.ts", "--grep", "missing mark"],
+    "status": 1,
+    "label": "pg-no-mark"
+  },
+  {
+    "extension": ".work/extension",
+    "arguments": ["--config=.work/verify-tools/config.ts", "playground-extra.spec.ts", "--grep", "malformed artwork"],
+    "status": 1,
+    "label": "pg-no-parser"
+  },
+  {
+    "extension": ".work/extension",
+    "arguments": [
+      "--config=.work/verify-tools/config.ts",
+      "playground-extra.spec.ts",
+      "--grep",
+      "overlapping character"
+    ],
+    "status": 1,
+    "label": "pg-no-clip"
+  },
+  {
+    "extension": ".work/extension",
+    "arguments": [
+      "tests/operation-safety.spec.ts",
+      "tests/studio-transfer.spec.ts",
+      "--grep",
+      "G1.2 ①②④|a binary message arriving after release",
+      "--repeat-each=10"
+    ],
+    "status": 0,
+    "label": "stability-after"
+  },
+  {
+    "extension": "../playground-v1-before/.work/extension",
+    "arguments": [
+      "tests/operation-safety.spec.ts",
+      "tests/studio-transfer.spec.ts",
+      "--grep",
+      "G1.2 ①②④|a binary message arriving after release",
+      "--repeat-each=10"
+    ],
+    "status": 0,
+    "label": "stability-before"
+  },
+  {
+    "extension": ".work/fault-hysteresis",
+    "arguments": ["--config=.work/verify-tools/config.ts", "timing.spec.ts", "--grep", "G1.2 ①②④", "--repeat-each=10"],
+    "status": 1,
+    "label": "no-hysteresis"
+  },
+  {
+    "extension": ".work/extension",
+    "arguments": ["--config=.work/verify-tools/config.ts", "live.spec.ts"],
+    "status": 1,
+    "label": "live-after-final"
+  },
+  {
+    "extension": "../playground-v1-before/.work/extension",
+    "arguments": ["--config=.work/verify-tools/config.ts", "live.spec.ts"],
+    "status": 0,
+    "label": "live-before"
+  }
+]

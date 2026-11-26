@@ -1,0 +1,1654 @@
+{
+  "environment": {
+    "os": "10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "url": "https://www.youtube.com/watch?v=LC1a-DwUhls"
+  },
+  "accepted": [1, 2, 3, 4, 5, 6, 7, 8],
+  "blocks": {
+    "quiet:startup": {
+      "pairs": [
+        {
+          "pair": 1,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 280,
+              "median": 0.40000000037252903,
+              "p95": 10,
+              "max": 62.49999999627471,
+              "total": 574.9999999944121
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793866777534.2,
+              "actualRafFrames": 279
+            },
+            "call": {
+              "n": 1459,
+              "median": 0,
+              "p95": 1.2999999998137355,
+              "max": 48.299999999813735,
+              "total": 574.9999999944121,
+              "atLeast2": 42,
+              "atLeast5": 22,
+              "atLeast10": 14,
+              "atLeast16": 4
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 103,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 50,
+              "event": 11,
+              "microtask": 58,
+              "MutationObserver": 1182,
+              "raf": 118,
+              "ResizeObserver": 13,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 21
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 506,
+              "median": 0.20000000018626451,
+              "p95": 1.7000000001862645,
+              "max": 26.999999999068677,
+              "total": 299.19999999459833
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793866813852.6,
+              "actualRafFrames": 505
+            },
+            "call": {
+              "n": 1049,
+              "median": 0,
+              "p95": 0.7999999998137355,
+              "max": 25.199999999254942,
+              "total": 299.19999999459833,
+              "atLeast2": 23,
+              "atLeast5": 7,
+              "atLeast10": 5,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 108,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 50,
+              "event": 11,
+              "microtask": 47,
+              "MutationObserver": 823,
+              "raf": 83,
+              "ResizeObserver": 9,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 20
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": -0.20000000018626451,
+            "p95": -8.299999999813735,
+            "frames": 226,
+            "cpuTotal": -275.79999999981374
+          }
+        },
+        {
+          "pair": 2,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 360,
+              "median": 0,
+              "p95": 7.7999999998137355,
+              "max": 33.40000000037253,
+              "total": 493.7000000011176
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793866890095.7,
+              "actualRafFrames": 359
+            },
+            "call": {
+              "n": 1422,
+              "median": 0,
+              "p95": 1.1000000005587935,
+              "max": 31.899999999441206,
+              "total": 493.7000000011176,
+              "atLeast2": 44,
+              "atLeast5": 18,
+              "atLeast10": 10,
+              "atLeast16": 3
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 105,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 50,
+              "event": 11,
+              "microtask": 62,
+              "MutationObserver": 1136,
+              "raf": 121,
+              "ResizeObserver": 13,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 23
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 357,
+              "median": 0,
+              "p95": 6.1000000005587935,
+              "max": 56.09999999590218,
+              "total": 552.4000000003725
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793866851237.1,
+              "actualRafFrames": 356
+            },
+            "call": {
+              "n": 1347,
+              "median": 0,
+              "p95": 1.2999999998137355,
+              "max": 49.5,
+              "total": 552.4000000003725,
+              "atLeast2": 45,
+              "atLeast5": 15,
+              "atLeast10": 12,
+              "atLeast16": 4
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 113,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 50,
+              "event": 11,
+              "microtask": 52,
+              "MutationObserver": 1085,
+              "raf": 108,
+              "ResizeObserver": 13,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 22
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": -1.699999999254942,
+            "frames": -3,
+            "cpuTotal": 58.69999999925494
+          }
+        },
+        {
+          "pair": 3,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 359,
+              "median": 0,
+              "p95": 7.200000001117587,
+              "max": 22.499999999068677,
+              "total": 373.6000000042841
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793866921111.2,
+              "actualRafFrames": 358
+            },
+            "call": {
+              "n": 1356,
+              "median": 0,
+              "p95": 1.099999999627471,
+              "max": 19.59999999962747,
+              "total": 373.6000000042841,
+              "atLeast2": 35,
+              "atLeast5": 15,
+              "atLeast10": 8,
+              "atLeast16": 2
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 117,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 48,
+              "microtask": 55,
+              "MutationObserver": 1079,
+              "raf": 127,
+              "ResizeObserver": 12,
+              "event": 10,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 19
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 415,
+              "median": 0,
+              "p95": 4.3999999994412065,
+              "max": 26.500000000931323,
+              "total": 403.4999999990687
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793866958933.2,
+              "actualRafFrames": 414
+            },
+            "call": {
+              "n": 1448,
+              "median": 0,
+              "p95": 1.099999999627471,
+              "max": 25.5,
+              "total": 403.4999999990687,
+              "atLeast2": 30,
+              "atLeast5": 12,
+              "atLeast10": 9,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 109,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 52,
+              "event": 11,
+              "microtask": 64,
+              "MutationObserver": 1153,
+              "raf": 126,
+              "ResizeObserver": 15,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 21
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": -2.8000000016763806,
+            "frames": 56,
+            "cpuTotal": 29.899999994784594
+          }
+        },
+        {
+          "pair": 4,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 365,
+              "median": 0,
+              "p95": 8.100000000558794,
+              "max": 37.59999999962747,
+              "total": 466.6999999983236
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867034500.2,
+              "actualRafFrames": 364
+            },
+            "call": {
+              "n": 1359,
+              "median": 0,
+              "p95": 1.2000000001862645,
+              "max": 34.299999999813735,
+              "total": 466.6999999983236,
+              "atLeast2": 34,
+              "atLeast5": 18,
+              "atLeast10": 6,
+              "atLeast16": 3
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 106,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 46,
+              "event": 11,
+              "microtask": 54,
+              "MutationObserver": 1100,
+              "raf": 109,
+              "ResizeObserver": 12,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 21
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 314,
+              "median": 0,
+              "p95": 10.300000004470348,
+              "max": 31.200000001117587,
+              "total": 505.1000000210479
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793866990694,
+              "actualRafFrames": 313
+            },
+            "call": {
+              "n": 1430,
+              "median": 0,
+              "p95": 1.099999999627471,
+              "max": 29.899999999441206,
+              "total": 505.1000000210479,
+              "atLeast2": 40,
+              "atLeast5": 17,
+              "atLeast10": 12,
+              "atLeast16": 8
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 111,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 48,
+              "event": 11,
+              "microtask": 59,
+              "MutationObserver": 1137,
+              "raf": 133,
+              "ResizeObserver": 15,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 21
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": 2.200000003911555,
+            "frames": -51,
+            "cpuTotal": 38.40000002272427
+          }
+        },
+        {
+          "pair": 5,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 407,
+              "median": 0,
+              "p95": 5.8999999994412065,
+              "max": 22.100000001490116,
+              "total": 433.4999999906868
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867065855.9,
+              "actualRafFrames": 406
+            },
+            "call": {
+              "n": 1443,
+              "median": 0,
+              "p95": 1.2000000001862645,
+              "max": 21.299999999813735,
+              "total": 433.4999999906868,
+              "atLeast2": 34,
+              "atLeast5": 13,
+              "atLeast10": 10,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 48,
+              "event": 11,
+              "microtask": 59,
+              "MutationObserver": 1164,
+              "raf": 121,
+              "ResizeObserver": 12,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 22
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 255,
+              "median": 0,
+              "p95": 10.499999999068677,
+              "max": 31.600000001490116,
+              "total": 434.9999999878928
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867089401.9,
+              "actualRafFrames": 254
+            },
+            "call": {
+              "n": 1356,
+              "median": 0,
+              "p95": 1.2000000001862645,
+              "max": 20.5,
+              "total": 434.9999999878928,
+              "atLeast2": 42,
+              "atLeast5": 17,
+              "atLeast10": 10,
+              "atLeast16": 3
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 102,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 48,
+              "event": 11,
+              "microtask": 59,
+              "MutationObserver": 1069,
+              "raf": 127,
+              "ResizeObserver": 15,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 21
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": 4.599999999627471,
+            "frames": -152,
+            "cpuTotal": 1.4999999972060323
+          }
+        },
+        {
+          "pair": 6,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 425,
+              "median": 0.09999999962747097,
+              "p95": 3.7000000001862645,
+              "max": 23.499999999068677,
+              "total": 376.3999999957159
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867172055.5,
+              "actualRafFrames": 424
+            },
+            "call": {
+              "n": 1467,
+              "median": 0,
+              "p95": 1,
+              "max": 15.899999999441206,
+              "total": 376.3999999957159,
+              "atLeast2": 32,
+              "atLeast5": 13,
+              "atLeast10": 8,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 106,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 50,
+              "event": 10,
+              "microtask": 65,
+              "MutationObserver": 1177,
+              "raf": 126,
+              "ResizeObserver": 12,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 21
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 342,
+              "median": 0,
+              "p95": 7.700000001117587,
+              "max": 31.500000000931323,
+              "total": 443.00000000558794
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867128479.4,
+              "actualRafFrames": 341
+            },
+            "call": {
+              "n": 1357,
+              "median": 0,
+              "p95": 1.099999999627471,
+              "max": 21.5,
+              "total": 443.00000000558794,
+              "atLeast2": 41,
+              "atLeast5": 15,
+              "atLeast10": 10,
+              "atLeast16": 5
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 1
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 46,
+              "event": 11,
+              "microtask": 55,
+              "MutationObserver": 1083,
+              "raf": 120,
+              "ResizeObserver": 14,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 22
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": -0.09999999962747097,
+            "p95": 4.000000000931323,
+            "frames": -83,
+            "cpuTotal": 66.60000000987202
+          }
+        },
+        {
+          "pair": 7,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 466,
+              "median": 0,
+              "p95": 4.200000001117587,
+              "max": 20.80000000167638,
+              "total": 360.30000000819564
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867210240.7,
+              "actualRafFrames": 465
+            },
+            "call": {
+              "n": 1479,
+              "median": 0,
+              "p95": 1,
+              "max": 14.700000000186265,
+              "total": 360.30000000819564,
+              "atLeast2": 27,
+              "atLeast5": 10,
+              "atLeast10": 4,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 113,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 48,
+              "event": 11,
+              "microtask": 58,
+              "MutationObserver": 1206,
+              "raf": 116,
+              "ResizeObserver": 12,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 22
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 410,
+              "median": 0,
+              "p95": 5,
+              "max": 24.09999999962747,
+              "total": 373.09999998658895
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867248466,
+              "actualRafFrames": 409
+            },
+            "call": {
+              "n": 1386,
+              "median": 0,
+              "p95": 1,
+              "max": 16.200000000186265,
+              "total": 373.09999998658895,
+              "atLeast2": 27,
+              "atLeast5": 13,
+              "atLeast10": 6,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 109,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 50,
+              "event": 11,
+              "microtask": 58,
+              "MutationObserver": 1110,
+              "raf": 118,
+              "ResizeObserver": 13,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 20
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": 0.7999999988824129,
+            "frames": -56,
+            "cpuTotal": 12.799999978393316
+          }
+        },
+        {
+          "pair": 8,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 361,
+              "median": 0,
+              "p95": 6.400000001303852,
+              "max": 26,
+              "total": 452.5999999931082
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867318279.7,
+              "actualRafFrames": 360
+            },
+            "call": {
+              "n": 1368,
+              "median": 0,
+              "p95": 1.099999999627471,
+              "max": 24.700000000186265,
+              "total": 452.5999999931082,
+              "atLeast2": 39,
+              "atLeast5": 14,
+              "atLeast10": 11,
+              "atLeast16": 5
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "MutationObserver": 1083,
+              "promise": 46,
+              "microtask": 60,
+              "raf": 125,
+              "ResizeObserver": 14,
+              "event": 12,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 22
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 460,
+              "median": 0.20000000018626451,
+              "p95": 3.5,
+              "max": 18.100000000558794,
+              "total": 360.7999999979511
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793867280330.3,
+              "actualRafFrames": 459
+            },
+            "call": {
+              "n": 1474,
+              "median": 0,
+              "p95": 0.900000000372529,
+              "max": 13.299999999813735,
+              "total": 360.7999999979511,
+              "atLeast2": 26,
+              "atLeast5": 12,
+              "atLeast10": 4,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 0,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "total": 0
+            },
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 48,
+              "event": 11,
+              "microtask": 63,
+              "MutationObserver": 1184,
+              "raf": 127,
+              "ResizeObserver": 12,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 23
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0.20000000018626451,
+            "p95": -2.9000000013038516,
+            "frames": 99,
+            "cpuTotal": -91.79999999515712
+          }
+        }
+      ],
+      "left": {
+        "cpu": {
+          "n": 3023,
+          "min": 0,
+          "median": 0,
+          "p95": 6.399999997578561,
+          "max": 62.49999999627471,
+          "sum": 3531.799999985844
+        },
+        "calls": {
+          "n": 11353,
+          "min": 0,
+          "median": 0,
+          "p95": 1.1000000005587935,
+          "max": 48.299999999813735,
+          "sum": 3531.799999985844
+        },
+        "rafIntervalMs": {
+          "n": 3007,
+          "min": 5.899999999999636,
+          "median": 7,
+          "p95": 48.40000000000009,
+          "max": 611.1999999999999,
+          "sum": 41369.00000000011
+        },
+        "gpu": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "p95": null,
+          "max": null,
+          "sum": 0
+        },
+        "video": {
+          "n": 8,
+          "total": 870,
+          "dropped": 0
+        },
+        "realFrames": {
+          "n": 8,
+          "min": 279,
+          "median": 362,
+          "p95": 465,
+          "max": 465,
+          "sum": 3015
+        }
+      },
+      "right": {
+        "cpu": {
+          "n": 3059,
+          "min": 0,
+          "median": 0,
+          "p95": 5.699999999254942,
+          "max": 56.09999999590218,
+          "sum": 3372.099999993108
+        },
+        "calls": {
+          "n": 10847,
+          "min": 0,
+          "median": 0,
+          "p95": 1.099999999627471,
+          "max": 49.5,
+          "sum": 3372.099999993108
+        },
+        "rafIntervalMs": {
+          "n": 3043,
+          "min": 5.600000000000136,
+          "median": 7,
+          "p95": 48.40000000000009,
+          "max": 548.5000000000001,
+          "sum": 41376.10000000012
+        },
+        "gpu": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "p95": null,
+          "max": null,
+          "sum": 0
+        },
+        "video": {
+          "n": 8,
+          "total": 872,
+          "dropped": 1
+        },
+        "realFrames": {
+          "n": 8,
+          "min": 254,
+          "median": 382.5,
+          "p95": 505,
+          "max": 505,
+          "sum": 3051
+        }
+      },
+      "delta": {
+        "median": 0,
+        "p95": -0.6999999983236194
+      },
+      "pairedP95": {
+        "n": 8,
+        "min": -8.299999999813735,
+        "median": -0.4500000001862645,
+        "p95": 4.599999999627471,
+        "max": 4.599999999627471,
+        "sum": -4.099999998696148
+      },
+      "absolutePairedP95": {
+        "n": 8,
+        "min": 0.7999999988824129,
+        "median": 2.850000001490116,
+        "p95": 8.299999999813735,
+        "max": 8.299999999813735,
+        "sum": 27.30000000540167
+      }
+    }
+  },
+  "attempts": [
+    {
+      "pair": 1,
+      "side": "left",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 7.68,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 209,
+            "ad": 24,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 98,
+              "dropped": 2
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 279,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 103,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 1,
+      "side": "right",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 6.112,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 431,
+            "ad": 29,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 100,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 505,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 108,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "side": "left",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 5.587,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 277,
+            "ad": 28,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 121,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 359,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 105,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "side": "right",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 9.669,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 403,
+            "ad": 31,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 134,
+              "dropped": 1
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 356,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 113,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 3,
+      "side": "left",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 9.528,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 376,
+            "ad": 29,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 285,
+              "dropped": 4
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 358,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 117,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 3,
+      "side": "right",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 3.988,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 370,
+            "ad": 29,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 129,
+              "dropped": 4
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 414,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 109,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 4,
+      "side": "left",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 3.731,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 431,
+            "ad": 31,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 112,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 364,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 106,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 4,
+      "side": "right",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 5.772,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 411,
+            "ad": 31,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 108,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 313,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 111,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 5,
+      "side": "left",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 4.685,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 431,
+            "ad": 31,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 109,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 406,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 5,
+      "side": "right",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 11.338,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": true,
+            "frameCount": 254,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 102,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 6,
+      "side": "left",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 9.642,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 366,
+            "ad": 29,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 130,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 424,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 106,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 6,
+      "side": "right",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 15.356,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 331,
+            "ad": 29,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 130,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 341,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 7,
+      "side": "left",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 5.014,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 325,
+            "ad": 27,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 131,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 465,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 113,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 7,
+      "side": "right",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 14.244,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 366,
+            "ad": 28,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 130,
+              "dropped": 1
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 409,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 109,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 8,
+      "side": "left",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 4.842,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 396,
+            "ad": 29,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 129,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 360,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pair": 8,
+      "side": "right",
+      "build": "base",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 5.821,
+      "valid": true,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 438,
+            "ad": 29,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 129,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 459,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 0
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

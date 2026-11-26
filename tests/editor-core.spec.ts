@@ -14,6 +14,9 @@ import { packCheckpoint, unpackCheckpoint } from '../src/studio/checkpoint-codec
 import { defaultModelSettings } from '../src/models/types';
 import { defaultFollowMotion } from '../src/signals/motion';
 import { commitDesign, editDesign, freezeTree, readDesign, shareDesign } from '../src/design/immutable';
+import { inspectAsset } from '../src/assets/inspect';
+import { vrmFixture } from './helpers/vrm-fixture';
+import { CHARACTER_HOME } from '../src/characters/home';
 
 function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined,
@@ -86,13 +89,16 @@ test('unknown initial settings are pending, while the first explicit OFF remains
     await Promise.resolve();
     expect(editor.open()).toMatchObject({ ok: false, error: /設定を読み込み中/ });
     editor.setEnabled(false);
-    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+    expect(editor.open()).toMatchObject({
+      ok: false,
+      error: '「作品を表示する」がOFFです。ONにしてから編集してください。',
+    });
     expect(editor.snapshot()).toMatchObject({ enabled: false, active: false });
     editor.setEnabled(true);
     expect(editor.open().ok).toBe(true);
     editor.setEnabled(false);
     expect(editor.snapshot()).toMatchObject({ enabled: false, active: false });
-    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+    expect(editor.open()).toMatchObject({ ok: false, error: /「作品を表示する」がOFF/ });
   } finally {
     editor.destroy();
   }
@@ -384,6 +390,8 @@ test('Studio deltas preserve gestures, Undo/Redo, save/discard and the bounded h
   expect(restored.history.past[0]!.decorations[1]).toBe(restored.history.past[1]!.decorations[1]);
   const recovered = harness();
   await Promise.resolve();
+  // A reload reads the same persisted artwork before adopting its checkpoint.
+  recovered.set(restored.saved!);
   recovered.editor.setEnabled(true);
   recovered.editor.open();
   await recovered.editor.restore(restored);
@@ -597,6 +605,7 @@ test('signal key edits share gesture history, locks, save/discard and session re
   const checkpoint = editor.checkpoint(),
     recovered = harness();
   await Promise.resolve();
+  recovered.set(checkpoint.saved!);
   recovered.editor.setEnabled(true);
   recovered.editor.open();
   await recovered.editor.restore(checkpoint);
@@ -679,6 +688,23 @@ test('checkpoint reload preserves draft, selection, asset references and Undo; a
   a.editor.destroy();
   b.editor.destroy();
 });
+test('a legacy dirty checkpoint without a proven base waits for the author', async () => {
+  const a = await opened();
+  const { origin: _origin, ...legacy } = a.editor.checkpoint();
+  const b = harness();
+  await Promise.resolve();
+  b.editor.setEnabled(true);
+  b.editor.open();
+  await b.editor.restore(legacy);
+  expect(b.editor.snapshot().recoveryPending).toBe(true);
+  expect(b.editor.snapshot().document.decorations).toEqual([]);
+  await b.editor.execute({ type: 'restore-draft' });
+  expect(b.editor.snapshot().recoveryPending).toBeUndefined();
+  expect(b.editor.snapshot().document).toEqual(legacy.draft);
+  expect(b.editor.snapshot().saved).toBeUndefined();
+  a.editor.destroy();
+  b.editor.destroy();
+});
 test('shared shortcuts preserve modifier meanings and composing input is ignored', () => {
   const input = {
       key: 'ArrowRight',
@@ -698,21 +724,22 @@ test('legacy v7 saved checkpoints migrate before conflict comparison and failed 
   const a = await opened();
   await a.editor.execute({ type: 'save' });
   const legacy = JSON.parse(
-      JSON.stringify(a.editor.checkpoint()).replaceAll('"schemaVersion":11', '"schemaVersion":7'),
+      JSON.stringify(a.editor.checkpoint()).replaceAll('"schemaVersion":18', '"schemaVersion":7'),
     ) as EditorCheckpoint,
     before = JSON.stringify(legacy);
+  expect(legacy.saved!.schemaVersion).toBe(7);
   const b = harness();
   await Promise.resolve();
   b.set(legacy.saved!);
   b.editor.setEnabled(true);
   b.editor.open();
   await b.editor.restore(legacy);
-  expect(b.editor.snapshot().document.schemaVersion).toBe(12);
+  expect(b.editor.snapshot().document.schemaVersion).toBe(18);
   expect(b.editor.snapshot().view.dirty).toBe(false);
   expect(b.editor.snapshot().view.error).toBe(false);
   expect(JSON.stringify(legacy)).toBe(before);
   const invalid = structuredClone(legacy);
-  Object.assign(invalid.saved!, { schemaVersion: 13 });
+  Object.assign(invalid.saved!, { schemaVersion: 19 });
   const current = b.editor.snapshot().document;
   await expect(b.editor.restore(invalid)).rejects.toThrow();
   expect(b.editor.snapshot().document).toEqual(current);
@@ -847,4 +874,114 @@ test('geometry snapshots during asset preflight preserve selection until import 
   await h.editor.execute({ type: 'undo' });
   expect(h.editor.snapshot().document).toEqual(old.document);
   h.editor.destroy();
+});
+
+test('a model is imported at the character home on the player, under its bars; an image keeps the viewport default', async () => {
+  const h = harness(),
+    model = inspectAsset(vrmFixture()).model!;
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  try {
+    await h.editor.import([{ id: `asset-${'d'.repeat(64)}`, name: 'Character.vrm', width: 256, height: 256, model }]);
+    await h.editor.import([assets[0]!]);
+    const [character, image] = h.editor.snapshot().document.decorations;
+    // Watching shows it right away: a model on the screen plane over the video is cut out where
+    // the player's bars are, so a fresh import there was invisible until it was moved.
+    expect(character).toMatchObject({ kind: 'model3d', placement: CHARACTER_HOME });
+    expect(image!.placement.anchor).toEqual({ kind: 'viewport' });
+  } finally {
+    h.editor.destroy();
+  }
+});
+
+test('without a player on the page, or dropped at a point, a model is imported on the viewport as before', async () => {
+  const h = harness(),
+    model = inspectAsset(vrmFixture()).model!;
+  const frame = h.ports.geometry.frameFor;
+  h.ports.geometry.frameFor = (placement) => (placement.anchor.kind === 'viewport' ? frame(placement) : undefined);
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  try {
+    await h.editor.import([{ id: `asset-${'e'.repeat(64)}`, name: 'Character.vrm', width: 256, height: 256, model }]);
+    expect(h.editor.snapshot().document.decorations[0]!.placement).toMatchObject({
+      anchor: { kind: 'viewport' },
+      x: 0.45,
+      y: 0.45,
+    });
+    h.ports.geometry.frameFor = frame;
+    await h.editor.import([{ id: `asset-${'f'.repeat(64)}`, name: 'Dropped.vrm', width: 256, height: 256, model }], {
+      x: 100,
+      y: 80,
+    });
+    expect(h.editor.snapshot().document.decorations[1]!.placement).toMatchObject({
+      anchor: { kind: 'viewport' },
+      x: 0.1,
+      y: 0.1,
+    });
+  } finally {
+    h.editor.destroy();
+  }
+});
+
+test('reimporting a VRM refreshes its body without adding a layer or losing edits and history', async () => {
+  const h = harness(),
+    measured = inspectAsset(vrmFixture()).model!,
+    legacy = structuredClone(measured),
+    id = `asset-${'c'.repeat(64)}`;
+  delete legacy.vrm!.body;
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  try {
+    await h.editor.import([{ id, name: 'Legacy.vrm', width: 200, height: 200, model: legacy }]);
+    await h.editor.execute({ type: 'change', patch: { name: 'Keep edits', opacity: 0.6, model: { playing: false } } });
+    const before = h.editor.snapshot().document,
+      expected = structuredClone(before);
+    if (expected.decorations[0]?.kind !== 'model3d') throw new Error('Expected a model layer');
+    expected.decorations[0].source = measured;
+    await h.editor.import([{ id, name: 'Renamed.vrm', width: 200, height: 200, model: measured }]);
+    expect(h.editor.snapshot().document).toEqual(expected);
+    await h.editor.execute({ type: 'undo' });
+    expect(h.editor.snapshot().document).toEqual(before);
+    await h.editor.execute({ type: 'redo' });
+    expect(h.editor.snapshot().document).toEqual(expected);
+    await h.editor.execute({ type: 'save' });
+    expect(await h.ports.storage.read()).toEqual(expected);
+    // Every layer is measured now: reading the same VRM again adds a second instance as it
+    // always did (Shota's decision, 2026-11-05), leaving the first one untouched.
+    await h.editor.import([{ id, name: 'Renamed.vrm', width: 200, height: 200, model: measured }]);
+    const twice = h.editor.snapshot().document.decorations;
+    expect(twice).toHaveLength(2);
+    expect(twice[0]).toEqual(expected.decorations[0]);
+    expect(twice[1]).toMatchObject({ kind: 'model3d', assetId: id, source: measured });
+  } finally {
+    h.editor.destroy();
+  }
+});
+
+test('reimporting refreshes every unmeasured copy of a VRM and adds none; a fully measured VRM adds a layer', async () => {
+  const h = harness(),
+    measured = inspectAsset(vrmFixture()).model!,
+    legacy = structuredClone(measured),
+    id = `asset-${'e'.repeat(64)}`;
+  delete legacy.vrm!.body;
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  try {
+    await h.editor.import([{ id, name: 'Legacy.vrm', width: 200, height: 200, model: legacy }]);
+    await h.editor.execute({ type: 'duplicate' });
+    const ids = h.editor.snapshot().document.decorations.map((layer) => layer.id);
+    expect(ids).toHaveLength(2);
+    await h.editor.import([{ id, name: 'Legacy.vrm', width: 200, height: 200, model: measured }]);
+    const refreshed = h.editor.snapshot().document.decorations;
+    expect(refreshed.map((layer) => layer.id)).toEqual(ids);
+    for (const layer of refreshed) expect(layer).toMatchObject({ kind: 'model3d', source: measured });
+    await h.editor.import([{ id, name: 'Legacy.vrm', width: 200, height: 200, model: measured }]);
+    expect(h.editor.snapshot().document.decorations).toHaveLength(3);
+  } finally {
+    h.editor.destroy();
+  }
 });

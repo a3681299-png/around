@@ -1,0 +1,547 @@
+{
+  "boundary": {
+    "fix": {
+      "rows": [
+        {
+          "name": "dot",
+          "source": "void chrome.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-globals",
+              "message": "Unexpected use of 'chrome'. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "bracket",
+          "source": "void chrome[\"storage\"];",
+          "errors": [
+            {
+              "ruleId": "no-restricted-globals",
+              "message": "Unexpected use of 'chrome'. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "alias",
+          "source": "const c = chrome; void c.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-globals",
+              "message": "Unexpected use of 'chrome'. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "optional",
+          "source": "void chrome?.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-globals",
+              "message": "Unexpected use of 'chrome'. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "globalThis",
+          "source": "void globalThis.chrome.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-properties",
+              "message": "'globalThis.chrome' is restricted from being used. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "window",
+          "source": "void window.chrome.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-properties",
+              "message": "'window.chrome' is restricted from being used. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "self",
+          "source": "void self.chrome.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-properties",
+              "message": "'self.chrome' is restricted from being used. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "windowBracket",
+          "source": "void window[\"chrome\"].storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-properties",
+              "message": "'window.chrome' is restricted from being used. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "computed",
+          "source": "void window[\"ch\" + \"rome\"].storage;",
+          "errors": []
+        },
+        {
+          "name": "objectAlias",
+          "source": "const w = window; void w.chrome.storage;",
+          "errors": []
+        },
+        {
+          "name": "typeOnly",
+          "source": "export type Sender = chrome.runtime.MessageSender;",
+          "errors": []
+        },
+        {
+          "name": "local",
+          "source": "export function local(chrome: object) { return chrome; }",
+          "errors": []
+        }
+      ],
+      "browserAllowed": true
+    },
+    "head": {
+      "rows": [
+        {
+          "name": "dot",
+          "source": "void chrome.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-globals",
+              "message": "Unexpected use of 'chrome'. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "bracket",
+          "source": "void chrome[\"storage\"];",
+          "errors": [
+            {
+              "ruleId": "no-restricted-globals",
+              "message": "Unexpected use of 'chrome'. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "alias",
+          "source": "const c = chrome; void c.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-globals",
+              "message": "Unexpected use of 'chrome'. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "optional",
+          "source": "void chrome?.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-globals",
+              "message": "Unexpected use of 'chrome'. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "globalThis",
+          "source": "void globalThis.chrome.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-properties",
+              "message": "'globalThis.chrome' is restricted from being used. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "window",
+          "source": "void window.chrome.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-properties",
+              "message": "'window.chrome' is restricted from being used. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "self",
+          "source": "void self.chrome.storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-properties",
+              "message": "'self.chrome' is restricted from being used. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "windowBracket",
+          "source": "void window[\"chrome\"].storage;",
+          "errors": [
+            {
+              "ruleId": "no-restricted-properties",
+              "message": "'window.chrome' is restricted from being used. Use Chrome APIs (chrome.*) only from src/browser/ and the extension entry points."
+            }
+          ]
+        },
+        {
+          "name": "computed",
+          "source": "void window[\"ch\" + \"rome\"].storage;",
+          "errors": []
+        },
+        {
+          "name": "objectAlias",
+          "source": "const w = window; void w.chrome.storage;",
+          "errors": []
+        },
+        {
+          "name": "typeOnly",
+          "source": "export type Sender = chrome.runtime.MessageSender;",
+          "errors": []
+        },
+        {
+          "name": "local",
+          "source": "export function local(chrome: object) { return chrome; }",
+          "errors": []
+        }
+      ],
+      "browserAllowed": true
+    }
+  },
+  "edits": [
+    {
+      "file": "tests/asset-load-benchmark.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/backup.spec.ts",
+      "before": 3,
+      "after": 0,
+      "showArtwork": 3
+    },
+    {
+      "file": "tests/card-preview.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/character-editor.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/character-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/creator-editor.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/editor-arrangement.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/editor-entry.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/editor-ux-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/editor-ux.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/effect-editor.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/g13-look-regression.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/g13-sparse-visual.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/g14-idle-recheck.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/group-editor.spec.ts",
+      "before": 3,
+      "after": 0,
+      "showArtwork": 3
+    },
+    {
+      "file": "tests/image-editor.spec.ts",
+      "before": 3,
+      "after": 0,
+      "showArtwork": 3
+    },
+    {
+      "file": "tests/layer-editor.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/legacy-data.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/media2-editor.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/media2-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/media2-performance.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/message-validation.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/model-editor.spec.ts",
+      "before": 4,
+      "after": 0,
+      "showArtwork": 4
+    },
+    {
+      "file": "tests/model-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/model-resources.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/model-studio.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/motion-editor.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/operation-controls.spec.ts",
+      "before": 4,
+      "after": 0,
+      "showArtwork": 4
+    },
+    {
+      "file": "tests/operation-editing-input.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/operation-live.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/page-marks.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/side-panel-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/side-panel.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/signal-motion-editor.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/signal-motion-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/signal-motion-timeline.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/signal-timeline-editor.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/signal-timeline-layout.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/signal-timeline-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/skin-editor.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/skin-studio.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/studio-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/studio-workspace-performance.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/studio-workspace.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/studio.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/theme-removal-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/ui0d-emergency.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/ui0d-verification.spec.ts",
+      "before": 3,
+      "after": 1,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/vrm-editor.spec.ts",
+      "before": 2,
+      "after": 0,
+      "showArtwork": 2
+    },
+    {
+      "file": "tests/vrm-live.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    },
+    {
+      "file": "tests/vrma-import.spec.ts",
+      "before": 1,
+      "after": 0,
+      "showArtwork": 1
+    }
+  ],
+  "replacements": {
+    "removedCheck": 76,
+    "addedHelper": 76,
+    "helper": "import { expect, type Page } from '@playwright/test';\n\n/** Turns on 作品を表示する in the popup. The switch is disabled until the popup has read the\n * settings; checking it before that races the popup's own load (the flaky check() of G1.1/R3-1). */\nexport async function showArtwork(popup: Page) {\n  const toggle = popup.getByRole('switch', { name: '作品を表示する' });\n  await expect(toggle).toBeEnabled();\n  await toggle.check();\n}\n"
+  },
+  "siteNames": {
+    "src/world/body-motion.ts": [],
+    "src/world/models.ts": [],
+    "src/characters/two-bone-ik.ts": [],
+    "src/renderers/three/vrm-player.ts": []
+  },
+  "history": "",
+  "manifestDiff": "",
+  "ordinary": {
+    "bytes": 2850811,
+    "sha256": "8a32a0dc5b3b9c4788d7d001a70bd71619197af05abf7d35fea75bbad12cdd43"
+  },
+  "ui1": {
+    "bytes": 2863974,
+    "sha256": "8f59cdcd8d882653992faa986772b229dfd8ff1dc67b3a8f1821a2e476b16364"
+  },
+  "g11": {
+    "bytes": 2852063,
+    "sha256": "eb6ad50f628a189e82291338cb85122aedf490dce34333c709229252da74c2bc"
+  }
+}

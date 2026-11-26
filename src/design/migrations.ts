@@ -1,7 +1,7 @@
 import { ASSET_LIMITS, ASSET_MESSAGES } from '../assets/limits';
 import { IMAGE_LIMITS } from './types';
 
-// Intermediate objects are untrusted. Only schema.ts's final v12 validation may
+// Intermediate objects are untrusted. Only schema.ts's final v14 validation may
 // produce a DesignDocument; migration never grants immutable.ts's validated mark.
 type Data = Record<string, unknown>;
 interface Shape {
@@ -9,6 +9,7 @@ interface Shape {
   layer?: readonly string[];
   kinds?: readonly string[];
   group?: readonly string[];
+  rule?: readonly string[];
 }
 const root1 = ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'];
 const root2 = [...root1, 'decorations'];
@@ -22,6 +23,11 @@ const layer9 = [...layer5, 'motion'];
 const layer10 = [...layer9, 'model', 'source'];
 const group6 = ['kind', 'id', 'name', 'opacity', 'zIndex', 'visible', 'locked', 'effects', 'children'];
 const group9 = [...group6, 'motion'];
+const layer12 = [...layer10, 'renderMode'];
+const layer14 = [...layer12, 'character'];
+const group12 = [...group9, 'renderMode'];
+const rule1 = ['kind', 'target', 'style'];
+const rule13 = [...rule1, 'skin'];
 const images = ['image'];
 const media = [...images, 'animation'];
 const models = [...media, 'model3d'];
@@ -54,6 +60,7 @@ function stage(value: unknown, version: number, shape: Shape): Data {
     }
   }
   if (Object.hasOwn(data, 'groups')) for (const group of list(data['groups'])) record(group, shape.group);
+  if (shape.rule) for (const rule of list(data['rules'])) record(rule, shape.rule);
   return data;
 }
 const next = (data: Data, version: number): Data => ({ ...data, schemaVersion: version });
@@ -142,6 +149,90 @@ export function migrateV11ToV12(value: unknown): Data {
   return next(stage(value, 11, { root: root8, layer: layer10, kinds: models, group: group9 }), 12);
 }
 
+export function migrateV12ToV13(value: unknown): Data {
+  // Rules pass unchanged through every earlier step, so this gate covers v1–v12:
+  // skin is new in v13 and every earlier rule keeps its native look by omission.
+  return next(stage(value, 12, { root: root8, layer: layer12, kinds: models, group: group12, rule: rule1 }), 13);
+}
+
+export function migrateV13ToV14(value: unknown): Data {
+  // Layers and source facts pass unchanged through every earlier step, so this gate covers
+  // v1–v13: a character and a measured body are new in v14; older VRM layers keep their own
+  // clips and simply have no measure.
+  const data = stage(value, 13, { root: root8, layer: layer12, kinds: models, group: group12, rule: rule13 });
+  for (const value of list(data['decorations'])) {
+    const layer = record(value);
+    if (layer['kind'] !== 'model3d' || layer['source'] === undefined) continue;
+    const vrm = record(layer['source'])['vrm'];
+    if (vrm !== undefined && Object.hasOwn(record(vrm), 'body'))
+      throw new Error('体型の測定にはDesignDocument v14が必要です。');
+  }
+  return next(data, 14);
+}
+
+/** v14 → v15 (chunk 3): a character may carry its personality and the author's switches for the
+ * computed motion and the autonomy. Nothing changes shape; absent keys keep v14's behaviour
+ * (computed motion on, autonomy off). Everything else passes unchanged through every earlier
+ * step, so checking the characters here covers v1–v14 (a character itself is v14). */
+export function migrateV14ToV15(value: unknown): Data {
+  const data = stage(value, 14, { root: root8, layer: layer14, kinds: models, group: group12, rule: rule13 });
+  for (const value of list(data['decorations'])) {
+    const layer = record(value);
+    if (layer['kind'] !== 'model3d' || layer['character'] === undefined) continue;
+    const character = record(layer['character']);
+    for (const key of ['personality', 'computedMotion', 'autonomy', 'behaviourMotions'])
+      if (Object.hasOwn(character, key)) throw new Error('キャラの性格と自律の設定にはDesignDocument v15が必要です。');
+  }
+  return next(data, 15);
+}
+/** v16: a motion's measured `hipsHeight`. Everything else passes through unchanged. */
+export function migrateV15ToV16(value: unknown): Data {
+  const data = stage(value, 15, { root: root8, layer: layer14, kinds: models, group: group12, rule: rule13 });
+  for (const value of list(data['decorations'])) {
+    const layer = record(value);
+    if (layer['kind'] !== 'model3d' || layer['character'] === undefined) continue;
+    const motions = record(layer['character'])['motions'];
+    if (!Array.isArray(motions)) continue; // the final schema rejects it
+    for (const motion of motions) {
+      const source = record(motion)['source'];
+      if (source !== undefined && Object.hasOwn(record(source), 'hipsHeight'))
+        throw new Error('動作の腰の高さにはDesignDocument v16が必要です。');
+    }
+  }
+  return next(data, 16);
+}
+
+/** v16 → v17 (the depth foundation): the artwork may name a room behind the UI (`space`) and a
+ * layer or group may be drawn there (`depth: 'room'`). Nothing changes shape; every earlier
+ * layer stays in front by omission. Layers, groups and the root pass unchanged through every
+ * earlier step, so this gate (the v16 shape: no `space`, no `depth`) covers v1–v16. */
+export function migrateV16ToV17(value: unknown): Data {
+  const data = stage(value, 16, { root: root8, layer: layer14, kinds: models, group: group12, rule: rule13 });
+  return next(data, 17);
+}
+
+/** v17 → v18 (the living room): the space may name its resident, its own layout and the camera's
+ * shapes. Nothing else changes; a v17 space carrying any of them is refused here. Everything else
+ * passes unchanged to the final schema, which checks the v18 shape (the v17 one is a subset). */
+export function migrateV17ToV18(value: unknown): Data {
+  const data = record(value);
+  if (data['schemaVersion'] !== 17) throw new Error('このデザインのバージョンには対応していません。');
+  const space = data['space'];
+  if (space !== undefined && space !== null && typeof space === 'object' && !Array.isArray(space)) {
+    const s = space as Data;
+    const camera = s['camera'];
+    if (
+      Object.hasOwn(s, 'resident') ||
+      Object.hasOwn(s, 'layout') ||
+      (camera !== null &&
+        typeof camera === 'object' &&
+        (Object.hasOwn(camera, 'shots') || Object.hasOwn(camera, 'transition')))
+    )
+      throw new Error('部屋の住人・配置・カメラの形にはDesignDocument v18が必要です。');
+  }
+  return next(data, 18);
+}
+
 export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV1ToV2,
   migrateV2ToV3,
@@ -154,14 +245,20 @@ export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV9ToV10,
   migrateV10ToV11,
   migrateV11ToV12,
+  migrateV12ToV13,
+  migrateV13ToV14,
+  migrateV14ToV15,
+  migrateV15ToV16,
+  migrateV16ToV17,
+  migrateV17ToV18,
 ]);
 
-/** Pure chain; a returned v12 object is still unvalidated external input. */
+/** Pure chain; a returned v18 object is still unvalidated external input. */
 export function migrateDesign(value: unknown): Data {
   let data = record(value);
   const version = data['schemaVersion'];
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 12)
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 18)
     throw new Error('このデザインのバージョンには対応していません。');
-  for (let from = version; from < 12; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
+  for (let from = version; from < 18; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
   return data;
 }

@@ -1,0 +1,298 @@
+{
+  "stage": "Retro theme removal round 1 baseline (all retro display options OFF, artwork with no base)",
+  "harness": "scripts/ui0c/marks.mjs UI0C_MODE=ui0d3, alternating pairs, headless, signed-out fresh profiles",
+  "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+  "measuredAt": "2026-11-01T12:14:45.326Z",
+  "features": "all retro display options stored OFF",
+  "browser": "143.0.7499.4",
+  "environment": {
+    "os": "win32 10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "node": "v24.16.0"
+  },
+  "before": {
+    "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\rm-base",
+    "revision": "6ce22ce3ae5f851557ee4fa1f3016cbc65f72a56",
+    "dirtySource": false,
+    "probe": "isolated-world-v3",
+    "asyncContinuations": "lowered-promises",
+    "busyMs": 0,
+    "busyAfterAwait": false,
+    "disableInk": false
+  },
+  "after": {
+    "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor",
+    "revision": "6ce22ce3ae5f851557ee4fa1f3016cbc65f72a56",
+    "dirtySource": true,
+    "probe": "isolated-world-v3",
+    "asyncContinuations": "lowered-promises",
+    "busyMs": 0,
+    "busyAfterAwait": false,
+    "disableInk": false
+  },
+  "metric": "extension CPU per frame (ms), isolated-world callbacks",
+  "pairs": [
+    {
+      "pair": 0,
+      "order": ["before", "after"],
+      "blocks": {
+        "before": {
+          "startup": {
+            "median": 0,
+            "p95": 1.8999999985098839,
+            "max": 13.900000005960464,
+            "longestCallbackMs": 12.400000002235174,
+            "longTasks": 17
+          },
+          "steady": {
+            "median": 0,
+            "p95": 0,
+            "max": 1.6000000014901161,
+            "longestCallbackMs": 1.199999999254942,
+            "longTasks": 1
+          },
+          "hover": {
+            "median": 0.09999999776482582,
+            "p95": 0.6999999992549419,
+            "max": 3.5,
+            "longestCallbackMs": 3.5,
+            "longTasks": 0
+          },
+          "scroll": {
+            "median": 0,
+            "p95": 0.8000000007450581,
+            "max": 3.600000001490116,
+            "longestCallbackMs": 3.600000001490116,
+            "longTasks": 0
+          }
+        },
+        "after": {
+          "startup": {
+            "median": 0,
+            "p95": 2,
+            "max": 12.400000002235174,
+            "longestCallbackMs": 9.5,
+            "longTasks": 19
+          },
+          "steady": {
+            "median": 0,
+            "p95": 0,
+            "max": 2.099999997764826,
+            "longestCallbackMs": 1.7999999970197678,
+            "longTasks": 0
+          },
+          "hover": {
+            "median": 0.09999999776482582,
+            "p95": 0.8000000007450581,
+            "max": 3.5,
+            "longestCallbackMs": 3.5,
+            "longTasks": 0
+          },
+          "scroll": {
+            "median": 0,
+            "p95": 0.6000000014901161,
+            "max": 2.7999999970197678,
+            "longestCallbackMs": 2.300000000745058,
+            "longTasks": 0
+          }
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": ["after", "before"],
+      "blocks": {
+        "after": {
+          "startup": {
+            "median": 0,
+            "p95": 1.2000000029802322,
+            "max": 18.600000001490116,
+            "longestCallbackMs": 15.600000001490116,
+            "longTasks": 16
+          },
+          "steady": {
+            "median": 0,
+            "p95": 0,
+            "max": 2.399999998509884,
+            "longestCallbackMs": 2.199999999254942,
+            "longTasks": 0
+          },
+          "hover": {
+            "median": 0.09999999776482582,
+            "p95": 0.9999999962747097,
+            "max": 4.100000005215406,
+            "longestCallbackMs": 3.2999999970197678,
+            "longTasks": 0
+          },
+          "scroll": {
+            "median": 0,
+            "p95": 0.4000000022351742,
+            "max": 2.5000000037252903,
+            "longestCallbackMs": 2.400000002235174,
+            "longTasks": 0
+          }
+        },
+        "before": {
+          "startup": {
+            "median": 0,
+            "p95": 1.0999999977648258,
+            "max": 14.700000006705523,
+            "longestCallbackMs": 11.600000001490116,
+            "longTasks": 15
+          },
+          "steady": {
+            "median": 0,
+            "p95": 0,
+            "max": 2.4999999962747097,
+            "longestCallbackMs": 2.2999999970197678,
+            "longTasks": 0
+          },
+          "hover": {
+            "median": 0.09999999776482582,
+            "p95": 1,
+            "max": 3.199999999254942,
+            "longestCallbackMs": 3,
+            "longTasks": 0
+          },
+          "scroll": {
+            "median": 0,
+            "p95": 0.7999999970197678,
+            "max": 2.7000000029802322,
+            "longestCallbackMs": 2.399999998509884,
+            "longTasks": 0
+          }
+        }
+      }
+    }
+  ],
+  "deltas": [
+    {
+      "scene": "startup",
+      "pair": 0,
+      "before": {
+        "median": 0,
+        "p95": 1.9
+      },
+      "after": {
+        "median": 0,
+        "p95": 2
+      },
+      "delta": {
+        "median": 0,
+        "p95": 0.1
+      }
+    },
+    {
+      "scene": "startup",
+      "pair": 1,
+      "before": {
+        "median": 0,
+        "p95": 1.1
+      },
+      "after": {
+        "median": 0,
+        "p95": 1.2
+      },
+      "delta": {
+        "median": 0,
+        "p95": 0.1
+      }
+    },
+    {
+      "scene": "steady",
+      "pair": 0,
+      "before": {
+        "median": 0,
+        "p95": 0
+      },
+      "after": {
+        "median": 0,
+        "p95": 0
+      },
+      "delta": {
+        "median": 0,
+        "p95": 0
+      }
+    },
+    {
+      "scene": "steady",
+      "pair": 1,
+      "before": {
+        "median": 0,
+        "p95": 0
+      },
+      "after": {
+        "median": 0,
+        "p95": 0
+      },
+      "delta": {
+        "median": 0,
+        "p95": 0
+      }
+    },
+    {
+      "scene": "hover",
+      "pair": 0,
+      "before": {
+        "median": 0.1,
+        "p95": 0.7
+      },
+      "after": {
+        "median": 0.1,
+        "p95": 0.8
+      },
+      "delta": {
+        "median": 0,
+        "p95": 0.1
+      }
+    },
+    {
+      "scene": "hover",
+      "pair": 1,
+      "before": {
+        "median": 0.1,
+        "p95": 1
+      },
+      "after": {
+        "median": 0.1,
+        "p95": 1
+      },
+      "delta": {
+        "median": 0,
+        "p95": 0
+      }
+    },
+    {
+      "scene": "scroll",
+      "pair": 0,
+      "before": {
+        "median": 0,
+        "p95": 0.8
+      },
+      "after": {
+        "median": 0,
+        "p95": 0.6
+      },
+      "delta": {
+        "median": 0,
+        "p95": -0.2
+      }
+    },
+    {
+      "scene": "scroll",
+      "pair": 1,
+      "before": {
+        "median": 0,
+        "p95": 0.8
+      },
+      "after": {
+        "median": 0,
+        "p95": 0.4
+      },
+      "delta": {
+        "median": 0,
+        "p95": -0.4
+      }
+    }
+  ]
+}

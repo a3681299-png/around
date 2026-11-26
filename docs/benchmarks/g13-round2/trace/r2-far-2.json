@@ -1,0 +1,8079 @@
+{
+  "label": "r2-far-2",
+  "pointerMode": "far",
+  "point": {
+    "x": 1400,
+    "y": 331.25
+  },
+  "far": {
+    "x": 503.125,
+    "y": 980
+  },
+  "comments": [11337, 14446.199999999255],
+  "frames": [
+    {
+      "t": 7572.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7579.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7586.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7593,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7607,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7662.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7697.2,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7718.1,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7745.9,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7766.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7787.5,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7801.3,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7822.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7877.8,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7919.4,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7933.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7947.2,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 7988.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8016.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8037.4,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8079,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8099.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8120.8,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8134.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8148.5,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8176.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8197.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8217.9,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8231.9,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8245.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8301.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8322.1,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8342.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8363.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8384.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8405.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8419.3,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8433.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8440.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8447.2,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8481.8,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8502.6,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8537.4,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8565.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8586,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8606.9,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8627.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8641.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8662.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8690.1,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8704,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8731.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8745.6,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8752.7,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8766.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8787.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8801.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8822.2,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8856.8,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8870.7,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8905.3,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8919.3,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8940.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8961,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8974.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8981.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8995.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9002.6,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9009.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9016.5,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9037.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9051.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9065.1,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9086,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9113.7,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9134.7,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9162.5,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9183.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9197.2,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9210.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9217.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9224.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9231.8,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9245.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9273.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9287.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9315,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9322,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9335.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9349.8,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9363.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9370.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9377.6,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9384.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9391.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9405.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9419.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9426.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9433,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9454,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9468.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9474.9,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9488.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9516.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9530.3,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9544.2,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9565.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9579,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9592.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9606.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9620.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9634.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9648.4,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9669.2,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9683.1,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9690.1,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9717.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9731.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9738.7,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9759.4,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9773.3,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9787.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9801.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9815,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9821.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9828.9,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9849.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9870.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9884.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9898.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9933.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9947,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9960.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9981.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9988.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10002.4,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10016.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10030.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10037.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10058,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10092.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10106.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10134.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10155.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10176.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10196.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": ""
+    },
+    {
+      "t": 10224.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10245.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10266.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10280.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10287.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10294.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10301,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10315,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10349.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10363.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10377.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10384.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10391.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10398.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10405.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10412.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10419.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10426,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10433,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10440,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10447,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10453.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10460.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10467.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10474.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10481.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10488.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10495.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10502.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10509.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10516.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10523.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10530.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10537.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10544.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10551,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10558,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10564.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10571.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10578.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10585.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10592.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10599.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10606.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10613.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10627.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10634.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10641.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10648.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10655.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10662.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10669.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10676.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10683.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10689.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10696.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10703.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10710.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10717.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10731.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10738.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10745.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10752.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10766.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10780.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10787.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10794.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10801,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10815,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10828.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10842.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10849.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10856.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10863.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10884.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10898.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10905.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10919.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10933.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10940.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10946.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10953.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10967.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10981.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10988.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10995.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11002.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11016.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11023.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11037.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11044,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11050.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11066.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11078.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11092.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11099.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11106.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11113.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11134.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11141.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11148.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11155.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11169,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11182.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11189.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11196.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11203.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11210.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11217.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11231.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11238.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11245.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11252.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11259.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11273.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11280.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11294,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11300.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11315.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11328.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11335.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11342.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11349.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": ""
+    },
+    {
+      "t": 11412.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11432.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11446.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11467.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11488.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11509.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11523.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11544,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11564.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11585.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11606.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11620.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11641.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11655.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11669.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11682.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11689.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11703.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11717.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11724.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11731.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11745.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11759.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11773.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11780.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11787,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11794.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11800.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11808,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11814.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11821.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11828.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11835.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11842.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11849.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11856.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11863.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11870.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11877.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11884.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11891.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11898.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11905,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11918.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11925.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11932.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11939.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11954,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11967.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11974.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11981.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11988.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11995.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12002.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12016.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12023,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12030,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12037,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12043.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12050.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12057.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12064.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12071.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12078.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12085.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12092.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12099.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12106.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12113.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12120.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12127.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12134.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12141.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12148,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12154.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12161.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12168.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12175.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12182.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12189.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12196.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12203.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12210.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12217.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12224.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12231.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12238.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12245.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12252.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12259.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12266,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12273,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12280,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12286.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12293.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12300.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12307.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12321.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12328.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12335.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12342.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12349.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12356.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12363.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12370.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12377.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12384.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12391,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12397.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12404.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12411.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12418.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12425.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12432.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12439.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12446.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12453.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12460.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12474.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12481.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12488.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12495.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12502,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12509,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12516,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12523,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12529.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12536.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12543.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12557.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12564.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12578.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12585.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12592.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12599.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12606.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12613.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12620.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12627.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12634.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12641.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12648,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12654.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12661.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12668.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12675.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12682.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12689.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12696.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12703.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12710.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12717.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12724.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12731.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12738.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12745.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12752,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12759.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12766.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12772.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12779.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12786.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12793.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12800.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12807.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12814.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12821.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12828.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12835.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12842.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12849.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12856.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12863.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12870.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12877.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12884,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12890.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12897.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12904.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12911.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12918.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12925.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12932.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12939.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12946.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12953.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12960.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12967.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12974.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12981.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12988.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12995.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13002.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13009,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13016,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13022.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13029.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13036.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13043.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13050.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13057.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13064.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13071.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13078.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13085.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13092.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13099.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13106.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13113.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13120.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13127,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13134.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13141,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13147.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13154.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13161.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13168.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13175.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13182.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13189.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13196.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13203.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13210.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13217.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13224.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13231.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13238.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13245.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13252,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13265.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13272.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13286.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13293.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13300.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13307.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13314.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13321.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13328.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13335.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13342.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13349.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13356.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13363.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13370.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13377,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13384,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13390.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13397.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13404.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13411.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13418.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13425.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13432.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13439.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13446.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13453.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13460.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13467.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13481.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13488.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13495.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13502,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13508.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13522.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13529.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13536.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13550.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13564.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13571.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13578.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13585.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13592.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13599.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13606.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13613.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13620.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13627,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13633.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13640.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13647.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13654.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13661.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13668.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13676,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13682.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13689.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13696.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13703.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13710.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13717.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13724.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13731.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13738,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13745,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13752,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13759.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13772.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13779.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13786.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13793.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13800.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13807.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13821.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13828.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13835.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13842.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13849.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13856.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13870,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13876.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13884,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13890.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13897.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13904.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13918.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13932.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13939.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13953.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13974.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13995.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14002.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14022.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14029.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14043.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14057.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14064.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14071.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14078.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14085.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14092.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14099.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14106.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14113.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14120,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14127,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14133.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14141,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14147.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14155.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14168.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14175.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14182.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14189.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14196.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14203.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14224.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14231.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14238.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14245.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14258.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14272.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14279.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14286.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14293.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14300.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14307.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14314.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14321.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14328.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14335.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14342.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14349.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14363,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14377,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14383.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14390.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14404.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14418.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14425.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14432.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14439.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14446.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    }
+  ],
+  "wheel": [
+    {
+      "t": 7610.10000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 7747.60000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 7853.699999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 7949.800000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 8063.699999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 8150.699999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 8270.10000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 8366.199999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 8459.199999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 8588.699999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 8710.60000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 8824.199999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 8925.39999999851,
+      "deltaY": -90
+    },
+    {
+      "t": 9017.89999999851,
+      "deltaY": -90
+    },
+    {
+      "t": 9141.300000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 9233.300000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 9351.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 9434.699999999255,
+      "deltaY": -90
+    },
+    {
+      "t": 9545.5,
+      "deltaY": -90
+    },
+    {
+      "t": 9651.5,
+      "deltaY": -90
+    },
+    {
+      "t": 9740.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 9830.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 9948.5,
+      "deltaY": -90
+    },
+    {
+      "t": 10062.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 11352.10000000149,
+      "deltaY": 120
+    }
+  ],
+  "geometry": [
+    {
+      "at": 2026,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {},
+      "mutated": [],
+      "visible": 13,
+      "added": 13,
+      "removed": 0,
+      "addedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "control.4"
+      ],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3219,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-subtree": 2,
+        "mutation-layout": 41,
+        "resize-observer": 2
+      },
+      "mutated": [
+        "subtree body(+1/-0 elements)",
+        "subtree body(+0/-1 elements)",
+        "subtree div.ytp-subtitles-button-icon(+0/-1 elements)",
+        "subtree div.ytp-subtitles-button-icon(+1/-0 elements)",
+        "subtree div.ytp-subtitles-button-icon(+0/-1 elements)",
+        "subtree div.ytp-subtitles-button-icon(+1/-0 elements)",
+        "subtree div.ytp-subtitles-button-icon(+0/-1 elements)",
+        "subtree div.ytp-subtitles-button-icon(+1/-0 elements)",
+        "subtree div.ytp-subtitles-button-icon(+0/-1 elements)",
+        "subtree div.ytp-subtitles-button-icon(+1/-0 elements)",
+        "layout ytd-page-manager#page-manager.style-scope.ytd-app(+1/-0 elements)",
+        "layout ytd-watch-flexy.style-scope.ytd-page-manager.watch-root-element(+10/-0 elements)",
+        "layout ytd-thumbnail.player-container-background-image.style-scope.ytd-watch-flexy(+1/-0 elements)",
+        "layout ytd-thumbnail.player-container-background-image.style-scope.ytd-watch-flexy(+1/-0 elements)",
+        "layout ytd-player#ytd-player.style-scope.ytd-watch-flexy(+1/-0 elements)",
+        "layout ytd-playlist-panel-renderer#playlist.style-scope.ytd-watch-flexy(+1/-0 elements)"
+      ],
+      "firstLayout": "layout ytd-page-manager#page-manager.style-scope.ytd-app(+1/-0 elements)",
+      "visible": 33,
+      "added": 27,
+      "removed": 7,
+      "addedIds": ["search.0", "navigation.0", "navigation.1", "control.1", "control.2", "control.5"],
+      "removedIds": ["control.30", "control.33", "control.34", "control.40", "control.41", "control.42"],
+      "viewportMoved": 6,
+      "documentMoved": 6,
+      "documentMovedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "control.4"
+      ]
+    },
+    {
+      "at": 3219,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "search.0",
+          "navigation.0",
+          "navigation.1",
+          "control.1",
+          "control.2",
+          "control.5",
+          "control.7",
+          "control.8"
+        ],
+        "removed": ["control.30", "control.33", "control.34", "control.40", "control.41", "control.42", "control.44"],
+        "changed": [
+          {
+            "id": "player.video",
+            "before": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.controls.bottom",
+            "before": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.controls.top",
+            "before": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.seek.0",
+            "before": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,980,null]"
+          },
+          {
+            "id": "player.seek.1",
+            "before": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,980,null]"
+          },
+          {
+            "id": "control.4",
+            "before": "[\"control.4\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},481,76,null]",
+            "after": "[\"control.4\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},415,523,12,32,null]"
+          }
+        ],
+        "changedCount": 6
+      }
+    },
+    {
+      "at": 3320,
+      "change": "subtree-check",
+      "result": "changed",
+      "roots": 1,
+      "controls": 129
+    },
+    {
+      "at": 3371,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-subtree": 1,
+        "mutation-look": 1,
+        "mutation-layout": 2,
+        "focus": 1
+      },
+      "mutated": [
+        "subtree html(+1/-0 elements)",
+        "layout video.video-stream.html5-main-video[tabindex]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout video.video-stream.html5-main-video[tabindex]",
+      "visible": 33,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3396,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 6,
+      "controls": 0
+    },
+    {
+      "at": 3605,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-subtree": 6,
+        "fonts": 1,
+        "mutation-layout": 8
+      },
+      "mutated": [
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "look yt-floating-button-view-model.ytFloatingButtonViewModelHost.style-scope.ytd-structured-description-content-renderer[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 36,
+      "added": 3,
+      "removed": 0,
+      "addedIds": ["control.112", "control.114", "control.116"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3605,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": ["control.112", "control.114", "control.116"],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 3853,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 9,
+        "fonts": 1
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+0/-0 elements)",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout span.ytp-time-current(+0/-0 elements)",
+        "layout span.ytp-time-current(+0/-0 elements)",
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 47,
+      "added": 11,
+      "removed": 0,
+      "addedIds": ["control.118", "control.120", "control.122", "control.124", "control.126", "control.128"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3853,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.118",
+          "control.120",
+          "control.122",
+          "control.124",
+          "control.126",
+          "control.128",
+          "control.130",
+          "control.132"
+        ],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 4055,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 11
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout ytd-continuation-item-renderer.style-scope.ytd-item-section-renderer(+4/-0 elements)",
+        "layout tp-yt-paper-spinner#spinner.style-scope.ytd-continuation-item-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout div#button.style-scope.ytd-continuation-item-renderer(+1/-0 elements)",
+        "layout ytd-button-renderer.style-scope.ytd-continuation-item-renderer(+2/-0 elements)",
+        "layout yt-button-shape(+1/-0 elements)",
+        "layout tp-yt-paper-spinner#spinner.style-scope.ytd-continuation-item-renderer(+0/-0 elements)",
+        "layout div#spinnerContainer.style-scope.tp-yt-paper-spinner[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+0/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+0/-0 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": null,
+      "visible": 49,
+      "added": 2,
+      "removed": 0,
+      "addedIds": ["control.140", "control.142"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4056,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": ["control.140", "control.142"],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 4084,
+      "change": "subtree-check",
+      "result": "changed",
+      "roots": 2,
+      "controls": 162
+    },
+    {
+      "at": 4262,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 4,
+        "mutation-subtree": 1,
+        "mutation-layout": 22
+      },
+      "mutated": [
+        "subtree ytd-app(+1/-0 elements)",
+        "subtree yt-page-navigation-progress.style-scope.ytd-app(+1/-0 elements)",
+        "subtree yt-page-navigation-progress.style-scope.ytd-app[hidden]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 49,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4352,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 70,
+      "controls": 0
+    },
+    {
+      "at": 4404,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 4453,
+      "change": "subtree-check",
+      "result": "changed",
+      "roots": 9,
+      "controls": 162
+    },
+    {
+      "at": 4453,
+      "change": "hold",
+      "wait": 5
+    },
+    {
+      "at": 4511,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 4,
+        "mutation-subtree": 74,
+        "mutation-layout": 60
+      },
+      "mutated": [
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 49,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4556,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 1,
+      "controls": 0
+    },
+    {
+      "at": 4604,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 1,
+      "controls": 0
+    },
+    {
+      "at": 4876,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 7,
+        "mutation-subtree": 3,
+        "mutation-layout": 6
+      },
+      "mutated": [
+        "subtree head(+1/-0 elements)",
+        "subtree head(+0/-1 elements)",
+        "subtree head(+1/-0 elements)",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTrailingLabel.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree yt-list-item-view-count-view-model.ytListItemViewCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree yt-list-item-like-count-view-model.ytListItemLikeCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTrailingLabel.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree yt-list-item-view-count-view-model.ytListItemViewCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree yt-list-item-like-count-view-model.ytListItemLikeCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "subtree span.ytIconWrapperHost.ytListItemViewModelAccessory.ytListItemViewModelImage[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 61,
+      "added": 31,
+      "removed": 19,
+      "addedIds": ["comment.0", "control.87", "control.88", "control.92", "control.93", "control.94"],
+      "removedIds": ["control.106", "control.108", "control.110", "control.112", "control.114", "control.116"],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4877,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "comment.0",
+          "control.87",
+          "control.88",
+          "control.92",
+          "control.93",
+          "control.94",
+          "control.98",
+          "control.99"
+        ],
+        "removed": [
+          "control.106",
+          "control.108",
+          "control.110",
+          "control.112",
+          "control.114",
+          "control.116",
+          "control.118",
+          "control.120"
+        ],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 5097,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 9
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 70,
+      "added": 28,
+      "removed": 19,
+      "addedIds": ["control.110", "control.114", "control.115", "control.116", "control.120", "control.121"],
+      "removedIds": ["control.129", "control.131", "control.133", "control.135", "control.137", "control.139"],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5098,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.110",
+          "control.114",
+          "control.115",
+          "control.116",
+          "control.120",
+          "control.121",
+          "control.125",
+          "control.126"
+        ],
+        "removed": [
+          "control.129",
+          "control.131",
+          "control.133",
+          "control.135",
+          "control.137",
+          "control.139",
+          "control.141",
+          "control.143"
+        ],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 5406,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 17
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 91,
+      "added": 31,
+      "removed": 10,
+      "addedIds": ["control.129", "control.133", "control.134", "control.135", "control.137", "control.141"],
+      "removedIds": ["control.150", "control.158", "control.166", "control.172", "control.174", "control.176"],
+      "viewportMoved": 9,
+      "documentMoved": 9,
+      "documentMovedIds": ["control.148", "control.152", "control.154", "control.156", "control.160", "control.162"]
+    },
+    {
+      "at": 5407,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.129",
+          "control.133",
+          "control.134",
+          "control.135",
+          "control.137",
+          "control.141",
+          "control.142",
+          "control.143"
+        ],
+        "removed": [
+          "control.150",
+          "control.158",
+          "control.166",
+          "control.172",
+          "control.174",
+          "control.176",
+          "control.178",
+          "control.180"
+        ],
+        "changed": [
+          {
+            "id": "control.148",
+            "before": "[\"control.148\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.148\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.152",
+            "before": "[\"control.152\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.152\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.154",
+            "before": "[\"control.154\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.154\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.23,61.67,null]"
+          },
+          {
+            "id": "control.156",
+            "before": "[\"control.156\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.156\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.160",
+            "before": "[\"control.160\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.160\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.162",
+            "before": "[\"control.162\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.162\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.23,61.67,null]"
+          },
+          {
+            "id": "control.164",
+            "before": "[\"control.164\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.164\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.168",
+            "before": "[\"control.168\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.168\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          }
+        ],
+        "changedCount": 9
+      }
+    },
+    {
+      "at": 5649,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 11
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": null,
+      "visible": 104,
+      "added": 29,
+      "removed": 16,
+      "addedIds": ["control.172", "control.176", "control.177", "control.178", "control.180", "control.184"],
+      "removedIds": ["control.193", "control.199", "control.201", "control.203", "control.205", "control.207"],
+      "viewportMoved": 3,
+      "documentMoved": 3,
+      "documentMovedIds": ["control.191", "control.195", "control.197"]
+    },
+    {
+      "at": 5649,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.172",
+          "control.176",
+          "control.177",
+          "control.178",
+          "control.180",
+          "control.184",
+          "control.185",
+          "control.186"
+        ],
+        "removed": [
+          "control.193",
+          "control.199",
+          "control.201",
+          "control.203",
+          "control.205",
+          "control.207",
+          "control.209",
+          "control.211"
+        ],
+        "changed": [
+          {
+            "id": "control.191",
+            "before": "[\"control.191\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.191\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.195",
+            "before": "[\"control.195\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.195\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.197",
+            "before": "[\"control.197\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.197\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.23,61.67,null]"
+          }
+        ],
+        "changedCount": 3
+      }
+    },
+    {
+      "at": 5904,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 11
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 117,
+      "added": 31,
+      "removed": 18,
+      "addedIds": ["control.199", "control.203", "control.204", "control.205", "control.207", "control.211"],
+      "removedIds": ["control.218", "control.222", "control.224", "control.226", "control.228", "control.230"],
+      "viewportMoved": 1,
+      "documentMoved": 1,
+      "documentMovedIds": ["control.220"]
+    },
+    {
+      "at": 5904,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.199",
+          "control.203",
+          "control.204",
+          "control.205",
+          "control.207",
+          "control.211",
+          "control.212",
+          "control.213"
+        ],
+        "removed": [
+          "control.218",
+          "control.222",
+          "control.224",
+          "control.226",
+          "control.228",
+          "control.230",
+          "control.232",
+          "control.234"
+        ],
+        "changed": [
+          {
+            "id": "control.220",
+            "before": "[\"control.220\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.220\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},109.5,40,null]"
+          }
+        ],
+        "changedCount": 1
+      }
+    },
+    {
+      "at": 6128,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-layout": 14
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)"
+      ],
+      "firstLayout": null,
+      "visible": 134,
+      "added": 31,
+      "removed": 14,
+      "addedIds": ["control.226", "control.230", "control.231", "control.232", "control.234", "control.236"],
+      "removedIds": ["control.245", "control.249", "control.251", "control.253", "control.257", "control.259"],
+      "viewportMoved": 5,
+      "documentMoved": 5,
+      "documentMovedIds": ["control.247", "control.255", "control.277", "control.279", "control.281"]
+    },
+    {
+      "at": 6128,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.226",
+          "control.230",
+          "control.231",
+          "control.232",
+          "control.234",
+          "control.236",
+          "control.238",
+          "control.239"
+        ],
+        "removed": [
+          "control.245",
+          "control.249",
+          "control.251",
+          "control.253",
+          "control.257",
+          "control.259",
+          "control.261",
+          "control.263"
+        ],
+        "changed": [
+          {
+            "id": "control.247",
+            "before": "[\"control.247\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.247\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.23,40,null]"
+          },
+          {
+            "id": "control.255",
+            "before": "[\"control.255\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.255\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.23,40,null]"
+          }
+        ],
+        "changedCount": 2
+      }
+    },
+    {
+      "at": 6356,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-layout": 5
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)"
+      ],
+      "firstLayout": null,
+      "visible": 138,
+      "added": 8,
+      "removed": 4,
+      "addedIds": ["control.258", "control.262", "control.263", "control.264", "control.315", "control.317"],
+      "removedIds": ["control.277", "control.279", "control.281", "control.283"],
+      "viewportMoved": 15,
+      "documentMoved": 15,
+      "documentMovedIds": ["control.285", "control.287", "control.289", "control.291", "control.293", "control.295"]
+    },
+    {
+      "at": 6357,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.258",
+          "control.262",
+          "control.263",
+          "control.264",
+          "control.315",
+          "control.317",
+          "control.319",
+          "control.321"
+        ],
+        "removed": ["control.277", "control.279", "control.281", "control.283"],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 6555,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 1
+      },
+      "mutated": ["look div.ytp-button.ytp-suggested-action-badge.ytp-suggested-action[style]"],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 6622,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 68,
+      "controls": 0
+    },
+    {
+      "at": 6664,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 6771,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-subtree": 68
+      },
+      "mutated": [
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 7646,
+      "change": "read",
+      "scroll": [0, 90],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "scroll": 1,
+        "mutation-layout": 1
+      },
+      "mutated": [
+        "layout div#player-container.style-scope.ytd-watch-flexy[style]",
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "firstLayout": "layout div#player-container.style-scope.ytd-watch-flexy[style]",
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 7853,
+      "change": "read",
+      "scroll": [0, 180],
+      "bumped": true,
+      "causes": {
+        "scroll": 1
+      },
+      "mutated": [],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 8063,
+      "change": "read",
+      "scroll": [0, 360],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "scroll": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 8268,
+      "change": "read",
+      "scroll": [0, 630],
+      "bumped": true,
+      "causes": {
+        "scroll": 2,
+        "mutation-look": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 8459,
+      "change": "read",
+      "scroll": [0, 810],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 2,
+        "scroll": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 8677,
+      "change": "read",
+      "scroll": [0, 900],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 2,
+        "scroll": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 8893,
+      "change": "read",
+      "scroll": [0, 1080],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "scroll": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 9100,
+      "change": "read",
+      "scroll": [0, 900],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "scroll": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 9301,
+      "change": "read",
+      "scroll": [0, 720],
+      "bumped": true,
+      "causes": {
+        "scroll": 2,
+        "mutation-look": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 9502,
+      "change": "read",
+      "scroll": [0, 540],
+      "bumped": true,
+      "causes": {
+        "scroll": 2,
+        "mutation-look": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 9705,
+      "change": "read",
+      "scroll": [0, 360],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 2,
+        "scroll": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 9918,
+      "change": "read",
+      "scroll": [0, 180],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "scroll": 2
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 10120,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "scroll": 2,
+        "mutation-look": 1
+      },
+      "mutated": [
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 10207,
+      "change": "hold",
+      "wait": 103
+    },
+    {
+      "at": 10339,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-layout": 1
+      },
+      "mutated": ["layout div#player-container.style-scope.ytd-watch-flexy[style]"],
+      "firstLayout": "layout div#player-container.style-scope.ytd-watch-flexy[style]",
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 11400,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "scroll": 1,
+        "mutation-layout": 1
+      },
+      "mutated": [
+        "layout div#player-container.style-scope.ytd-watch-flexy[style]",
+        "look yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-0 elements)",
+        "look div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "firstLayout": "layout div#player-container.style-scope.ytd-watch-flexy[style]",
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    }
+  ],
+  "approach": [
+    {
+      "at": 5918,
+      "change": "approach",
+      "value": true,
+      "event": "pointermove",
+      "target": "video.video-stream.html5-main-video",
+      "point": {
+        "x": 466.6666564941406,
+        "y": 110.41666412353516
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "search.0",
+          "shape": {
+            "left": 366,
+            "top": 8,
+            "width": 640,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.4",
+          "shape": {
+            "left": 419,
+            "top": 16,
+            "width": 515,
+            "height": 24
+          }
+        }
+      ],
+      "near": ["player.controls.top"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6365,
+      "change": "approach",
+      "value": false,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [],
+      "near": [],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7752,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.287",
+          "shape": {
+            "left": 1384,
+            "top": 291.65625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.287"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7899,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.289",
+          "shape": {
+            "left": 1384,
+            "top": 348.875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.289", "control.287"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8084,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.291",
+          "shape": {
+            "left": 1384,
+            "top": 316.09375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.291", "control.289", "control.287"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8235,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.291",
+          "shape": {
+            "left": 1384,
+            "top": 226.09375,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.293",
+          "shape": {
+            "left": 1384,
+            "top": 373.3125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.291", "control.289"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8269,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "a.ytLockupMetadataViewModelTitle",
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.293",
+          "shape": {
+            "left": 1384,
+            "top": 283.3125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.293", "control.291", "control.289"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8366,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div.ytContentMetadataViewModelMetadataRow",
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.295",
+          "shape": {
+            "left": 1384,
+            "top": 340.53125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.295", "control.293", "control.291", "control.289"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8436,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.295",
+          "shape": {
+            "left": 1384,
+            "top": 340.53125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.295", "control.293", "control.291"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8588,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div.ytSpecTouchFeedbackShapeFill",
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.297",
+          "shape": {
+            "left": 1384,
+            "top": 307.75,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.297", "control.295", "control.293", "control.291"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8610,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.297",
+          "shape": {
+            "left": 1384,
+            "top": 307.75,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.297", "control.295", "control.293"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8718,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.299",
+          "shape": {
+            "left": 1384,
+            "top": 364.96875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.299", "control.297", "control.295", "control.293"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8719,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.299",
+          "shape": {
+            "left": 1384,
+            "top": 364.96875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.299", "control.297", "control.295"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8947,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.299",
+          "shape": {
+            "left": 1384,
+            "top": 364.96875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.299", "control.297"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9255,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.295",
+          "shape": {
+            "left": 1384,
+            "top": 340.53125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.295", "control.297", "control.299"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9355,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.293",
+          "shape": {
+            "left": 1384,
+            "top": 283.3125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.293", "control.295", "control.297", "control.299"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9374,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.293",
+          "shape": {
+            "left": 1384,
+            "top": 283.3125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.293", "control.295", "control.297"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9552,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.291",
+          "shape": {
+            "left": 1384,
+            "top": 316.09375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.291", "control.293", "control.295", "control.297"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9610,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.291",
+          "shape": {
+            "left": 1384,
+            "top": 316.09375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.291", "control.293", "control.295"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9651,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "span.ytAttributedStringHost.ytAttributedStringWhiteSpacePreWrap",
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.289",
+          "shape": {
+            "left": 1384,
+            "top": 258.875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.289", "control.291", "control.293", "control.295"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9721,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.289",
+          "shape": {
+            "left": 1384,
+            "top": 258.875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.289", "control.291", "control.293"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9830,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div.ytSpecTouchFeedbackShapeFill",
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.287",
+          "shape": {
+            "left": 1384,
+            "top": 291.65625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.287", "control.289", "control.291", "control.293"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9919,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.287",
+          "shape": {
+            "left": 1384,
+            "top": 291.65625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.287", "control.289", "control.291"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 10005,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.287",
+          "shape": {
+            "left": 1384,
+            "top": 381.65625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.287", "control.289"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 10181,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [],
+      "near": ["control.287"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 10425,
+      "change": "approach",
+      "value": false,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [],
+      "near": [],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 11401,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 331.25
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.287",
+          "shape": {
+            "left": 1384,
+            "top": 351.65625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.287"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    }
+  ]
+}

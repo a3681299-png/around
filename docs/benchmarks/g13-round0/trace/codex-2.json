@@ -1,0 +1,6054 @@
+{
+  "label": "codex-2",
+  "pointerMode": "codex",
+  "point": {
+    "x": 700,
+    "y": 650
+  },
+  "far": {
+    "x": 503.125,
+    "y": 980
+  },
+  "frames": [
+    {
+      "t": 5886.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 5893.1,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5913.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5920.8,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5927.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5934.8,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5941.8,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5948.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5955.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5962.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5969.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5976.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5983.3,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5990.3,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 5997.2,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6004.2,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6011.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6018.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6025.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6031.9,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 6038.9,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6045.8,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6052.8,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6059.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6066.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6073.6,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6087.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6094.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6101.4,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6108.8,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6115.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6122.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6129.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6136.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6143.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6150,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6157,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6163.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6170.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6177.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6184.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6191.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6198.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6205.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6212.4,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6219.5,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6226.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6233.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6240.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6247.2,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6254.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6261.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6268,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6275,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6281.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6288.8,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6295.8,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6302.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6309.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6316.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6323.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6330.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6337.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6344.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6351.3,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6358.3,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6365.2,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6372.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6379,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6386,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6393,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6400,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6406.9,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6413.8,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6420.8,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6427.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6434.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6448.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6455.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6462.4,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6469.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6476.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6483.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6490.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6497.1,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6504,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6511,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6518,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6524.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6531.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6539.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6545.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6552.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6559.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6566.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6573.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6580.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6587.8,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6594.4,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6601.5,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6608.3,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6615.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6622.2,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6629.2,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6636,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6643.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6650,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6656.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6663.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6670.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6677.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6684.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6691.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6698.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6705.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6712.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6719.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6726.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6733.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6740.2,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6747.5,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6754.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6761.1,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6768,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6775.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6782,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6788.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6795.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6802.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6809.7,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6817.1,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6823.7,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6830.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6837.4,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6844.4,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6851.4,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6858.9,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6865.2,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6872.1,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6879.1,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6886.1,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6893.1,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6900,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6906.9,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6913.9,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6920.9,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6927.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6935,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6941.6,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6948.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6955.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6962.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6969.4,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6976.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6983.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6990.7,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6997.6,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7004.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7011,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7018.1,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7024.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7031.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7038.9,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7045.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7052.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7059.7,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7066.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7073.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7080.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7087.7,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7094.3,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7101.5,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7108.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7115.3,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7122.5,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7129.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7135.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7142.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7149.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7156.8,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7163.8,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7170.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7177.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7184.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7191.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7198.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7205.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7212.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7219.3,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7226.2,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7233.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7240.2,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7247.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7253.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7260.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7267.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7274.8,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7282.1,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7288.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7295.6,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7302.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7309.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7316.4,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7323.4,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7330.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7337.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7344.2,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7351.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7358.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7365.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7372.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7379,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7386,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7392.8,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7399.8,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7407,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7413.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7420.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7427.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7434.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7441.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7448.4,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7455.4,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7462.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7469.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7476.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7483.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7490,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7497,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7503.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7510.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7517.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7524.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7531.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7538.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7545.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7552.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7559.5,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7566.5,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7573.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7580.4,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7587.4,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7594.3,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7601.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7608.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7615.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7622.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7629.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7636.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7643,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7649.7,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7656.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7663.6,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7670.8,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7684.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7691.5,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7698.3,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7705.4,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7712.3,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7719.2,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7726.2,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7733.2,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7740,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7747,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7753.9,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7760.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7767.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7774.8,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7781.7,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7788.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7795.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7802.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7809.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7816.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7823.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7830.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7837.2,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7844.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7865.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7872.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7879,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7886.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7892.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7899.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7906.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7913.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7920.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7927.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7934.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7941.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7948.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7955.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7962.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7969.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7976.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7983.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7989.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7996.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8003.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8010.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8017.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8024.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8031.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8038.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8045.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8052.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8059.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8066.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8073.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8080.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8087.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8094.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8101.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8108.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8115,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8122,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8128.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8135.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8143.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8149.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8157,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8163.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8170.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8177.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8184.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8191.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8198.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8205.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8212.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8219.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8226.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8233,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8240.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8247.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8254.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8260.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8267.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8274.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8282.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8289.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8295.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8302.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8309.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8316.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8323.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8330.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8337.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8344.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8351.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8358.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8365,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8372,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8379.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8385.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8393.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8399.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8406.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8413.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8420.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8427.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8434.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8441.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8448.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8455.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8462.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8469.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8476.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8483,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8489.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8496.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8503.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8510.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8517.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8524.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8531.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8538.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8545.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8552.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8559.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8566.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8573.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8580.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8587.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8594.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8600.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8607.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8615,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8621.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8628.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8635.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8642.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8649.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8656.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8663.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8670.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8677.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8684.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8691.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8698.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8705.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8712.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8719.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8726,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8733.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8739.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8746.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8753.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8760.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8767.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8774.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8781.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8788.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8795.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8802.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8809.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8816.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8823.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8830.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8837.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8844.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8851.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8858,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8864.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8871.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8878.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8885.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8892.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8899.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8906.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8913.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8920.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8927.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8934.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8941.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8948.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8955.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8962.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8969.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8976.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8983,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8989.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8996.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9003.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9010.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9017.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9024.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9031.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9038.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9046,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9052.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9059.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9066.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9073.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9080.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9087.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9094.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9101.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9108,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9114.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    }
+  ],
+  "wheel": [
+    {
+      "t": 5894.400000002235,
+      "deltaY": 90
+    },
+    {
+      "t": 5984.5,
+      "deltaY": 90
+    },
+    {
+      "t": 6075.10000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 6165,
+      "deltaY": 90
+    },
+    {
+      "t": 6245.800000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 6332.400000002235,
+      "deltaY": 90
+    },
+    {
+      "t": 6415,
+      "deltaY": 90
+    },
+    {
+      "t": 6505.20000000298,
+      "deltaY": 90
+    },
+    {
+      "t": 6589,
+      "deltaY": 90
+    },
+    {
+      "t": 6671.800000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 6755.400000002235,
+      "deltaY": 90
+    },
+    {
+      "t": 6843.400000002235,
+      "deltaY": 90
+    },
+    {
+      "t": 6928.900000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 7012.300000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 7095.400000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 7180.5,
+      "deltaY": -90
+    },
+    {
+      "t": 7262.400000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 7346,
+      "deltaY": -90
+    },
+    {
+      "t": 7421.900000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 7498.20000000298,
+      "deltaY": -90
+    },
+    {
+      "t": 7590.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 7672,
+      "deltaY": -90
+    },
+    {
+      "t": 7762.10000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 7851,
+      "deltaY": -90
+    }
+  ],
+  "geometry": [
+    {
+      "at": 1766,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {},
+      "mutated": [],
+      "visible": 13,
+      "added": 13,
+      "removed": 0,
+      "addedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "control.4"
+      ],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 2829,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 50,
+        "resize-observer": 5
+      },
+      "mutated": [
+        "ytd-masthead#masthead.chunked(+0/-1)",
+        "ytd-masthead#masthead.chunked(+0/-1)",
+        "ytd-masthead#masthead.chunked(+0/-1)",
+        "ytd-masthead#masthead.chunked(+0/-1)",
+        "ytd-masthead#masthead.chunked(+0/-1)",
+        "ytd-masthead#masthead.chunked(+13/-0)",
+        "div#start.style-scope.ytd-masthead(+0/-1)",
+        "div#start.style-scope.ytd-masthead(+1/-0)",
+        "div#end.style-scope.ytd-masthead(+0/-1)",
+        "div#end.style-scope.ytd-masthead(+1/-0)",
+        "iron-media-query.style-scope.ytd-masthead[style]",
+        "yt-icon#guide-icon.style-scope.ytd-masthead(+3/-0)"
+      ],
+      "visible": 33,
+      "added": 27,
+      "removed": 7,
+      "addedIds": ["search.0", "navigation.0", "navigation.1", "control.1", "control.2", "control.5"],
+      "removedIds": ["control.30", "control.33", "control.34", "control.40", "control.41", "control.42"],
+      "viewportMoved": 6,
+      "documentMoved": 6,
+      "documentMovedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "control.4"
+      ]
+    },
+    {
+      "at": 2913,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 3,
+        "focus": 1
+      },
+      "mutated": [
+        "html(+1/-0)",
+        "video.video-stream.html5-main-video[tabindex]",
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 33,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 2921,
+      "change": "hold",
+      "wait": 189
+    },
+    {
+      "at": 3151,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 19,
+        "fonts": 2,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "yt-floating-button-view-model.ytFloatingButtonViewModelHost.style-scope.ytd-structured-description-content-renderer[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div#contents.style-scope.ytd-item-section-renderer(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)"
+      ],
+      "visible": 39,
+      "added": 6,
+      "removed": 0,
+      "addedIds": ["control.112", "control.114", "control.116", "control.118", "control.120", "control.122"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3151,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "search.0",
+          "navigation.0",
+          "navigation.1",
+          "control.1",
+          "control.2",
+          "control.5",
+          "control.7",
+          "control.8"
+        ],
+        "removed": ["control.30", "control.33", "control.34", "control.40", "control.41", "control.42", "control.44"],
+        "changed": [
+          {
+            "id": "player.video",
+            "before": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.controls.bottom",
+            "before": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.controls.top",
+            "before": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.seek.0",
+            "before": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,980,null]"
+          },
+          {
+            "id": "player.seek.1",
+            "before": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,980,null]"
+          },
+          {
+            "id": "control.4",
+            "before": "[\"control.4\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},481,76,null]",
+            "after": "[\"control.4\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},415,523,12,32,null]"
+          }
+        ],
+        "changedCount": 6
+      }
+    },
+    {
+      "at": 3357,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 16,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div#contents.style-scope.ytd-item-section-renderer(+2/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]"
+      ],
+      "visible": 49,
+      "added": 10,
+      "removed": 0,
+      "addedIds": ["control.124", "control.126", "control.128", "control.130", "control.132", "control.134"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3357,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.124",
+          "control.126",
+          "control.128",
+          "control.130",
+          "control.132",
+          "control.134",
+          "control.136",
+          "control.138"
+        ],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 3556,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 143,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "head(+0/-1)",
+        "head(+1/-0)",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "span.yt-icon-shape.ytSpecIconShapeHost(+1/-0)",
+        "span.yt-icon-shape.ytSpecIconShapeHost[class]"
+      ],
+      "visible": 49,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3766,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 42
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "span.yt-icon-shape.style-scope.yt-icon[class]",
+        "span.yt-icon-shape.style-scope.yt-icon(+1/-0)",
+        "span.yt-icon-shape.style-scope.yt-icon[class]",
+        "span.yt-icon-shape.style-scope.yt-icon(+1/-0)",
+        "span.yt-icon-shape.style-scope.yt-icon[class]"
+      ],
+      "visible": 49,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3766,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 3778,
+      "change": "hold",
+      "wait": 186
+    },
+    {
+      "at": 4015,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 23
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]"
+      ],
+      "visible": 87,
+      "added": 50,
+      "removed": 12,
+      "addedIds": ["comment.0", "control.87", "control.88", "control.92", "control.93", "control.94"],
+      "removedIds": ["control.106", "control.108", "control.112", "control.118", "control.122", "control.124"],
+      "viewportMoved": 7,
+      "documentMoved": 7,
+      "documentMovedIds": ["control.110", "control.114", "control.116", "control.120", "control.126", "control.134"]
+    },
+    {
+      "at": 4015,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "comment.0",
+          "control.87",
+          "control.88",
+          "control.92",
+          "control.93",
+          "control.94",
+          "control.98",
+          "control.99"
+        ],
+        "removed": [
+          "control.106",
+          "control.108",
+          "control.112",
+          "control.118",
+          "control.122",
+          "control.124",
+          "control.128",
+          "control.130"
+        ],
+        "changed": [
+          {
+            "id": "control.110",
+            "before": "[\"control.110\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.110\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.114",
+            "before": "[\"control.114\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.114\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.116",
+            "before": "[\"control.116\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.116\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},160.1875,61.671875,null]"
+          },
+          {
+            "id": "control.120",
+            "before": "[\"control.120\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.120\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},48,123.46875,null]"
+          },
+          {
+            "id": "control.126",
+            "before": "[\"control.126\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.126\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.234375,40,null]"
+          },
+          {
+            "id": "control.134",
+            "before": "[\"control.134\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.134\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},120.1875,40,null]"
+          },
+          {
+            "id": "control.142",
+            "before": "[\"control.142\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.142\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.234375,40,null]"
+          }
+        ],
+        "changedCount": 7
+      }
+    },
+    {
+      "at": 4219,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 18,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div#contents.style-scope.ytd-item-section-renderer(+2/-0)",
+        "ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+9/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer(+3/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer[class]",
+        "yt-formatted-string.style-scope.ytd-comment-thread-renderer(+4/-0)",
+        "ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+0/-1)"
+      ],
+      "visible": 129,
+      "added": 49,
+      "removed": 7,
+      "addedIds": ["control.164", "control.168", "control.169", "control.170", "control.172", "control.176"],
+      "removedIds": ["control.183", "control.187", "control.189", "control.193", "control.201", "control.209"],
+      "viewportMoved": 12,
+      "documentMoved": 12,
+      "documentMovedIds": ["control.185", "control.191", "control.195", "control.197", "control.199", "control.203"]
+    },
+    {
+      "at": 4219,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.164",
+          "control.168",
+          "control.169",
+          "control.170",
+          "control.172",
+          "control.176",
+          "control.177",
+          "control.178"
+        ],
+        "removed": [
+          "control.183",
+          "control.187",
+          "control.189",
+          "control.193",
+          "control.201",
+          "control.209",
+          "control.217"
+        ],
+        "changed": [
+          {
+            "id": "control.185",
+            "before": "[\"control.185\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.185\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.234375,40,null]"
+          },
+          {
+            "id": "control.191",
+            "before": "[\"control.191\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.191\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.195",
+            "before": "[\"control.195\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.195\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.197",
+            "before": "[\"control.197\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.197\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.234375,61.671875,null]"
+          },
+          {
+            "id": "control.199",
+            "before": "[\"control.199\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.199\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.203",
+            "before": "[\"control.203\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.203\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.205",
+            "before": "[\"control.205\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.205\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.234375,61.671875,null]"
+          },
+          {
+            "id": "control.207",
+            "before": "[\"control.207\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.207\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          }
+        ],
+        "changedCount": 12
+      }
+    },
+    {
+      "at": 4425,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 90,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "tp-yt-paper-button#more.style-scope.ytd-expander[hidden]",
+        "div#contents.style-scope.ytd-item-section-renderer(+2/-0)",
+        "ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+9/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer(+3/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer[class]",
+        "yt-formatted-string.style-scope.ytd-comment-thread-renderer(+4/-0)"
+      ],
+      "visible": 138,
+      "added": 17,
+      "removed": 8,
+      "addedIds": ["control.244", "control.250", "control.254", "control.255", "control.256", "control.258"],
+      "removedIds": ["control.269", "control.271", "control.273", "control.275", "control.277", "control.279"],
+      "viewportMoved": 14,
+      "documentMoved": 14,
+      "documentMovedIds": ["control.246", "control.247", "control.248", "control.285", "control.287", "control.289"]
+    },
+    {
+      "at": 4426,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.244",
+          "control.250",
+          "control.254",
+          "control.255",
+          "control.256",
+          "control.258",
+          "control.262",
+          "control.263"
+        ],
+        "removed": [
+          "control.269",
+          "control.271",
+          "control.273",
+          "control.275",
+          "control.277",
+          "control.279",
+          "control.281",
+          "control.283"
+        ],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 4625,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 28,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4771,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 4779,
+      "change": "hold",
+      "wait": 40
+    },
+    {
+      "at": 4831,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 30
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4839,
+      "change": "hold",
+      "wait": 188
+    },
+    {
+      "at": 5035,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 29
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5043,
+      "change": "hold",
+      "wait": 185
+    },
+    {
+      "at": 5234,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 28
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5241,
+      "change": "hold",
+      "wait": 188
+    },
+    {
+      "at": 5436,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 24
+      },
+      "mutated": [
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div.ytp-scrubber-container[style]",
+        "div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "div.ytp-hover-progress[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5617,
+      "change": "hold",
+      "wait": 12
+    },
+    {
+      "at": 5635,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 1
+      },
+      "mutated": ["button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[style]"],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5644,
+      "change": "hold",
+      "wait": 186
+    },
+    {
+      "at": 5836,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 1
+      },
+      "mutated": ["div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]"],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5910,
+      "change": "hold",
+      "wait": 122
+    },
+    {
+      "at": 6038,
+      "change": "read",
+      "scroll": [0, 180],
+      "bumped": true,
+      "causes": {
+        "mutation": 16,
+        "scroll": 2
+      },
+      "mutated": [
+        "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+        "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6039,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,572.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,572.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,572.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,392.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,491.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,671.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,491.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 6240,
+      "change": "read",
+      "scroll": [0, 360],
+      "bumped": true,
+      "causes": {
+        "mutation": 15,
+        "scroll": 2
+      },
+      "mutated": [
+        "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+        "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6240,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,392.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,392.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,392.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,212.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,311.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,491.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,311.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 6445,
+      "change": "read",
+      "scroll": [0, 630],
+      "bumped": true,
+      "causes": {
+        "scroll": 3
+      },
+      "mutated": [],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6445,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,212.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-57.75,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,212.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-57.75,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,212.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-57.75,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,41.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,41.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,41.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,41.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,311.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,41.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 6642,
+      "change": "read",
+      "scroll": [0, 810],
+      "bumped": true,
+      "causes": {
+        "scroll": 2
+      },
+      "mutated": [],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 6642,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-57.75,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-237.75,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-57.75,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-237.75,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-57.75,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-237.75,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,41.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-138.25,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,41.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-138.25,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,41.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-138.25,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,41.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-138.25,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,41.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-138.25,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 6843,
+      "change": "read",
+      "scroll": [0, 1080],
+      "bumped": true,
+      "causes": {
+        "scroll": 2
+      },
+      "mutated": [],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 7044,
+      "change": "read",
+      "scroll": [0, 900],
+      "bumped": true,
+      "causes": {
+        "scroll": 3
+      },
+      "mutated": [],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 7045,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-237.75,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-327.75,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-237.75,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-327.75,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-237.75,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-327.75,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-228.25,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-228.25,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-228.25,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-228.25,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-138.25,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-228.25,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7247,
+      "change": "read",
+      "scroll": [0, 720],
+      "bumped": true,
+      "causes": {
+        "scroll": 2
+      },
+      "mutated": [],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 7248,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-327.75,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-147.75,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-327.75,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-147.75,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-327.75,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-147.75,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-228.25,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-48.25,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-228.25,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-48.25,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-228.25,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-48.25,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-228.25,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-48.25,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-228.25,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-48.25,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7453,
+      "change": "read",
+      "scroll": [0, 450],
+      "bumped": true,
+      "causes": {
+        "scroll": 3
+      },
+      "mutated": [],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 7453,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-147.75,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,122.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-147.75,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,122.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-147.75,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,122.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,-48.25,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,221.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,-48.25,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,221.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,-48.25,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,221.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,-48.25,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,221.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,-48.25,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,221.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7649,
+      "change": "read",
+      "scroll": [0, 270],
+      "bumped": true,
+      "causes": {
+        "scroll": 2
+      },
+      "mutated": [],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 7649,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,122.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,302.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,122.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,302.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,122.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,302.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,221.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,401.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,221.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,401.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,221.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,401.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,221.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,401.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,221.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,401.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7850,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 15,
+        "scroll": 2
+      },
+      "mutated": [
+        "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+        "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 129,
+      "documentMoved": 0
+    },
+    {
+      "at": 8052,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 16,
+        "scroll": 1
+      },
+      "mutated": [
+        "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+        "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]"
+      ],
+      "visible": 138,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 8052,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,302.25,676,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,572.25,676,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,302.25,676,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,572.25,676,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,302.25,676,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,572.25,676,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,401.75,617.734375,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},721.234375,94.765625,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,401.75,617.734375,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},808,64,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,401.75,617.734375,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},872,48,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,401.75,617.734375,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},920,48,[402.265625,671.75,617.734375,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,401.75,617.734375,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},968,48,[402.265625,671.75,617.734375,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 8409,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    }
+  ],
+  "approach": [
+    {
+      "at": 4364,
+      "change": "approach",
+      "value": true,
+      "event": "pointermove",
+      "target": "h1.style-scope.ytd-watch-metadata",
+      "point": {
+        "x": 700,
+        "y": 650
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "control.54",
+          "shape": {
+            "left": 708,
+            "top": 580.25,
+            "width": 48,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.56",
+          "shape": {
+            "left": 756,
+            "top": 580.25,
+            "width": 48,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.66",
+          "shape": {
+            "left": 725.234375,
+            "top": 679.75,
+            "width": 86.765625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "player.seek.0", "player.seek.1", "control.54", "control.66"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 4722,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 700,
+        "y": 650
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "control.54",
+          "shape": {
+            "left": 708,
+            "top": 580.25,
+            "width": 48,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.56",
+          "shape": {
+            "left": 756,
+            "top": 580.25,
+            "width": 48,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.66",
+          "shape": {
+            "left": 725.234375,
+            "top": 679.75,
+            "width": 86.765625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "control.54", "control.66"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6388,
+      "change": "approach",
+      "value": false,
+      "point": {
+        "x": 700,
+        "y": 650
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [],
+      "near": [],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7649,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 700,
+        "y": 650
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "comment.0",
+          "shape": {
+            "left": 16,
+            "top": 641.25,
+            "width": 980,
+            "height": 25
+          }
+        }
+      ],
+      "near": ["comment.0"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7851,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "h1.style-scope.ytd-watch-metadata",
+      "point": {
+        "x": 700,
+        "y": 650
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "control.54",
+          "shape": {
+            "left": 708,
+            "top": 580.25,
+            "width": 48,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.56",
+          "shape": {
+            "left": 756,
+            "top": 580.25,
+            "width": 48,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.66",
+          "shape": {
+            "left": 725.234375,
+            "top": 679.75,
+            "width": 86.765625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "control.54", "control.66", "comment.0"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8200,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 700,
+        "y": 650
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "control.54",
+          "shape": {
+            "left": 708,
+            "top": 580.25,
+            "width": 48,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.56",
+          "shape": {
+            "left": 756,
+            "top": 580.25,
+            "width": 48,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.66",
+          "shape": {
+            "left": 725.234375,
+            "top": 679.75,
+            "width": 86.765625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "control.54", "control.66"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    }
+  ]
+}

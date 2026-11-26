@@ -1,15 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { cp, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { sidePanelDriver } from './helpers/side-panel';
 import { nativeShortcut } from './helpers/native-shortcut';
+import { openEditor } from './helpers/editor';
 
 async function setup() {
   const work = path.resolve('.work');
   await mkdir(work, { recursive: true });
   const extension = await mkdtemp(path.join(work, 'g-entry-extension-'));
-  await cp(path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist'), extension, { recursive: true });
+  await cp(path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? 'dist'), extension, { recursive: true });
   const manifest = JSON.parse(await readFile(path.join(extension, 'manifest.json'), 'utf8'));
   // Chrome's _execute_action invokes the real toolbar action (Popup / onClicked).
   // Bind it only in this private test copy; no synthetic runtime message launches UI.
@@ -28,8 +30,8 @@ async function setup() {
   await popup.goto('chrome-extension://' + id + '/popup/index.html');
   const page = await context.newPage();
   await page.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await showArtwork(popup);
+  await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   await expect(popup.locator('#creator-editor-direct')).toBeEnabled();
   await page.bringToFront();
   return { context, page, popup, id, profile, extension };
@@ -46,7 +48,7 @@ test('the emergency accelerator is assigned, latches drawing OFF, and unrelated 
     ).toBe('Alt+Shift+Q');
     await nativeShortcut(page, profile, extension, 'Q');
     await expect(popup.getByRole('button', { name: '描画を再開' })).toBeVisible();
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-theme', 'retro');
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-site', 'youtube');
     // A previously approved YouTube tab must lose its approval on navigation.
     const unrelated = page;
     await unrelated.goto('https://example.com/');
@@ -85,16 +87,16 @@ test('OFF opens the real action settings; its top button opens the editor and se
     const panel = await sidePanelDriver(context, page, id);
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await panel.files([path.resolve('tests/fixtures/motion/petal.png')]);
-    await expect.poll(() => panel.text('.dirty')).toBe('未保存の変更');
+    await expect.poll(() => panel.text('.dirty')).toBe('未保存');
     const opened = context.waitForEvent('page');
     await panel.click('.display-settings');
     const settings = await opened;
-    await expect(settings.getByRole('switch', { name: 'Theme ON / OFF' })).toBeChecked();
+    await expect(settings.getByRole('switch', { name: '作品を表示する' })).toBeChecked();
     await expect(settings.locator('#creator-editor-direct')).toBeEnabled();
     await settings.screenshot({ path: info.outputPath('display-settings.png') });
     // Return directly to the same target and its existing draft.
     await settings.locator('#creator-editor-direct').click();
-    await expect.poll(() => panel.text('.dirty')).toBe('未保存の変更');
+    await expect.poll(() => panel.text('.dirty')).toBe('未保存');
     await panel.screenshot(info.outputPath('editor-settings-entry.png'));
     await panel.detach();
     await action.detach();
@@ -138,11 +140,11 @@ test('settings starts clear of the player, remembers a dragged position, and rem
   test.setTimeout(60_000);
   const { context, page, popup } = await setup();
   try {
-    const icon = page.getByRole('button', { name: 'Web World Themes の設定', exact: true });
-    const panel = page.getByRole('dialog', { name: 'Web World Themes の設定' });
+    const icon = page.getByRole('button', { name: 'Around の設定', exact: true });
+    const panel = page.getByRole('dialog', { name: 'Around の設定' });
     for (const enabled of [false, true]) {
-      await popup.getByRole('switch', { name: 'Theme ON / OFF' }).setChecked(enabled);
-      await expect.poll(() => page.locator('html').getAttribute('data-ww-theme')).toBe(enabled ? 'retro' : null);
+      await popup.getByRole('switch', { name: '作品を表示する' }).setChecked(enabled);
+      await expect.poll(() => page.locator('html').getAttribute('data-around-site')).toBe(enabled ? 'youtube' : null);
       for (const [width, height] of [
         [1920, 1080],
         [1100, 760],
@@ -174,7 +176,7 @@ test('settings starts clear of the player, remembers a dragged position, and rem
     }
     await page.setViewportSize({ width: 1100, height: 760 });
     await icon.click();
-    const titlebar = (await panel.locator('.ww-titlebar').boundingBox())!;
+    const titlebar = (await panel.locator('.around-titlebar').boundingBox())!;
     await page.mouse.move(titlebar.x + 80, titlebar.y + 10);
     await page.mouse.down();
     await page.mouse.move(650, 110, { steps: 5 });
@@ -189,33 +191,64 @@ test('settings starts clear of the player, remembers a dragged position, and rem
     await page.getByRole('button', { name: 'Fullscreen', exact: true }).click();
     await icon.click();
     await expect(panel).toBeVisible();
-    await expect(panel.getByRole('slider', { name: 'Effect Strength' })).toBeEnabled();
+    await expect(panel.getByRole('switch', { name: '作品を表示する' })).toBeEnabled();
   } finally {
     await context.close();
   }
 });
 
-test('the page editor opens display settings and hands its unsaved draft back to the official panel', async () => {
+test('the editor opens display settings and hands its unsaved draft back to the official panel', async () => {
   test.setTimeout(60_000);
   const { context, page, popup, id } = await setup();
   try {
-    await page.bringToFront();
-    await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-    const editor = page.locator('#web-world-themes-creator');
+    // UI0-d: the editor is the Studio page (here its own window, as a tab); its 表示設定 opens the
+    // same settings as the popup.
+    const { panel: editor } = await openEditor(popup, page);
     await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
-    await expect(editor.locator('.dirty')).toHaveText('未保存の変更');
+    await expect(editor.locator('.dirty')).toHaveText('未保存');
+    const opened = context.waitForEvent('page');
     await editor.locator('.display-settings').click();
-    const settings = page.getByRole('dialog', { name: 'Web World Themes の設定' });
-    await expect(settings).toBeVisible();
+    const settings = await opened;
+    await expect(settings.getByRole('button', { name: 'エディターを開く', exact: true })).toBeEnabled();
+    await expect(settings.getByRole('button', { name: '別ウィンドウで開く', exact: true })).toBeEnabled();
     await settings.getByRole('button', { name: 'エディターを開く', exact: true }).click();
-    await expect(settings).not.toBeVisible();
+    await expect(settings.locator('#creator-launch-status')).toHaveText('サイドパネルで編集中です。');
+    // The side panel belongs to the YouTube tab; here the editor's window is a tab of the same window.
+    await page.bringToFront();
     const panel = await sidePanelDriver(context, page, id);
-    await expect.poll(() => panel.text('.dirty')).toBe('未保存の変更');
+    await expect.poll(() => panel.text('.dirty')).toBe('未保存');
     expect(
-      await panel.evaluate(
-        'document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer").length',
-      ),
+      await panel.evaluate('document.querySelector("#around-creator").shadowRoot.querySelectorAll(".layer").length'),
     ).toBe(1);
+    await panel.detach();
+  } finally {
+    await context.close();
+  }
+});
+
+test('the in-video icon opens the side panel within its click in 制作モード, and 表示設定 otherwise', async () => {
+  test.setTimeout(60_000);
+  const { context, page, popup, id } = await setup();
+  try {
+    const icon = page.getByRole('button', { name: 'Around の設定', exact: true });
+    const settings = page.getByRole('dialog', { name: 'Around の設定' });
+    // OFF: the icon opens 表示設定, with the same two ways into the editor as the popup.
+    await expect(popup.getByRole('switch', { name: '制作モード', exact: true })).not.toBeChecked();
+    await page.bringToFront();
+    await icon.click();
+    await expect(settings).toBeVisible();
+    await expect(settings.getByRole('button', { name: 'エディターを開く', exact: true })).toBeEnabled();
+    await expect(settings.getByRole('button', { name: '別ウィンドウで開く', exact: true })).toBeEnabled();
+    await expect(settings.getByRole('button', { name: /デザインを編集|インページ/ })).toHaveCount(0);
+    await settings.getByRole('button', { name: '設定を閉じる' }).click();
+    // ON: the same click opens Chrome's side panel itself (the click's user activation reaches
+    // chrome.sidePanel.open through the extension message); no settings appear.
+    await popup.getByRole('switch', { name: '制作モード', exact: true }).check();
+    await page.bringToFront();
+    await icon.click();
+    const panel = await sidePanelDriver(context, page, id);
+    await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    await expect(settings).toBeHidden();
     await panel.detach();
   } finally {
     await context.close();

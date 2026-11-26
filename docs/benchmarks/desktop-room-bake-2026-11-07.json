@@ -1,0 +1,1558 @@
+{
+  "date": "2026-11-07 JST",
+  "revision": "d33e2c8958374e7e6930cd2376416677cd3438ad",
+  "machine": {
+    "cpu": "AMD Ryzen 5 5600X",
+    "gpu": "AMD Radeon RX 6800",
+    "ramGiB": 64,
+    "os": "Windows 11 Pro 26H2 (26300.9711)"
+  },
+  "browser": "153.0.8010.12",
+  "conditions": {
+    "width": 1920,
+    "height": 1080,
+    "dpr": 1,
+    "screenX": -4000,
+    "screenY": 0,
+    "periodMs": 6.099999999999994
+  },
+  "windowMs": 6000,
+  "samplesPerBake": 384,
+  "bake1024": {
+    "assets": {
+      "static_desk_l": {
+        "file": "desk.glb",
+        "scale": 2.5082,
+        "size_m": [2.454, 1.494, 0.74],
+        "triangles": 10391
+      },
+      "static_chair": {
+        "file": "chair.glb",
+        "scale": 1.1385,
+        "size_m": [0.678, 0.747, 1.12],
+        "triangles": 2832
+      },
+      "static_lamp_desk": {
+        "file": "lamp.glb",
+        "scale": 0.4899,
+        "size_m": [0.136, 0.329, 0.48],
+        "triangles": 4488
+      }
+    },
+    "levels": {
+      "1.0": {
+        "file": "room-1_0.glb",
+        "bytes": 1175512,
+        "triangles": 17903,
+        "draws": 19
+      },
+      "0.5": {
+        "file": "room-0_5.glb",
+        "bytes": 859996,
+        "triangles": 9046,
+        "draws": 19
+      },
+      "0.25": {
+        "file": "room-0_25.glb",
+        "bytes": 639820,
+        "triangles": 4618,
+        "draws": 19
+      }
+    },
+    "bake": {
+      "sun_night": {
+        "seconds": 24.9,
+        "bytes": 2746555,
+        "size": 1024
+      },
+      "room_desk": {
+        "seconds": 22,
+        "bytes": 2633066,
+        "size": 1024
+      },
+      "room_pendant": {
+        "seconds": 23.3,
+        "bytes": 2459401,
+        "size": 1024
+      },
+      "screen": {
+        "seconds": 20.6,
+        "bytes": 2325583,
+        "size": 1024
+      },
+      "screen_monitor": {
+        "seconds": 22.4,
+        "bytes": 2530437,
+        "size": 1024
+      }
+    },
+    "device": "HIP"
+  },
+  "bake2048": {
+    "assets": {
+      "static_desk_l": {
+        "file": "desk.glb",
+        "scale": 2.5082,
+        "size_m": [2.454, 1.494, 0.74],
+        "triangles": 10391
+      },
+      "static_chair": {
+        "file": "chair.glb",
+        "scale": 1.1385,
+        "size_m": [0.678, 0.747, 1.12],
+        "triangles": 2832
+      },
+      "static_lamp_desk": {
+        "file": "lamp.glb",
+        "scale": 0.4899,
+        "size_m": [0.136, 0.329, 0.48],
+        "triangles": 4488
+      }
+    },
+    "levels": {
+      "1.0": {
+        "file": "room-1_0.glb",
+        "bytes": 1175512,
+        "triangles": 17903,
+        "draws": 19
+      }
+    },
+    "bake": {
+      "sun_night": {
+        "seconds": 69.4,
+        "bytes": 9598985,
+        "size": 2048
+      },
+      "room_desk": {
+        "seconds": 56.3,
+        "bytes": 9230460,
+        "size": 2048
+      },
+      "room_pendant": {
+        "seconds": 54.3,
+        "bytes": 8490368,
+        "size": 2048
+      },
+      "screen": {
+        "seconds": 48,
+        "bytes": 8024703,
+        "size": 2048
+      },
+      "screen_monitor": {
+        "seconds": 48.5,
+        "bytes": 8870241,
+        "size": 2048
+      }
+    },
+    "device": "HIP"
+  },
+  "scenes": {
+    "base": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 0.9,
+      "gpuMedianMs": 0.317,
+      "gpuP95Ms": 0.548,
+      "drawCalls": 23,
+      "triangles": 18455,
+      "loadMs": 629,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 131,
+      "videoDropped": 2,
+      "videoDroppedPercent": 1.527,
+      "runs": [
+        {
+          "round": 1,
+          "query": "",
+          "loadedMs": 629,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.39999999944120646,
+            "p95": 0.599999999627471
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.35524,
+            "p95": 2.37683
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 107,
+          "video": {
+            "dropped": 0,
+            "total": 43
+          },
+          "measuredMs": 6001.700000000186
+        },
+        {
+          "round": 2,
+          "query": "",
+          "loadedMs": 726,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31656,
+            "p95": 0.54787
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 118,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6001.4000000003725
+        },
+        {
+          "round": 3,
+          "query": "",
+          "loadedMs": 629,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31744,
+            "p95": 0.5186
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 162,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6005.9000000003725
+        }
+      ]
+    },
+    "video-only": {
+      "n": 3,
+      "cpuMedianMs": null,
+      "cpuP95Ms": null,
+      "gpuMedianMs": null,
+      "gpuP95Ms": null,
+      "drawCalls": null,
+      "triangles": null,
+      "loadMs": null,
+      "lightmapBytesGpu": null,
+      "videoTotal": 132,
+      "videoDropped": 2,
+      "videoDroppedPercent": 1.515,
+      "runs": [
+        {
+          "round": 1,
+          "query": "room=0",
+          "video": {
+            "total": 44,
+            "dropped": 0
+          },
+          "measuredMs": 6015.5999999996275
+        },
+        {
+          "round": 2,
+          "query": "room=0",
+          "video": {
+            "total": 44,
+            "dropped": 2
+          },
+          "measuredMs": 6015.39999999851
+        },
+        {
+          "round": 3,
+          "query": "room=0",
+          "video": {
+            "total": 44,
+            "dropped": 0
+          },
+          "measuredMs": 6009.5999999996275
+        }
+      ]
+    },
+    "level-0_5": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 0.8,
+      "gpuMedianMs": 0.313,
+      "gpuP95Ms": 0.529,
+      "drawCalls": 23,
+      "triangles": 9598,
+      "loadMs": 649,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 132,
+      "videoDropped": 2,
+      "videoDroppedPercent": 1.515,
+      "runs": [
+        {
+          "round": 1,
+          "query": "level=0_5",
+          "loadedMs": 636,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.7999999998137355
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31332,
+            "p95": 0.52256
+          },
+          "calls": 23,
+          "triangles": 9598,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 52,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6005.700000000186
+        },
+        {
+          "round": 2,
+          "query": "level=0_5",
+          "loadedMs": 654,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8000000007450581
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31312,
+            "p95": 0.52888
+          },
+          "calls": 23,
+          "triangles": 9598,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 124,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6002.5999999996275
+        },
+        {
+          "round": 3,
+          "query": "level=0_5",
+          "loadedMs": 649,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31332,
+            "p95": 0.53364
+          },
+          "calls": 23,
+          "triangles": 9598,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 142,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6001.799999998882
+        }
+      ]
+    },
+    "level-0_25": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 0.9,
+      "gpuMedianMs": 0.312,
+      "gpuP95Ms": 0.513,
+      "drawCalls": 23,
+      "triangles": 5170,
+      "loadMs": 687,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 132,
+      "videoDropped": 0,
+      "videoDroppedPercent": 0,
+      "runs": [
+        {
+          "round": 1,
+          "query": "level=0_25",
+          "loadedMs": 687,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 1
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31008,
+            "p95": 0.50502
+          },
+          "calls": 23,
+          "triangles": 5170,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 54,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6004.200000000186
+        },
+        {
+          "round": 2,
+          "query": "level=0_25",
+          "loadedMs": 687,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8999999985098839
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31244,
+            "p95": 0.5691
+          },
+          "calls": 23,
+          "triangles": 5170,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 262,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6002.700000001118
+        },
+        {
+          "round": 3,
+          "query": "level=0_25",
+          "loadedMs": 681,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31268,
+            "p95": 0.51311
+          },
+          "calls": 23,
+          "triangles": 5170,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 231,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6002
+        }
+      ]
+    },
+    "lm-2048": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 0.9,
+      "gpuMedianMs": 0.32,
+      "gpuP95Ms": 0.673,
+      "drawCalls": 23,
+      "triangles": 18455,
+      "loadMs": 2287,
+      "lightmapBytesGpu": 201326592,
+      "videoTotal": 132,
+      "videoDropped": 2,
+      "videoDroppedPercent": 1.515,
+      "runs": [
+        {
+          "round": 1,
+          "query": "lm=2048",
+          "loadedMs": 2303,
+          "lightmapBytesGpu": 201326592,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 990,
+            "median": 0.599999999627471,
+            "p95": 1.1000000005587935
+          },
+          "gpu": {
+            "n": 990,
+            "median": 0.3208,
+            "p95": 0.67274
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 287,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6003
+        },
+        {
+          "round": 2,
+          "query": "lm=2048",
+          "loadedMs": 2287,
+          "lightmapBytesGpu": 201326592,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8000000007450581
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31996,
+            "p95": 0.52646
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 374,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6003.0999999996275
+        },
+        {
+          "round": 3,
+          "query": "lm=2048",
+          "loadedMs": 2271,
+          "lightmapBytesGpu": 201326592,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 990,
+            "median": 0.5,
+            "p95": 0.8999999985098839
+          },
+          "gpu": {
+            "n": 990,
+            "median": 0.31784,
+            "p95": 0.74118
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 186,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6000.0999999996275
+        }
+      ]
+    },
+    "half-resolution": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 0.9,
+      "gpuMedianMs": 0.143,
+      "gpuP95Ms": 0.243,
+      "drawCalls": 23,
+      "triangles": 18455,
+      "loadMs": 795,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 132,
+      "videoDropped": 6,
+      "videoDroppedPercent": 4.545,
+      "runs": [
+        {
+          "round": 1,
+          "query": "resolution=half",
+          "loadedMs": 795,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 960,
+          "renderHeight": 540,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.1764,
+            "p95": 1.00332
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 257,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6002.5
+        },
+        {
+          "round": 2,
+          "query": "resolution=half",
+          "loadedMs": 830,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 960,
+          "renderHeight": 540,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8000000007450581
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.14292,
+            "p95": 0.24251
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 135,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6001.10000000149
+        },
+        {
+          "round": 3,
+          "query": "resolution=half",
+          "loadedMs": 734,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 960,
+          "renderHeight": 540,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8999999985098839
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.14308,
+            "p95": 0.20034
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 61,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6002.199999999255
+        }
+      ]
+    },
+    "split-draws": {
+      "n": 3,
+      "cpuMedianMs": 0.6,
+      "cpuP95Ms": 0.9,
+      "gpuMedianMs": 0.318,
+      "gpuP95Ms": 0.54,
+      "drawCalls": 74,
+      "triangles": 18455,
+      "loadMs": 693,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 132,
+      "videoDropped": 2,
+      "videoDroppedPercent": 1.515,
+      "runs": [
+        {
+          "round": 1,
+          "query": "draws=split",
+          "loadedMs": 699,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.599999999627471,
+            "p95": 1
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31836,
+            "p95": 0.53972
+          },
+          "calls": 74,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 90,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6003.200000000186
+        },
+        {
+          "round": 2,
+          "query": "draws=split",
+          "loadedMs": 693,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31776,
+            "p95": 0.3548
+          },
+          "calls": 74,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 160,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6004.9000000003725
+        },
+        {
+          "round": 3,
+          "query": "draws=split",
+          "loadedMs": 675,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.599999999627471,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.3182,
+            "p95": 0.55874
+          },
+          "calls": 74,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 96,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6006.5999999996275
+        }
+      ]
+    },
+    "no-character": {
+      "n": 3,
+      "cpuMedianMs": 0.3,
+      "cpuP95Ms": 0.5,
+      "gpuMedianMs": 0.273,
+      "gpuP95Ms": 0.307,
+      "drawCalls": 21,
+      "triangles": 17927,
+      "loadMs": 694,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 131,
+      "videoDropped": 2,
+      "videoDroppedPercent": 1.527,
+      "runs": [
+        {
+          "round": 1,
+          "query": "character=0",
+          "loadedMs": 694,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.2999999998137355,
+            "p95": 0.5
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.27212,
+            "p95": 0.3072
+          },
+          "calls": 21,
+          "triangles": 17927,
+          "geometries": 22,
+          "textures": 10,
+          "heapMB": 227,
+          "video": {
+            "dropped": 0,
+            "total": 43
+          },
+          "measuredMs": 6000.799999999814
+        },
+        {
+          "round": 2,
+          "query": "character=0",
+          "loadedMs": 693,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.2999999988824129,
+            "p95": 0.5
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.27428,
+            "p95": 0.31156
+          },
+          "calls": 21,
+          "triangles": 17927,
+          "geometries": 22,
+          "textures": 10,
+          "heapMB": 158,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6003.5
+        },
+        {
+          "round": 3,
+          "query": "character=0",
+          "loadedMs": 697,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.2999999988824129,
+            "p95": 0.5
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.27276,
+            "p95": 0.30352
+          },
+          "calls": 21,
+          "triangles": 17927,
+          "geometries": 22,
+          "textures": 10,
+          "heapMB": 143,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6003
+        }
+      ]
+    },
+    "floor-probe": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 2.2,
+      "gpuMedianMs": 0.317,
+      "gpuP95Ms": 1.289,
+      "drawCalls": 23,
+      "triangles": 18455,
+      "loadMs": 691,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 131,
+      "videoDropped": 0,
+      "videoDroppedPercent": 0,
+      "runs": [
+        {
+          "round": 1,
+          "query": "floor=probe",
+          "loadedMs": 691,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 2.2000000001862645
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31568,
+            "p95": 1.12037
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 17,
+          "heapMB": 64,
+          "video": {
+            "dropped": 0,
+            "total": 43
+          },
+          "measuredMs": 6001.4000000003725
+        },
+        {
+          "round": 2,
+          "query": "floor=probe",
+          "loadedMs": 724,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 2.300000000745058
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31688,
+            "p95": 1.31647
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 17,
+          "heapMB": 68,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6003.699999999255
+        },
+        {
+          "round": 3,
+          "query": "floor=probe",
+          "loadedMs": 683,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 2.199999999254942
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31772,
+            "p95": 1.28902
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 17,
+          "heapMB": 63,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6006.89999999851
+        }
+      ]
+    },
+    "floor-static": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 0.8,
+      "gpuMedianMs": 0.314,
+      "gpuP95Ms": 0.542,
+      "drawCalls": 23,
+      "triangles": 18455,
+      "loadMs": 670,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 132,
+      "videoDropped": 0,
+      "videoDroppedPercent": 0,
+      "runs": [
+        {
+          "round": 1,
+          "query": "floor=static",
+          "loadedMs": 665,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31236,
+            "p95": 0.5422
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 17,
+          "heapMB": 119,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6004.899999999441
+        },
+        {
+          "round": 2,
+          "query": "floor=static",
+          "loadedMs": 689,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8000000007450581
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.3484,
+            "p95": 1.24288
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 17,
+          "heapMB": 140,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6003.700000001118
+        },
+        {
+          "round": 3,
+          "query": "floor=static",
+          "loadedMs": 670,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 990,
+            "median": 0.5,
+            "p95": 0.8000000007450581
+          },
+          "gpu": {
+            "n": 990,
+            "median": 0.3142,
+            "p95": 0.50768
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 17,
+          "heapMB": 119,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6000.5999999996275
+        }
+      ]
+    },
+    "outline": {
+      "n": 3,
+      "cpuMedianMs": 0.7,
+      "cpuP95Ms": 1.4,
+      "gpuMedianMs": 0.988,
+      "gpuP95Ms": 1.028,
+      "drawCalls": 1,
+      "triangles": 2,
+      "loadMs": 697,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 131,
+      "videoDropped": 1,
+      "videoDroppedPercent": 0.763,
+      "runs": [
+        {
+          "round": 1,
+          "query": "outline=1",
+          "loadedMs": 809,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.7999999998137355,
+            "p95": 1.5
+          },
+          "gpu": {
+            "n": 991,
+            "median": 1.0306,
+            "p95": 2.159
+          },
+          "calls": 1,
+          "triangles": 2,
+          "geometries": 24,
+          "textures": 19,
+          "heapMB": 62,
+          "video": {
+            "dropped": 1,
+            "total": 43
+          },
+          "measuredMs": 6006
+        },
+        {
+          "round": 2,
+          "query": "outline=1",
+          "loadedMs": 678,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.7000000011175871,
+            "p95": 1.300000000745058
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.98392,
+            "p95": 1.01548
+          },
+          "calls": 1,
+          "triangles": 2,
+          "geometries": 24,
+          "textures": 19,
+          "heapMB": 192,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6002
+        },
+        {
+          "round": 3,
+          "query": "outline=1",
+          "loadedMs": 697,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 990,
+            "median": 0.7000000011175871,
+            "p95": 1.400000000372529
+          },
+          "gpu": {
+            "n": 990,
+            "median": 0.9882,
+            "p95": 1.02772
+          },
+          "calls": 1,
+          "triangles": 2,
+          "geometries": 24,
+          "textures": 19,
+          "heapMB": 152,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6000.300000000745
+        }
+      ]
+    },
+    "layers-off": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 0.8,
+      "gpuMedianMs": 0.317,
+      "gpuP95Ms": 0.527,
+      "drawCalls": 23,
+      "triangles": 18455,
+      "loadMs": 694,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 132,
+      "videoDropped": 0,
+      "videoDroppedPercent": 0,
+      "runs": [
+        {
+          "round": 1,
+          "query": "w=sun_night:1,room_desk:0,room_pendant:0,screen:0,screen_monitor:0",
+          "loadedMs": 740,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8000000007450581
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.3178,
+            "p95": 0.52819
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 100,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6002
+        },
+        {
+          "round": 2,
+          "query": "w=sun_night:1,room_desk:0,room_pendant:0,screen:0,screen_monitor:0",
+          "loadedMs": 686,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.40000000037252903,
+            "p95": 0.7999999988824129
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31728,
+            "p95": 0.50985
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 238,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6001.0999999996275
+        },
+        {
+          "round": 3,
+          "query": "w=sun_night:1,room_desk:0,room_pendant:0,screen:0,screen_monitor:0",
+          "loadedMs": 694,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8000000007450581
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31736,
+            "p95": 0.52702
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 114,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6002.700000001118
+        }
+      ]
+    },
+    "theater": {
+      "n": 3,
+      "cpuMedianMs": 0.5,
+      "cpuP95Ms": 0.9,
+      "gpuMedianMs": 0.318,
+      "gpuP95Ms": 0.535,
+      "drawCalls": 23,
+      "triangles": 18455,
+      "loadMs": 679,
+      "lightmapBytesGpu": 50331648,
+      "videoTotal": 132,
+      "videoDropped": 2,
+      "videoDroppedPercent": 1.515,
+      "runs": [
+        {
+          "round": 1,
+          "query": "w=sun_night:0.3,room_desk:0,room_pendant:0,screen:1,screen_monitor:0.6",
+          "loadedMs": 673,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.8999999994412065
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31712,
+            "p95": 0.3616
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 202,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6003.200000000186
+        },
+        {
+          "round": 2,
+          "query": "w=sun_night:0.3,room_desk:0,room_pendant:0,screen:1,screen_monitor:0.6",
+          "loadedMs": 712,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.35208,
+            "p95": 2.00612
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 165,
+          "video": {
+            "dropped": 0,
+            "total": 44
+          },
+          "measuredMs": 6003.399999999441
+        },
+        {
+          "round": 3,
+          "query": "w=sun_night:0.3,room_desk:0,room_pendant:0,screen:1,screen_monitor:0.6",
+          "loadedMs": 679,
+          "lightmapBytesGpu": 50331648,
+          "renderWidth": 1920,
+          "renderHeight": 1080,
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "gpuTimer": true,
+          "cpu": {
+            "n": 991,
+            "median": 0.5,
+            "p95": 0.900000000372529
+          },
+          "gpu": {
+            "n": 991,
+            "median": 0.31824,
+            "p95": 0.5347
+          },
+          "calls": 23,
+          "triangles": 18455,
+          "geometries": 23,
+          "textures": 16,
+          "heapMB": 148,
+          "video": {
+            "dropped": 2,
+            "total": 44
+          },
+          "measuredMs": 6003.89999999851
+        }
+      ]
+    }
+  },
+  "camera": [
+    {
+      "axis": "x",
+      "v": -0.6,
+      "outside": 0.21
+    },
+    {
+      "axis": "x",
+      "v": -0.4,
+      "outside": 0.1
+    },
+    {
+      "axis": "x",
+      "v": -0.2,
+      "outside": 0
+    },
+    {
+      "axis": "x",
+      "v": 0.2,
+      "outside": 0
+    },
+    {
+      "axis": "x",
+      "v": 0.4,
+      "outside": 0
+    },
+    {
+      "axis": "x",
+      "v": 0.6,
+      "outside": 0
+    },
+    {
+      "axis": "y",
+      "v": -0.4,
+      "outside": 0
+    },
+    {
+      "axis": "y",
+      "v": -0.2,
+      "outside": 0
+    },
+    {
+      "axis": "y",
+      "v": 0.2,
+      "outside": 0
+    },
+    {
+      "axis": "y",
+      "v": 0.4,
+      "outside": 0
+    },
+    {
+      "axis": "z",
+      "v": -0.6,
+      "outside": 0.05
+    },
+    {
+      "axis": "z",
+      "v": -0.3,
+      "outside": 0
+    },
+    {
+      "axis": "z",
+      "v": 0.3,
+      "outside": 0
+    },
+    {
+      "axis": "z",
+      "v": 0.6,
+      "outside": 0
+    },
+    {
+      "axis": "z",
+      "v": 1,
+      "outside": 0
+    },
+    {
+      "axis": "dolly",
+      "v": 0.5,
+      "outside": 0
+    },
+    {
+      "axis": "dolly",
+      "v": 1,
+      "outside": 0
+    },
+    {
+      "axis": "dolly",
+      "v": 1.5,
+      "outside": 0
+    }
+  ]
+}

@@ -1,0 +1,737 @@
+{
+  "date": "2026-11-07",
+  "base": "a1fe387",
+  "candidate": "b46cedc",
+  "scene": "real YouTube watch to search results (lofi), 6s from Enter after at least 50px of flight",
+  "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+  "os": "Windows 11 Pro 26H2",
+  "chromium": "153.0.8010.12",
+  "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "displayHz": 60,
+  "cpu": "CDP V8 500us, attributed by extension URL, ms",
+  "order": "odd A0,A1,B; even B,A1,A0",
+  "summary": {
+    "AA": {
+      "long": {
+        "min": -5,
+        "max": 3,
+        "median": -2,
+        "increased": 1,
+        "decreased": 5
+      },
+      "longWithExtension": {
+        "min": -4,
+        "max": 1,
+        "median": -2,
+        "increased": 1,
+        "decreased": 7
+      },
+      "total": {
+        "min": -66.48,
+        "max": 17.177,
+        "median": -8.255,
+        "increased": 2,
+        "decreased": 6
+      },
+      "dropped": {
+        "min": 0,
+        "max": 0,
+        "median": 0,
+        "increased": 0,
+        "decreased": 0
+      },
+      "videoFrames": {
+        "min": -8,
+        "max": 2,
+        "median": 1,
+        "increased": 5,
+        "decreased": 3
+      },
+      "median": {
+        "min": 0,
+        "max": 0,
+        "median": 0,
+        "increased": 0,
+        "decreased": 0
+      },
+      "p95": {
+        "min": -1.956,
+        "max": 1.064,
+        "median": -0.758,
+        "increased": 3,
+        "decreased": 5
+      }
+    },
+    "AB": {
+      "long": {
+        "min": -5,
+        "max": 2,
+        "median": -1,
+        "increased": 2,
+        "decreased": 5
+      },
+      "longWithExtension": {
+        "min": -4,
+        "max": 1,
+        "median": -1.5,
+        "increased": 1,
+        "decreased": 6
+      },
+      "total": {
+        "min": -43.226,
+        "max": 36.303,
+        "median": -9.592,
+        "increased": 3,
+        "decreased": 5
+      },
+      "dropped": {
+        "min": 0,
+        "max": 0,
+        "median": 0,
+        "increased": 0,
+        "decreased": 0
+      },
+      "videoFrames": {
+        "min": -6,
+        "max": 9,
+        "median": -0.5,
+        "increased": 3,
+        "decreased": 4
+      },
+      "median": {
+        "min": 0,
+        "max": 0,
+        "median": 0,
+        "increased": 0,
+        "decreased": 0
+      },
+      "p95": {
+        "min": -1.118,
+        "max": 0.998,
+        "median": -0.482,
+        "increased": 3,
+        "decreased": 5
+      }
+    }
+  },
+  "AA": [
+    {
+      "pair": 1,
+      "A": {
+        "long": 8,
+        "longWithExtension": 8,
+        "total": 277.187,
+        "dropped": 0,
+        "videoFrames": 29,
+        "median": 0,
+        "p95": 4.152,
+        "flight": 72.12432638875215,
+        "clock": 1.157,
+        "duration": 6001.8,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 8,
+        "longWithExtension": 7,
+        "total": 221.46,
+        "dropped": 0,
+        "videoFrames": 21,
+        "median": 0,
+        "p95": 3.057,
+        "flight": 81.14729385987712,
+        "clock": 1.081,
+        "duration": 6016.4,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": 0,
+        "longWithExtension": -1,
+        "total": -55.727,
+        "dropped": 0,
+        "videoFrames": -8,
+        "median": 0,
+        "p95": -1.095
+      }
+    },
+    {
+      "pair": 2,
+      "A": {
+        "long": 11,
+        "longWithExtension": 10,
+        "total": 235.44,
+        "dropped": 0,
+        "videoFrames": 22,
+        "median": 0,
+        "p95": 3.08,
+        "flight": 55.99350591879495,
+        "clock": 0.94,
+        "duration": 6008.5,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 6,
+        "longWithExtension": 6,
+        "total": 233.867,
+        "dropped": 0,
+        "videoFrames": 20,
+        "median": 0,
+        "p95": 4.082,
+        "flight": 54.105530653211645,
+        "clock": 1.084,
+        "duration": 6008.3,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -5,
+        "longWithExtension": -4,
+        "total": -1.573,
+        "dropped": 0,
+        "videoFrames": -2,
+        "median": 0,
+        "p95": 1.002
+      }
+    },
+    {
+      "pair": 3,
+      "A": {
+        "long": 9,
+        "longWithExtension": 9,
+        "total": 247.51,
+        "dropped": 0,
+        "videoFrames": 23,
+        "median": 0,
+        "p95": 3.065,
+        "flight": 72.12095316040703,
+        "clock": 1.033,
+        "duration": 6005.2,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 7,
+        "longWithExtension": 6,
+        "total": 181.03,
+        "dropped": 0,
+        "videoFrames": 24,
+        "median": 0,
+        "p95": 2.064,
+        "flight": 54.105530653211645,
+        "clock": 0.891,
+        "duration": 6000.7,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -2,
+        "longWithExtension": -3,
+        "total": -66.48,
+        "dropped": 0,
+        "videoFrames": 1,
+        "median": 0,
+        "p95": -1.001
+      }
+    },
+    {
+      "pair": 4,
+      "A": {
+        "long": 9,
+        "longWithExtension": 9,
+        "total": 233.745,
+        "dropped": 0,
+        "videoFrames": 19,
+        "median": 0,
+        "p95": 5.104,
+        "flight": 54.090274657280126,
+        "clock": 0.916,
+        "duration": 6007.4,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 7,
+        "longWithExtension": 7,
+        "total": 250.922,
+        "dropped": 0,
+        "videoFrames": 20,
+        "median": 0,
+        "p95": 3.148,
+        "flight": 54.136043276551206,
+        "clock": 0.933,
+        "duration": 6006.4,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -2,
+        "longWithExtension": -2,
+        "total": 17.177,
+        "dropped": 0,
+        "videoFrames": 1,
+        "median": 0,
+        "p95": -1.956
+      }
+    },
+    {
+      "pair": 5,
+      "A": {
+        "long": 8,
+        "longWithExtension": 8,
+        "total": 215.289,
+        "dropped": 0,
+        "videoFrames": 19,
+        "median": 0,
+        "p95": 4.056,
+        "flight": 72.10569634441165,
+        "clock": 0.872,
+        "duration": 6008.7,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 8,
+        "longWithExtension": 7,
+        "total": 227.642,
+        "dropped": 0,
+        "videoFrames": 20,
+        "median": 0,
+        "p95": 4.075,
+        "flight": 72.15483906697631,
+        "clock": 0.919,
+        "duration": 6008.6,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": 0,
+        "longWithExtension": -1,
+        "total": 12.353,
+        "dropped": 0,
+        "videoFrames": 1,
+        "median": 0,
+        "p95": 0.019
+      }
+    },
+    {
+      "pair": 6,
+      "A": {
+        "long": 9,
+        "longWithExtension": 9,
+        "total": 243.155,
+        "dropped": 0,
+        "videoFrames": 22,
+        "median": 0,
+        "p95": 4.07,
+        "flight": 55.94436279479484,
+        "clock": 0.898,
+        "duration": 6016.6,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 6,
+        "longWithExtension": 5,
+        "total": 203.696,
+        "dropped": 0,
+        "videoFrames": 20,
+        "median": 0,
+        "p95": 3.076,
+        "flight": 54.15129990360342,
+        "clock": 0.878,
+        "duration": 6007.3,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -3,
+        "longWithExtension": -4,
+        "total": -39.459,
+        "dropped": 0,
+        "videoFrames": -2,
+        "median": 0,
+        "p95": -0.994
+      }
+    },
+    {
+      "pair": 7,
+      "A": {
+        "long": 9,
+        "longWithExtension": 9,
+        "total": 240.441,
+        "dropped": 0,
+        "videoFrames": 22,
+        "median": 0,
+        "p95": 3.101,
+        "flight": 81.07952367988017,
+        "clock": 0.98,
+        "duration": 6006.7,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 7,
+        "longWithExtension": 7,
+        "total": 236.621,
+        "dropped": 0,
+        "videoFrames": 23,
+        "median": 0,
+        "p95": 4.165,
+        "flight": 72.1700956427115,
+        "clock": 1.063,
+        "duration": 6002.7,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -2,
+        "longWithExtension": -2,
+        "total": -3.82,
+        "dropped": 0,
+        "videoFrames": 1,
+        "median": 0,
+        "p95": 1.064
+      }
+    },
+    {
+      "pair": 8,
+      "A": {
+        "long": 8,
+        "longWithExtension": 8,
+        "total": 268.965,
+        "dropped": 0,
+        "videoFrames": 18,
+        "median": 0,
+        "p95": 4.115,
+        "flight": 55.92910638841148,
+        "clock": 0.969,
+        "duration": 6008.6,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 11,
+        "longWithExtension": 9,
+        "total": 256.276,
+        "dropped": 0,
+        "videoFrames": 20,
+        "median": 0,
+        "p95": 3.592,
+        "flight": 72.10907028646345,
+        "clock": 0.948,
+        "duration": 6005.3,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": 3,
+        "longWithExtension": 1,
+        "total": -12.689,
+        "dropped": 0,
+        "videoFrames": 2,
+        "median": 0,
+        "p95": -0.523
+      }
+    }
+  ],
+  "AB": [
+    {
+      "pair": 1,
+      "A": {
+        "long": 8,
+        "longWithExtension": 8,
+        "total": 277.187,
+        "dropped": 0,
+        "videoFrames": 29,
+        "median": 0,
+        "p95": 4.152,
+        "flight": 72.12432638875215,
+        "clock": 1.157,
+        "duration": 6001.8,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 7,
+        "longWithExtension": 7,
+        "total": 255.168,
+        "dropped": 0,
+        "videoFrames": 23,
+        "median": 0,
+        "p95": 3.034,
+        "flight": 72.1700956427115,
+        "clock": 1.017,
+        "duration": 6005.6,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -1,
+        "longWithExtension": -1,
+        "total": -22.019,
+        "dropped": 0,
+        "videoFrames": -6,
+        "median": 0,
+        "p95": -1.118
+      }
+    },
+    {
+      "pair": 2,
+      "A": {
+        "long": 11,
+        "longWithExtension": 10,
+        "total": 235.44,
+        "dropped": 0,
+        "videoFrames": 22,
+        "median": 0,
+        "p95": 3.08,
+        "flight": 55.99350591879495,
+        "clock": 0.94,
+        "duration": 6008.5,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 6,
+        "longWithExtension": 6,
+        "total": 251.393,
+        "dropped": 0,
+        "videoFrames": 19,
+        "median": 0,
+        "p95": 4.078,
+        "flight": 55.87996342607966,
+        "clock": 1.094,
+        "duration": 6004.9,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -5,
+        "longWithExtension": -4,
+        "total": 15.953,
+        "dropped": 0,
+        "videoFrames": -3,
+        "median": 0,
+        "p95": 0.998
+      }
+    },
+    {
+      "pair": 3,
+      "A": {
+        "long": 9,
+        "longWithExtension": 9,
+        "total": 247.51,
+        "dropped": 0,
+        "videoFrames": 23,
+        "median": 0,
+        "p95": 3.065,
+        "flight": 72.12095316040703,
+        "clock": 1.033,
+        "duration": 6005.2,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 6,
+        "longWithExtension": 6,
+        "total": 231.191,
+        "dropped": 0,
+        "videoFrames": 20,
+        "median": 0,
+        "p95": 3.473,
+        "flight": 55.846077962808856,
+        "clock": 0.893,
+        "duration": 6015.3,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -3,
+        "longWithExtension": -3,
+        "total": -16.319,
+        "dropped": 0,
+        "videoFrames": -3,
+        "median": 0,
+        "p95": 0.408
+      }
+    },
+    {
+      "pair": 4,
+      "A": {
+        "long": 9,
+        "longWithExtension": 9,
+        "total": 233.745,
+        "dropped": 0,
+        "videoFrames": 19,
+        "median": 0,
+        "p95": 5.104,
+        "flight": 54.090274657280126,
+        "clock": 0.916,
+        "duration": 6007.4,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 7,
+        "longWithExtension": 7,
+        "total": 270.048,
+        "dropped": 0,
+        "videoFrames": 24,
+        "median": 0,
+        "p95": 4.091,
+        "flight": 81.19643667135276,
+        "clock": 0.961,
+        "duration": 6007.8,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -2,
+        "longWithExtension": -2,
+        "total": 36.303,
+        "dropped": 0,
+        "videoFrames": 5,
+        "median": 0,
+        "p95": -1.013
+      }
+    },
+    {
+      "pair": 5,
+      "A": {
+        "long": 8,
+        "longWithExtension": 8,
+        "total": 215.289,
+        "dropped": 0,
+        "videoFrames": 19,
+        "median": 0,
+        "p95": 4.056,
+        "flight": 72.10569634441165,
+        "clock": 0.872,
+        "duration": 6008.7,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 8,
+        "longWithExtension": 7,
+        "total": 225.616,
+        "dropped": 0,
+        "videoFrames": 20,
+        "median": 0,
+        "p95": 3.11,
+        "flight": 73.83435985577785,
+        "clock": 1.219,
+        "duration": 6008.6,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": 0,
+        "longWithExtension": -1,
+        "total": 10.327,
+        "dropped": 0,
+        "videoFrames": 1,
+        "median": 0,
+        "p95": -0.946
+      }
+    },
+    {
+      "pair": 6,
+      "A": {
+        "long": 9,
+        "longWithExtension": 9,
+        "total": 243.155,
+        "dropped": 0,
+        "videoFrames": 22,
+        "median": 0,
+        "p95": 4.07,
+        "flight": 55.94436279479484,
+        "clock": 0.898,
+        "duration": 6016.6,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 8,
+        "longWithExtension": 7,
+        "total": 199.929,
+        "dropped": 0,
+        "videoFrames": 21,
+        "median": 0,
+        "p95": 3.072,
+        "flight": 72.15483906697631,
+        "clock": 0.879,
+        "duration": 6015.6,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": -1,
+        "longWithExtension": -2,
+        "total": -43.226,
+        "dropped": 0,
+        "videoFrames": -1,
+        "median": 0,
+        "p95": -0.998
+      }
+    },
+    {
+      "pair": 7,
+      "A": {
+        "long": 9,
+        "longWithExtension": 9,
+        "total": 240.441,
+        "dropped": 0,
+        "videoFrames": 22,
+        "median": 0,
+        "p95": 3.101,
+        "flight": 81.07952367988017,
+        "clock": 0.98,
+        "duration": 6006.7,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 10,
+        "longWithExtension": 9,
+        "total": 237.576,
+        "dropped": 0,
+        "videoFrames": 22,
+        "median": 0,
+        "p95": 4.076,
+        "flight": 56.64938294359988,
+        "clock": 0.98,
+        "duration": 6007.5,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": 1,
+        "longWithExtension": 0,
+        "total": -2.865,
+        "dropped": 0,
+        "videoFrames": 0,
+        "median": 0,
+        "p95": 0.975
+      }
+    },
+    {
+      "pair": 8,
+      "A": {
+        "long": 8,
+        "longWithExtension": 8,
+        "total": 268.965,
+        "dropped": 0,
+        "videoFrames": 18,
+        "median": 0,
+        "p95": 4.115,
+        "flight": 55.92910638841148,
+        "clock": 0.969,
+        "duration": 6008.6,
+        "refreshMedianMs": 16.7
+      },
+      "B": {
+        "long": 10,
+        "longWithExtension": 9,
+        "total": 226.926,
+        "dropped": 0,
+        "videoFrames": 27,
+        "median": 0,
+        "p95": 4.096,
+        "flight": 72.1700956427115,
+        "clock": 1,
+        "duration": 6004.3,
+        "refreshMedianMs": 16.7
+      },
+      "delta": {
+        "long": 2,
+        "longWithExtension": 1,
+        "total": -42.039,
+        "dropped": 0,
+        "videoFrames": 9,
+        "median": 0,
+        "p95": -0.019
+      }
+    }
+  ],
+  "exclusions": [
+    {
+      "pair": 7,
+      "variant": 0,
+      "attempt": 1,
+      "reason": "TimeoutError: page.goto: Timeout 30000ms exceeded."
+    }
+  ]
+}

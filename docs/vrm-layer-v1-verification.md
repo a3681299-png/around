@@ -81,7 +81,7 @@ npm run lint
 npm run build
 npm test -- --workers=2
 # 実サイト・手元のモデルは明示的に指定した場合だけ使用する
-$env:WW_LIVE_VRM='1'
-$env:WW_VRM_FILE='<権限のあるローカルVRMの絶対パス>'
+$env:AROUND_LIVE_VRM='1'
+$env:AROUND_VRM_FILE='<権限のあるローカルVRMの絶対パス>'
 npm test -- tests/vrm-live.spec.ts --workers=1
 ```

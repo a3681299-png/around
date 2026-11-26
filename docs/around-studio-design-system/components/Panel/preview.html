@@ -1,0 +1,65 @@
+<!-- @dsCard group="Layout" height=360 subtitle="docked 340 and floating; click 開き直す to see it constructed" -->
+<div
+  class="ww"
+  style="
+    background: var(--ground);
+    padding: 20px;
+    min-height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    align-items: flex-start;
+  "
+>
+  <div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+    <section class="around-panel around-construct" style="width: 340px" id="docked">
+      <header class="around-panel__header"
+        ><span class="around-panel__eyebrow">PROPERTIES</span><span class="around-panel__title">雨粒</span
+        ><span class="around-chip around-chip--saved">保存済み</span></header
+      >
+      <div class="around-panel__body">
+        <div class="around-section"
+          ><div class="around-section__head">配置</div>
+          <div class="around-pair"
+            ><div class="around-scrub"
+              ><span class="around-scrub__axis">X</span><input class="around-scrub__value" value="212" /><span
+                class="around-scrub__unit"
+                >px</span
+              ></div
+            ><div class="around-scrub"
+              ><span class="around-scrub__axis">Y</span><input class="around-scrub__value" value="84" /><span
+                class="around-scrub__unit"
+                >px</span
+              ></div
+            ></div
+          ></div
+        >
+        <div class="around-section"
+          ><div class="around-section__head">表示</div
+          ><label class="around-toggle"><input type="checkbox" checked />雰囲気レイヤー</label></div
+        >
+      </div></section
+    >
+    <button class="around-btn around-btn--ghost" id="reopen">開き直す</button>
+  </div>
+  <section class="around-panel around-panel--float" style="width: 340px">
+    <header class="around-panel__header"
+      ><span class="around-panel__title">クイック編集</span><span class="around-chip around-chip--saved">保存済み</span
+      ><button class="around-icon-btn around-icon-btn--dense" aria-label="閉じる"
+        ><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" /></svg></button
+    ></header>
+    <div class="around-panel__body"
+      ><div class="around-section"
+        ><p class="small" style="margin: 0; color: var(--ink-muted)">外側の角丸 8 − 余白 4 = 内側の角丸 4</p></div
+      ></div
+    ></section
+  ></div
+>
+<script>
+  document.getElementById('reopen').addEventListener('click', function () {
+    var p = document.getElementById('docked');
+    p.classList.remove('around-construct');
+    void p.offsetWidth;
+    p.classList.add('around-construct');
+  });
+</script>

@@ -1,0 +1,444 @@
+main[data-skin-tool] > .workspace-nav,
+main[data-skin-tool] > .selection-bar {
+  display: none !important;
+}
+/* The skin editor takes the whole inspector column; the canvas and library stay. */
+main[data-skin-tool] .studio-inspectors {
+  grid-template-rows: minmax(0, 1fr);
+}
+main[data-skin-tool] .studio-inspectors > :not(.skin) {
+  display: none !important;
+}
+main[data-skin-tool] .studio-inspectors > .skin {
+  overflow: auto;
+  padding: var(--space-8) var(--space-12);
+}
+.skin[hidden] {
+  display: none;
+}
+.skin h3 {
+  margin: var(--space-4) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.skin .skin-parts-section {
+  margin-top: var(--space-8);
+  border-top: 0;
+  padding-top: 0;
+}
+/* around-part: ruled cards; the chosen one is a cobalt edge on cobalt wash. */
+.skin-parts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin: var(--space-8) 0 var(--space-12);
+}
+.skin-part {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  min-height: 52px;
+  padding: var(--space-4) var(--space-8);
+  text-align: left;
+  border-color: var(--line);
+}
+.skin-part[aria-pressed='true'] {
+  border-color: var(--cobalt);
+  background: var(--cobalt-wash);
+}
+.skin-part .name {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 700;
+}
+/* The state is a word plus its shape: filled circle applied, triangle advice, small dot none. */
+.skin-part .state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+/* A count that is not known yet shows nothing, not a placeholder. */
+.skin-part .state:empty {
+  display: none;
+}
+.skin-empty.around-empty {
+  margin: 0 0 var(--space-12);
+}
+.skin-part .state::before {
+  content: '';
+  flex: none;
+  width: 4px;
+  height: 4px;
+  margin: 0 2px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+}
+.skin-part[data-status='applied'] .state::before {
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  background: var(--ok-green);
+}
+/* Not on this page: advice (triangle). */
+.skin-part[data-status='missing'] .state::before {
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border-radius: 0;
+  background: var(--lamp-amber);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+/* The picture is loading or could not be read: not done yet, the dashed circle of 未保存. */
+.skin-part[data-status='loading'] .state::before,
+.skin-part[data-status='error'] .state::before {
+  box-sizing: border-box;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border: 1px dashed var(--ink-muted);
+  background: transparent;
+}
+.skin-part[data-status='error'] .state {
+  color: var(--ink);
+}
+.skin-editor {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-12);
+}
+.skin-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.skin-name {
+  font-size: 20px;
+  line-height: 32px;
+}
+.skin-reach {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+.skin-reason {
+  padding: var(--space-8) var(--space-12);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--lamp-amber);
+  color: var(--lamp-amber);
+}
+.skin-reason[hidden] {
+  display: none;
+}
+/* An error is told in ink on a ruled edge, never in amber or red. */
+.skin-reason[data-kind='error'] {
+  box-shadow: inset 0 0 0 1px var(--line-control);
+  color: var(--ink);
+}
+/* The skin's states are tabs (around-tabs), wrapped when there are many. */
+.skin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  margin: var(--space-12) 0 var(--space-4);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-sunk);
+}
+.skin-tab {
+  flex: 1 0 auto;
+  font-size: 12px;
+}
+/* A small filled circle: this state has its own picture. */
+.skin-tab[data-own]::before {
+  content: '';
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ok-green);
+}
+.skin-state-help {
+  margin: var(--space-4) 0 var(--space-8);
+}
+.skin-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin: var(--space-8) 0;
+}
+.skin-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 84px;
+  margin: var(--space-8) 0;
+  padding: var(--space-12);
+  border: 1px dashed var(--line-control);
+  border-radius: 4px;
+  color: var(--ink);
+  background: var(--surface-sunk);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color calc(var(--around-frame) * 2) steps(2, end);
+}
+.skin-drop:hover,
+.skin-drop[data-over] {
+  border-color: var(--cobalt);
+  background: var(--cobalt-wash);
+}
+.skin-drop:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
+}
+.skin-drop small {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+.skin-drop[hidden],
+.skin-inherit[hidden],
+.slice[hidden] {
+  display: none;
+}
+.skin-inherit {
+  padding: var(--space-8);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.skin-inherit p {
+  margin: 0 0 var(--space-8);
+}
+/* The image sits on a flat sunk ground; the guides are ruled cobalt lines. */
+.slice-stage {
+  position: relative;
+  margin: var(--space-8) auto;
+  touch-action: none;
+  background: var(--surface-sunk);
+  outline: 1px solid var(--line);
+}
+.slice-stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.slice-stage[data-pixelated] img {
+  image-rendering: pixelated;
+}
+.slice-shade {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.4);
+}
+.slice-guide {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.slice-guide:hover:not(:disabled),
+.slice-guide:active:not(:disabled) {
+  background: transparent;
+}
+.slice-guide::before {
+  content: '';
+  position: absolute;
+  background: var(--cobalt);
+}
+.slice-guide[data-axis='x'] {
+  top: -12px;
+  bottom: -12px;
+  width: 20px;
+  margin-left: -10px;
+  cursor: col-resize;
+}
+.slice-guide[data-axis='x']::before {
+  top: 12px;
+  bottom: 12px;
+  left: 10px;
+  width: 1px;
+}
+.slice-guide[data-axis='y'] {
+  left: -12px;
+  right: -12px;
+  height: 20px;
+  margin-top: -10px;
+  cursor: row-resize;
+}
+.slice-guide[data-axis='y']::before {
+  left: 12px;
+  right: 12px;
+  top: 10px;
+  height: 1px;
+}
+.slice-guide:hover::before,
+.slice-guide:focus-visible::before,
+.slice-guide[data-dragging]::before {
+  outline: 1px solid var(--cobalt);
+}
+.slice-guide:focus-visible {
+  outline: none;
+}
+.slice-guide .knob {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--cobalt);
+}
+.slice-guide[data-axis='x'] .knob {
+  top: 0;
+}
+.slice-guide[data-axis='y'] .knob {
+  left: 0;
+}
+.slice-guide .value {
+  position: absolute;
+  padding: 0 var(--space-4);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--on-cobalt);
+  background: var(--cobalt);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.slice-guide[data-axis='x'] .value {
+  bottom: -8px;
+}
+.slice-guide[data-axis='y'] .value {
+  right: -8px;
+}
+.slice-numbers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+.slice-numbers label,
+.skin-row label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.skin input[type='number'],
+.skin select {
+  width: 100%;
+  max-width: none;
+}
+.skin-row {
+  display: flex;
+  gap: var(--space-8);
+  margin: var(--space-8) 0;
+}
+.skin-row > * {
+  flex: 1;
+}
+.skin details {
+  margin-top: var(--space-8);
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+  padding-top: var(--space-8);
+}
+.size-previews {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: var(--space-8) 0;
+}
+.size-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.size-preview small {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+/* The previews show YouTube's own grounds, so these two colours stay YouTube's. */
+.size-frame {
+  overflow: hidden;
+  padding: var(--space-4);
+  border-radius: 4px;
+  background: #f4f4f4;
+}
+.size-frame[data-dark] {
+  background: #0f0f0f;
+}
+.size-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: 0 0;
+  font:
+    500 13px/1.2 Roboto,
+    Arial,
+    sans-serif;
+  color: #0f0f0f;
+}
+.size-frame[data-dark] .size-box {
+  color: #f1f1f1;
+}
+.skin-compact label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin: var(--space-4) 0;
+}
+.skin input[type='radio'] {
+  margin: 0;
+  accent-color: var(--cobalt);
+}
+.skin-note {
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink-muted);
+}
+/* Advice, not enforced: amber text with a triangle on the surface. */
+.skin-ink {
+  display: flex;
+  gap: var(--space-8);
+  margin: var(--space-4) 0;
+  padding: var(--space-4) var(--space-8);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-muted);
+}
+.skin-ink[data-warn='true'] {
+  box-shadow: inset 0 0 0 1px var(--lamp-amber);
+  color: var(--lamp-amber);
+}
+.skin-ink[hidden] {
+  display: none;
+}
+.skin-report ul {
+  margin: var(--space-8) 0 0;
+  padding-left: var(--space-20);
+}
+.report-facts li {
+  color: var(--ink-muted);
+}
+.report-warnings:empty {
+  display: none;
+}
+.report-warnings li {
+  margin: var(--space-4) 0;
+  color: var(--lamp-amber);
+}

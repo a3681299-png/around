@@ -1,7 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openEditor } from './helpers/editor';
 import { exposeEditorControls } from './helpers/editor-workspace';
 import { declinePromotion, waitForAdvertToEnd } from './helpers/youtube-live';
 
@@ -44,12 +46,53 @@ async function nativeInputs(page: Page) {
   // YouTube expands the volume panel on hover. Its visible, intermediate box
   // is not yet a usable coordinate for a raw native drag.
   await (await slider.elementHandle())!.waitForElementState('stable');
-  const volume = (await slider.boundingBox())!;
+  await slider.evaluate((node) => {
+    const records: unknown[] = [];
+    const record = (event: MouseEvent) => {
+      const rect = node.getBoundingClientRect();
+      records.push({
+        type: event.type,
+        x: event.clientX,
+        y: event.clientY,
+        target: (event.target as Element)?.outerHTML.slice(0, 250),
+        slider: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+      });
+    };
+    document.addEventListener('mousedown', record, true);
+    document.addEventListener('mouseup', record, true);
+    (window as unknown as { operationVolumeAudit: () => unknown[] }).operationVolumeAudit = () => {
+      document.removeEventListener('mousedown', record, true);
+      document.removeEventListener('mouseup', record, true);
+      return records;
+    };
+  });
+  // Read the slider's box again right before pressing, until two reads a frame apart agree:
+  // YouTube may still move its player while the page finishes its layout (once the box moved
+  // by (-8, +33.75) between the read and the press, docs/playground-plan.md 「塊1の修正」).
+  const settledBox = async () => {
+    let last = (await slider.boundingBox())!;
+    for (let i = 0; i < 20; i++) {
+      await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+      const now = (await slider.boundingBox())!;
+      if (now.x === last.x && now.y === last.y && now.width === last.width && now.height === last.height) return now;
+      last = now;
+    }
+    throw new Error('The volume slider kept moving: ' + JSON.stringify(last));
+  };
+  const volume = await settledBox();
   await page.mouse.move(volume.x + volume.width * 0.3, volume.y + volume.height / 2);
   await page.mouse.down();
   const quieter = await video.evaluate((v: HTMLVideoElement) => v.volume);
   await page.mouse.move(volume.x + volume.width * 0.65, volume.y + volume.height / 2, { steps: 6 });
   await page.mouse.up();
+  const events = (await page.evaluate(() =>
+    (window as unknown as { operationVolumeAudit: () => unknown[] }).operationVolumeAudit(),
+  )) as { type: string; x: number; y: number; target: string; slider: { x: number; y: number } }[];
+  console.log('LIVE_VOLUME_INPUT ' + JSON.stringify({ box: volume, quieter, events }));
+  // The press reached the slider itself, at the box that was read (not a stale place).
+  const press = events.find((event) => event.type === 'mousedown');
+  expect(press?.target, 'mousedown target').toMatch(/ytp-volume-slider/);
+  expect(press?.slider).toEqual({ x: volume.x, y: volume.y, width: volume.width, height: volume.height });
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeGreaterThan(quieter);
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeLessThan(1);
   await player.focus();
@@ -81,7 +124,7 @@ async function nativeInputs(page: Page) {
 
 test('optional real YouTube operation checks with and without authored paint', async ({}, info) => {
   test.skip(
-    process.env.WW_LIVE_OPERATIONS !== '1',
+    process.env.AROUND_LIVE_OPERATIONS !== '1',
     'Explicit public-network operation verification; fixtures cover signed-in input behavior without posting.',
   );
   test.setTimeout(180_000);
@@ -93,14 +136,17 @@ test('optional real YouTube operation checks with and without authored paint', a
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();
-    const url = process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
+    const url = process.env.AROUND_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await showArtwork(popup);
+    if (process.env.AROUND_LIVE_OPERATIONS_OFF === '1')
+      await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await page.bringToFront();
     const before = await nativeInputs(page);
-    await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-    const editor = page.locator('#web-world-themes-creator');
+    await showArtwork(popup);
+    // UI0-d round 3: the editor window (as a tab); the operation checks stay on the YouTube page.
+    const { panel: editor } = await openEditor(popup, page);
     await exposeEditorControls(editor);
     await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
     await editor.getByLabel('配置の基準').selectOption('video-player');
@@ -131,8 +177,8 @@ test('optional real YouTube operation checks with and without authored paint', a
         .catch(async (error: Error) => {
           // Keep why protection hides the restored artwork on the live page.
           const state = await page.evaluate(() => ({
-            safety: document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety'),
-            planes: [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].map((h) => h.id),
+            safety: document.querySelector('#around-decorations')?.getAttribute('data-around-safety'),
+            planes: [...document.querySelectorAll('[id^="around-"][id$="decorations"]')].map((h) => h.id),
             video: (() => {
               const v = document.querySelector<HTMLVideoElement>('video.html5-main-video');
               return v && { paused: v.paused, readyState: v.readyState, currentTime: v.currentTime };

@@ -1,0 +1,2 @@
+.work/perf/ にChromeへ読み込める拡張機能を作成しました。
+{"out":"C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-before\\.work\\perf","revision":"447b2bf31e319051e327f9ada2b83954276b8ff8","dirtySource":false}

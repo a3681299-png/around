@@ -33,21 +33,21 @@ F以前にmanifestと成果物が残っていた実験出力は次のとおり�
 
 ## 保存先と拡張ID
 
-通常版・実験版のmanifestは共に name=Web World Themes、version=0.1.0。固定ID用のkeyはない。名前では識別できないので、chrome://extensions のデベロッパーモードでIDと読み込み元を記録する。テストでも同じビルドを異なる絶対パスへ置いて異なるIDになることを確認する。
+通常版・実験版のmanifestは共に name=Around、version=0.1.0。固定ID用のkeyはない。名前では識別できないので、chrome://extensions のデベロッパーモードでIDと読み込み元を記録する。テストでも同じビルドを異なる絶対パスへ置いて異なるIDになることを確認する。
 
-| 保存先                                                                                | 内容                                       | IDとの関係                                                   |
-| ------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------ |
-| chrome.storage.local: webWorldThemes.enabled / strength / noiseStrength / creatorMode | 表示設定・制作モード（制作モードはGから）  | 拡張IDとChromeプロファイルに固有                             |
-| 同: webWorldThemes.features.\<id\> / palette.hue,saturation,brightness                | 表示オプション・配色                       | 同上                                                         |
-| 同: webWorldThemes.design.\<siteId\>                                                  | 保存作品。現在は1サイト1作品               | 同上                                                         |
-| 同: webWorldThemes.creator.guideDismissed                                             | 制作ガイド                                 | 同上                                                         |
-| 同: webWorldThemes.studio.workspace.v1 / workbench.v2 / sidepanel.v1 / timeline.v1    | 制作画面の配置・開閉・タイムライン         | 同上                                                         |
-| 同: webWorldThemes.settings.position.v1                                               | 設定ウィンドウ位置（Gから）                | 同上                                                         |
-| chrome.storage.session: webWorldThemes.studio.session.\<targetTab\>                   | 下書き・履歴の接続復旧checkpoint。6MiB上限 | 拡張ID・ブラウザーセッション・対象タブに依存。移行しない     |
-| IndexedDB web-world-themes-assets v1 / assets                                         | 原本Blob・SHA-256由来ID・メタデータ・lease | chrome-extension://\<拡張ID\> のオリジン・プロファイルに固有 |
-| IndexedDB web-world-themes-signal-takes v1 / takes                                    | id, chars, updatedAt, take                 | 同上                                                         |
-| Worker / Content内のMap・ArrayBuffer・GPU資源                                         | 転送許可、検証済みの印、原本キャッシュ等   | メモリのみ。再承認・再検証で作り直す                         |
-| Chrome側のsidePanel設定・ショートカット                                               | 対象タブ・パネル、キー割り当て             | Chrome管理。バックアップ外                                   |
+| 保存先                                                                        | 内容                                       | IDとの関係                                                   |
+| ----------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------ |
+| chrome.storage.local: around.enabled / strength / noiseStrength / creatorMode | 表示設定・制作モード（制作モードはGから）  | 拡張IDとChromeプロファイルに固有                             |
+| 同: around.features.\<id\> / palette.hue,saturation,brightness                | 表示オプション・配色                       | 同上                                                         |
+| 同: around.design.\<siteId\>                                                  | 保存作品。現在は1サイト1作品               | 同上                                                         |
+| 同: around.creator.guideDismissed                                             | 制作ガイド                                 | 同上                                                         |
+| 同: around.studio.workspace.v1 / workbench.v2 / sidepanel.v1 / timeline.v1    | 制作画面の配置・開閉・タイムライン         | 同上                                                         |
+| 同: around.settings.position.v1                                               | 設定ウィンドウ位置（Gから）                | 同上                                                         |
+| chrome.storage.session: around.studio.session.\<targetTab\>                   | 下書き・履歴の接続復旧checkpoint。6MiB上限 | 拡張ID・ブラウザーセッション・対象タブに依存。移行しない     |
+| IndexedDB around-assets v1 / assets                                           | 原本Blob・SHA-256由来ID・メタデータ・lease | chrome-extension://\<拡張ID\> のオリジン・プロファイルに固有 |
+| IndexedDB around-signal-takes v1 / takes                                      | id, chars, updatedAt, take                 | 同上                                                         |
+| Worker / Content内のMap・ArrayBuffer・GPU資源                                 | 転送許可、検証済みの印、原本キャッシュ等   | メモリのみ。再承認・再検証で作り直す                         |
+| Chrome側のsidePanel設定・ショートカット                                       | 対象タブ・パネル、キー割り当て             | Chrome管理。バックアップ外                                   |
 
 chrome.storage.sync、独自localStorage、外部サーバー保存は使っていない。通常版mainは設定だけを持つ古い実装。実験版の素材・作品・テイクを別IDから自動では読めない。Chrome Local Storageは拡張の削除で消えるため、先に書き出す。[Chrome Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、[Storage and cookies](https://developer.chrome.com/docs/extensions/develop/concepts/storage-and-cookies)。
 
@@ -72,7 +72,7 @@ chrome.storage.sync、独自localStorage、外部サーバー保存は使って�
 
 1. mainへのマージを完了し、READMEに readme-after-merge.md の下書きを反映する。依頼Gではマージしない。
 2. 通常版は**今の絶対パスのdistへ**ビルドする。Chromeでは既存カードの「再読み込み」を使う。別パスを「パッケージ化されていない拡張機能を読み込む」で追加しない。IDが同じことを確認する。
-3. 実験版も**現在登録されている同じ絶対パスへ**、マージ済みソースをビルドする。登録元が .work/creator-editor/dist ならそのworktreeで WW_BUILD_OUT=dist。登録元が同worktreeの .work/f-verified なら WW_BUILD_OUT=.work/f-verified。旧ビルドは先にコピーしておく。
+3. 実験版も**現在登録されている同じ絶対パスへ**、マージ済みソースをビルドする。登録元が .work/creator-editor/dist ならそのworktreeで AROUND_BUILD_OUT=dist。登録元が同worktreeの .work/f-verified なら AROUND_BUILD_OUT=.work/f-verified。旧ビルドは先にコピーしておく。
 4. 各カードとYouTubeを再読み込みする。テーマの重複を避け、書き出す対象だけ有効にして順に操作する。各拡張の「作品と設定のバックアップ」から別々のファイルへ保存する。通常版の設定もバックアップする。
 5. 専用ページのIDが記録と一致し、ファイルが保存済みであることを確認する。隔離プロファイルへ同じビルドを読み込み、ファイルの確認・復元まで試す。
 
@@ -80,7 +80,7 @@ chrome.storage.sync、独自localStorage、外部サーバー保存は使って�
 
 ```powershell
 Set-Location -LiteralPath 'C:\Users\sm787\GitHub-Projects\web-world-themes'
-$env:WW_BUILD_OUT = 'dist'
+$env:AROUND_BUILD_OUT = 'dist'
 npm run build
 # 実験版も登録元の絶対パスを確認してから、そのworktreeで出力先を指定する。
 ```

@@ -1,0 +1,6348 @@
+{
+  "date": "2026-11-07 JST",
+  "revision": {
+    "A": "c69d9bb",
+    "B": "b3db85e"
+  },
+  "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+  "instrumentation": "g11 + CDP 500us in the same windows",
+  "sha256": {
+    "A": "d9eff99e7e12a88073d8307d0a134a3c94c9ebab737065c4de4c8bac48baa4f3",
+    "B": "165bec0f6054459ceec136dd34f87654d3b4136124be31926b2e521fd7c69f54"
+  },
+  "displayHz": 60,
+  "machine": {
+    "cpu": "Ryzen 5 5600X",
+    "gpu": "Radeon RX 6800",
+    "ramGiB": 64,
+    "os": "Windows 11 Pro 26H2 (26300.9711)"
+  },
+  "calibration": [
+    {
+      "load": 0,
+      "frames": 35,
+      "total": 0.4,
+      "median": 0,
+      "p95": 0.1
+    },
+    {
+      "load": 2,
+      "frames": 35,
+      "total": 71.2,
+      "median": 2,
+      "p95": 2
+    }
+  ],
+  "scenes": {
+    "startup": {
+      "count": {
+        "AA": 8,
+        "AB": 8
+      },
+      "comparison": {
+        "cdpCpu": {
+          "AA": {
+            "min": -184.355,
+            "max": 157.811,
+            "median": -26.005
+          },
+          "AB": {
+            "min": -168.761,
+            "max": 144.136,
+            "median": 1.536
+          },
+          "aboveAA": [],
+          "belowAA": []
+        },
+        "cdpMedian": {
+          "AA": {
+            "min": -2.828,
+            "max": 0.557,
+            "median": -0.076
+          },
+          "AB": {
+            "min": -2.028,
+            "max": 0.846,
+            "median": 0.111
+          },
+          "aboveAA": [7],
+          "belowAA": []
+        },
+        "cdpP95": {
+          "AA": {
+            "min": -7.663,
+            "max": 10.366,
+            "median": 2.016
+          },
+          "AB": {
+            "min": -5.101,
+            "max": 10.592,
+            "median": 0.522
+          },
+          "aboveAA": [6],
+          "belowAA": []
+        },
+        "g11Cpu": {
+          "AA": {
+            "min": -296.2,
+            "max": 223.6,
+            "median": -22.1
+          },
+          "AB": {
+            "min": -220,
+            "max": 325.3,
+            "median": -9.6
+          },
+          "aboveAA": [2],
+          "belowAA": []
+        },
+        "g11Median": {
+          "AA": {
+            "min": -0.3,
+            "max": 1.3,
+            "median": 0
+          },
+          "AB": {
+            "min": -0.9,
+            "max": 0.5,
+            "median": 0.05
+          },
+          "aboveAA": [],
+          "belowAA": [1, 2, 6]
+        },
+        "g11P95": {
+          "AA": {
+            "min": -2.6,
+            "max": 4.9,
+            "median": 1.8
+          },
+          "AB": {
+            "min": -2.5,
+            "max": 5.8,
+            "median": -0.3
+          },
+          "aboveAA": [2],
+          "belowAA": []
+        },
+        "long": {
+          "AA": {
+            "min": -10,
+            "max": 4,
+            "median": 0.5
+          },
+          "AB": {
+            "min": -4,
+            "max": 7,
+            "median": -3
+          },
+          "aboveAA": [2, 7],
+          "belowAA": []
+        },
+        "dropped": {
+          "AA": {
+            "min": -1,
+            "max": 1,
+            "median": 0
+          },
+          "AB": {
+            "min": -1,
+            "max": 2,
+            "median": 0
+          },
+          "aboveAA": [6],
+          "belowAA": []
+        },
+        "videoTotal": {
+          "AA": {
+            "min": -42,
+            "max": 30,
+            "median": -2
+          },
+          "AB": {
+            "min": -26,
+            "max": 59,
+            "median": -2
+          },
+          "aboveAA": [2],
+          "belowAA": []
+        }
+      },
+      "pairs": {
+        "AA": [
+          {
+            "pair": 1,
+            "trial": 2,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 127,
+                "total": 706.5,
+                "median": 2.9,
+                "p95": 21.6
+              },
+              "cdp": {
+                "frames": 148,
+                "total": 716.911,
+                "median": 2.828,
+                "p95": 14.701,
+                "start": 157.93300000019372,
+                "end": 6014.127999998629,
+                "topSelf": [
+                  ["(anonymous)", 141.84],
+                  ["fixedContainingBlock", 64.28],
+                  ["contextChain", 61.41],
+                  ["inspectGlb", 21.89],
+                  ["paint", 16.68]
+                ]
+              },
+              "gpu": {
+                "frames": 38,
+                "total": 355.036,
+                "median": 5.853,
+                "p95": 34.657
+              },
+              "long": 18,
+              "video": {
+                "dropped": 1,
+                "total": 115,
+                "observedMs": 4885
+              },
+              "window": {
+                "start": 0,
+                "closed": 6005.0999999996275,
+                "read": 6008.799999998882,
+                "interactive": 1267.199999999255,
+                "response": 115.69999999925494,
+                "clockBracketMs": 7.099999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 53,
+                "total": 410.3,
+                "median": 4.2,
+                "p95": 19.8
+              },
+              "cdp": {
+                "frames": 120,
+                "total": 550.658,
+                "median": 0,
+                "p95": 19.505,
+                "start": 1229.1730000004172,
+                "end": 6146.74499999918,
+                "topSelf": [
+                  ["(anonymous)", 87.17],
+                  ["fixedContainingBlock", 55.3],
+                  ["contextChain", 33.33],
+                  ["sampleScroll", 25.11],
+                  ["update", 15.59]
+                ]
+              },
+              "gpu": {
+                "frames": 13,
+                "total": 235.727,
+                "median": 6.476,
+                "p95": 145.055
+              },
+              "long": 13,
+              "video": {
+                "dropped": 2,
+                "total": 73,
+                "observedMs": 3350
+              },
+              "window": {
+                "start": 0,
+                "closed": 6027.800000000745,
+                "read": 6095.300000000745,
+                "interactive": 2954.0999999996275,
+                "response": 1216.0999999996275,
+                "clockBracketMs": 33.90000000037253,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -166.253,
+              "cdpMedian": -2.828,
+              "cdpP95": 4.804,
+              "g11Cpu": -296.2,
+              "g11Median": 1.3,
+              "g11P95": -1.8,
+              "long": -5,
+              "dropped": 1,
+              "videoTotal": -42
+            }
+          },
+          {
+            "pair": 2,
+            "trial": 2,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 71,
+                "total": 446,
+                "median": 3.6,
+                "p95": 16
+              },
+              "cdp": {
+                "frames": 93,
+                "total": 606.737,
+                "median": 4.108,
+                "p95": 20.912,
+                "start": 1176.7369999997318,
+                "end": 6154.264999998733,
+                "topSelf": [
+                  ["(anonymous)", 115.38],
+                  ["fixedContainingBlock", 66.91],
+                  ["contextChain", 37.1],
+                  ["inspectGlb", 19.58],
+                  ["paint", 18.14]
+                ]
+              },
+              "gpu": {
+                "frames": 19,
+                "total": 183.689,
+                "median": 8.494,
+                "p95": 20.359
+              },
+              "long": 11,
+              "video": {
+                "dropped": 1,
+                "total": 35,
+                "observedMs": 3386
+              },
+              "window": {
+                "start": 0,
+                "closed": 6032,
+                "read": 6118.89999999851,
+                "interactive": 2742.5,
+                "response": 1165.0999999996275,
+                "clockBracketMs": 38.59999999962747,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 115,
+                "total": 667.5,
+                "median": 3.5,
+                "p95": 18.6
+              },
+              "cdp": {
+                "frames": 137,
+                "total": 764.548,
+                "median": 3.103,
+                "p95": 18.995,
+                "start": 178.18600000068545,
+                "end": 6045.036000002176,
+                "topSelf": [
+                  ["(anonymous)", 140.78],
+                  ["fixedContainingBlock", 77.39],
+                  ["contextChain", 69.25],
+                  ["paint", 35.96],
+                  ["inspectGlb", 17.83]
+                ]
+              },
+              "gpu": {
+                "frames": 33,
+                "total": 380.462,
+                "median": 11.329,
+                "p95": 26.139
+              },
+              "long": 12,
+              "video": {
+                "dropped": 1,
+                "total": 59,
+                "observedMs": 4600
+              },
+              "window": {
+                "start": 0,
+                "closed": 6007.4000000003725,
+                "read": 6029.5999999996275,
+                "interactive": 1559.9000000003725,
+                "response": 163.59999999962747,
+                "clockBracketMs": 13.900000000372529,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 157.811,
+              "cdpMedian": -1.005,
+              "cdpP95": -1.917,
+              "g11Cpu": 221.5,
+              "g11Median": -0.1,
+              "g11P95": 2.6,
+              "long": 1,
+              "dropped": 0,
+              "videoTotal": 24
+            }
+          },
+          {
+            "pair": 3,
+            "trial": 3,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 112,
+                "total": 601.5,
+                "median": 2.8,
+                "p95": 21.3
+              },
+              "cdp": {
+                "frames": 134,
+                "total": 671.056,
+                "median": 2.445,
+                "p95": 17.209,
+                "start": 153.285000000149,
+                "end": 6016.517000000924,
+                "topSelf": [
+                  ["(anonymous)", 118.79],
+                  ["fixedContainingBlock", 62.74],
+                  ["contextChain", 53],
+                  ["paint", 20.35],
+                  ["sampleScroll", 18.65]
+                ]
+              },
+              "gpu": {
+                "frames": 32,
+                "total": 344.315,
+                "median": 8.783,
+                "p95": 26.722
+              },
+              "long": 16,
+              "video": {
+                "dropped": 0,
+                "total": 107,
+                "observedMs": 4583
+              },
+              "window": {
+                "start": 0,
+                "closed": 6009.700000001118,
+                "read": 6012,
+                "interactive": 1597.300000000745,
+                "response": 139,
+                "clockBracketMs": 2.099999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 122,
+                "total": 620.8,
+                "median": 2.5,
+                "p95": 18.7
+              },
+              "cdp": {
+                "frames": 145,
+                "total": 654.742,
+                "median": 2.055,
+                "p95": 16.436,
+                "start": 127.04099999926984,
+                "end": 6016.717000000179,
+                "topSelf": [
+                  ["(anonymous)", 116.46],
+                  ["fixedContainingBlock", 49.32],
+                  ["contextChain", 47.78],
+                  ["sampleScroll", 25.31],
+                  ["applyLayout", 22.63]
+                ]
+              },
+              "gpu": {
+                "frames": 35,
+                "total": 340.294,
+                "median": 4.211,
+                "p95": 38.096
+              },
+              "long": 19,
+              "video": {
+                "dropped": 0,
+                "total": 112,
+                "observedMs": 4801
+              },
+              "window": {
+                "start": 0,
+                "closed": 6010.5,
+                "read": 6013.799999998882,
+                "interactive": 1391.5999999996275,
+                "response": 113.09999999962747,
+                "clockBracketMs": 2.400000000372529,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -16.314,
+              "cdpMedian": -0.39,
+              "cdpP95": -0.773,
+              "g11Cpu": 19.3,
+              "g11Median": -0.3,
+              "g11P95": -2.6,
+              "long": 3,
+              "dropped": 0,
+              "videoTotal": 5
+            }
+          },
+          {
+            "pair": 4,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 127,
+                "total": 622.7,
+                "median": 2.3,
+                "p95": 16.3
+              },
+              "cdp": {
+                "frames": 149,
+                "total": 733.25,
+                "median": 2.492,
+                "p95": 17.178,
+                "start": 132.19800000078976,
+                "end": 6014.31799999997,
+                "topSelf": [
+                  ["(anonymous)", 146.25],
+                  ["contextChain", 53.78],
+                  ["fixedContainingBlock", 40.35],
+                  ["sampleScroll", 37.59],
+                  ["applyLayout", 23.81]
+                ]
+              },
+              "gpu": {
+                "frames": 37,
+                "total": 250.391,
+                "median": 3.807,
+                "p95": 20.412
+              },
+              "long": 18,
+              "video": {
+                "dropped": 1,
+                "total": 110,
+                "observedMs": 4717
+              },
+              "window": {
+                "start": 0,
+                "closed": 6008.39999999851,
+                "read": 6010.5999999996275,
+                "interactive": 1467.699999999255,
+                "response": 118.69999999925494,
+                "clockBracketMs": 2.5,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 119,
+                "total": 559.2,
+                "median": 2.3,
+                "p95": 20.5
+              },
+              "cdp": {
+                "frames": 140,
+                "total": 608.512,
+                "median": 2.044,
+                "p95": 15.872,
+                "start": 137.0980000011623,
+                "end": 6018.879000000656,
+                "topSelf": [
+                  ["(anonymous)", 100.84],
+                  ["fixedContainingBlock", 52.85],
+                  ["contextChain", 47.2],
+                  ["paint", 18.55],
+                  ["inspectGlb", 17.38]
+                ]
+              },
+              "gpu": {
+                "frames": 34,
+                "total": 318.532,
+                "median": 3.791,
+                "p95": 35.623
+              },
+              "long": 15,
+              "video": {
+                "dropped": 1,
+                "total": 108,
+                "observedMs": 4617
+              },
+              "window": {
+                "start": 0,
+                "closed": 6013.9000000003725,
+                "read": 6016,
+                "interactive": 1571.4000000003725,
+                "response": 114.79999999888241,
+                "clockBracketMs": 1.599999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -124.738,
+              "cdpMedian": -0.448,
+              "cdpP95": -1.306,
+              "g11Cpu": -63.5,
+              "g11Median": 0,
+              "g11P95": 4.2,
+              "long": -3,
+              "dropped": 0,
+              "videoTotal": -2
+            }
+          },
+          {
+            "pair": 5,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 116,
+                "total": 598.5,
+                "median": 2.4,
+                "p95": 16
+              },
+              "cdp": {
+                "frames": 138,
+                "total": 650.914,
+                "median": 2.067,
+                "p95": 16.507,
+                "start": 128.95700000040233,
+                "end": 6018.393999999389,
+                "topSelf": [
+                  ["(anonymous)", 123],
+                  ["fixedContainingBlock", 55.67],
+                  ["contextChain", 49.33],
+                  ["applyLayout", 21.83],
+                  ["sampleScroll", 18.84]
+                ]
+              },
+              "gpu": {
+                "frames": 34,
+                "total": 445.164,
+                "median": 6.311,
+                "p95": 30.414
+              },
+              "long": 17,
+              "video": {
+                "dropped": 0,
+                "total": 108,
+                "observedMs": 4650
+              },
+              "window": {
+                "start": 0,
+                "closed": 6014.299999998882,
+                "read": 6016.0999999996275,
+                "interactive": 1538.2999999988824,
+                "response": 117.89999999850988,
+                "clockBracketMs": 1.699999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 116,
+                "total": 622.3,
+                "median": 2.7,
+                "p95": 20.9
+              },
+              "cdp": {
+                "frames": 137,
+                "total": 694.534,
+                "median": 2.305,
+                "p95": 22.73,
+                "start": 138.35699999891222,
+                "end": 6022.6739999987185,
+                "topSelf": [
+                  ["(anonymous)", 142.12],
+                  ["fixedContainingBlock", 61.29],
+                  ["contextChain", 54.19],
+                  ["paint", 21.84],
+                  ["applyLayout", 19.19]
+                ]
+              },
+              "gpu": {
+                "frames": 33,
+                "total": 326.563,
+                "median": 6.769,
+                "p95": 32.147
+              },
+              "long": 17,
+              "video": {
+                "dropped": 0,
+                "total": 106,
+                "observedMs": 4585
+              },
+              "window": {
+                "start": 0,
+                "closed": 6011.5999999996275,
+                "read": 6018.800000000745,
+                "interactive": 1606.5,
+                "response": 126.30000000074506,
+                "clockBracketMs": 1.200000001117587,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 43.62,
+              "cdpMedian": 0.238,
+              "cdpP95": 6.223,
+              "g11Cpu": 23.8,
+              "g11Median": 0.3,
+              "g11P95": 4.9,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": -2
+            }
+          },
+          {
+            "pair": 6,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 114,
+                "total": 686.2,
+                "median": 3.4,
+                "p95": 20
+              },
+              "cdp": {
+                "frames": 134,
+                "total": 719.192,
+                "median": 2.526,
+                "p95": 15.446,
+                "start": 175.27500000037253,
+                "end": 6023.436000000685,
+                "topSelf": [
+                  ["(anonymous)", 146.95],
+                  ["fixedContainingBlock", 99.81],
+                  ["contextChain", 71.65],
+                  ["updateWorldMatrix", 17.65],
+                  ["container", 11.66]
+                ]
+              },
+              "gpu": {
+                "frames": 32,
+                "total": 346.812,
+                "median": 8.282,
+                "p95": 28.29
+              },
+              "long": 18,
+              "video": {
+                "dropped": 0,
+                "total": 88,
+                "observedMs": 4829
+              },
+              "window": {
+                "start": 0,
+                "closed": 6014.699999999255,
+                "read": 6019.0999999996275,
+                "interactive": 1325,
+                "response": 113.89999999850988,
+                "clockBracketMs": 3.599999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 78,
+                "total": 577.7,
+                "median": 3.7,
+                "p95": 24.8
+              },
+              "cdp": {
+                "frames": 100,
+                "total": 683.497,
+                "median": 3.083,
+                "p95": 25.812,
+                "start": 598.5399999991059,
+                "end": 6029.527999999002,
+                "topSelf": [
+                  ["(anonymous)", 133.62],
+                  ["fixedContainingBlock", 76.48],
+                  ["contextChain", 55.69],
+                  ["inspectGlb", 17.5],
+                  ["paint", 17.48]
+                ]
+              },
+              "gpu": {
+                "frames": 20,
+                "total": 214.462,
+                "median": 8.216,
+                "p95": 33.477
+              },
+              "long": 19,
+              "video": {
+                "dropped": 0,
+                "total": 81,
+                "observedMs": 4200
+              },
+              "window": {
+                "start": 0,
+                "closed": 6011.199999999255,
+                "read": 6021.699999999255,
+                "interactive": 1916.0999999996275,
+                "response": 586.7999999988824,
+                "clockBracketMs": 4.700000001117587,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -35.695,
+              "cdpMedian": 0.557,
+              "cdpP95": 10.366,
+              "g11Cpu": -108.5,
+              "g11Median": 0.3,
+              "g11P95": 4.8,
+              "long": 1,
+              "dropped": 0,
+              "videoTotal": -7
+            }
+          },
+          {
+            "pair": 7,
+            "trial": 2,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 63,
+                "total": 403.4,
+                "median": 2.6,
+                "p95": 17.9
+              },
+              "cdp": {
+                "frames": 104,
+                "total": 598.184,
+                "median": 2.038,
+                "p95": 22.519,
+                "start": 890.160000000149,
+                "end": 6019.808000000194,
+                "topSelf": [
+                  ["(anonymous)", 82.51],
+                  ["fixedContainingBlock", 45],
+                  ["contextChain", 39.33],
+                  ["inspectGlb", 20.23],
+                  ["sampleScroll", 18.36]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 205.262,
+                "median": 12.939,
+                "p95": 25.744
+              },
+              "long": 14,
+              "video": {
+                "dropped": 1,
+                "total": 79,
+                "observedMs": 3450
+              },
+              "window": {
+                "start": 0,
+                "closed": 6013,
+                "read": 6017.0999999996275,
+                "interactive": 2751.300000000745,
+                "response": 880.5999999996275,
+                "clockBracketMs": 27,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 119,
+                "total": 627,
+                "median": 2.6,
+                "p95": 18.9
+              },
+              "cdp": {
+                "frames": 138,
+                "total": 698.431,
+                "median": 2.546,
+                "p95": 14.856,
+                "start": 153.32000000029802,
+                "end": 6017.081000000238,
+                "topSelf": [
+                  ["(anonymous)", 144.68],
+                  ["fixedContainingBlock", 66.34],
+                  ["contextChain", 46.63],
+                  ["paint", 25.08],
+                  ["applyLayout", 22.95]
+                ]
+              },
+              "gpu": {
+                "frames": 35,
+                "total": 470.83,
+                "median": 9.247,
+                "p95": 44.28
+              },
+              "long": 18,
+              "video": {
+                "dropped": 0,
+                "total": 109,
+                "observedMs": 4717
+              },
+              "window": {
+                "start": 0,
+                "closed": 6009.0999999996275,
+                "read": 6013,
+                "interactive": 1454.9000000003725,
+                "response": 141.59999999962747,
+                "clockBracketMs": 1.299999998882413,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 100.247,
+              "cdpMedian": 0.508,
+              "cdpP95": -7.663,
+              "g11Cpu": 223.6,
+              "g11Median": 0,
+              "g11P95": 1,
+              "long": 4,
+              "dropped": -1,
+              "videoTotal": 30
+            }
+          },
+          {
+            "pair": 8,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 123,
+                "total": 695.9,
+                "median": 2.9,
+                "p95": 20.2
+              },
+              "cdp": {
+                "frames": 143,
+                "total": 706.444,
+                "median": 2.268,
+                "p95": 14.115,
+                "start": 173.97700000181794,
+                "end": 6011.501000000164,
+                "topSelf": [
+                  ["(anonymous)", 149.2],
+                  ["fixedContainingBlock", 76.71],
+                  ["contextChain", 45.12],
+                  ["sampleScroll", 24.84],
+                  ["inspectGlb", 20.67]
+                ]
+              },
+              "gpu": {
+                "frames": 36,
+                "total": 393.643,
+                "median": 6.879,
+                "p95": 25.699
+              },
+              "long": 22,
+              "video": {
+                "dropped": 1,
+                "total": 115,
+                "observedMs": 4915
+              },
+              "window": {
+                "start": 0,
+                "closed": 6005.199999999255,
+                "read": 6007.299999998882,
+                "interactive": 1236.4000000003725,
+                "response": 129.59999999962747,
+                "clockBracketMs": 2.299999998882413,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 76,
+                "total": 452.4,
+                "median": 2.8,
+                "p95": 20
+              },
+              "cdp": {
+                "frames": 95,
+                "total": 522.089,
+                "median": 2.539,
+                "p95": 23.54,
+                "start": 138.76400000043213,
+                "end": 6146.457000000402,
+                "topSelf": [
+                  ["(anonymous)", 114.13],
+                  ["contextChain", 41.87],
+                  ["fixedContainingBlock", 38.23],
+                  ["scan", 15.99],
+                  ["inspectGlb", 15.85]
+                ]
+              },
+              "gpu": {
+                "frames": 19,
+                "total": 177.398,
+                "median": 8.195,
+                "p95": 34.146
+              },
+              "long": 12,
+              "video": {
+                "dropped": 1,
+                "total": 81,
+                "observedMs": 3533
+              },
+              "window": {
+                "start": 0,
+                "closed": 6063.9000000003725,
+                "read": 6116.200000001118,
+                "interactive": 2573.60000000149,
+                "response": 124.5,
+                "clockBracketMs": 51.90000000037253,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -184.355,
+              "cdpMedian": 0.271,
+              "cdpP95": 9.425,
+              "g11Cpu": -243.5,
+              "g11Median": -0.1,
+              "g11P95": -0.2,
+              "long": -10,
+              "dropped": 0,
+              "videoTotal": -34
+            }
+          }
+        ],
+        "AB": [
+          {
+            "pair": 1,
+            "trial": 2,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 127,
+                "total": 706.5,
+                "median": 2.9,
+                "p95": 21.6
+              },
+              "cdp": {
+                "frames": 148,
+                "total": 716.911,
+                "median": 2.828,
+                "p95": 14.701,
+                "start": 157.93300000019372,
+                "end": 6014.127999998629,
+                "topSelf": [
+                  ["(anonymous)", 141.84],
+                  ["fixedContainingBlock", 64.28],
+                  ["contextChain", 61.41],
+                  ["inspectGlb", 21.89],
+                  ["paint", 16.68]
+                ]
+              },
+              "gpu": {
+                "frames": 38,
+                "total": 355.036,
+                "median": 5.853,
+                "p95": 34.657
+              },
+              "long": 18,
+              "video": {
+                "dropped": 1,
+                "total": 115,
+                "observedMs": 4885
+              },
+              "window": {
+                "start": 0,
+                "closed": 6005.0999999996275,
+                "read": 6008.799999998882,
+                "interactive": 1267.199999999255,
+                "response": 115.69999999925494,
+                "clockBracketMs": 7.099999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 120,
+                "total": 631.6,
+                "median": 2,
+                "p95": 19.3
+              },
+              "cdp": {
+                "frames": 141,
+                "total": 660.157,
+                "median": 2.067,
+                "p95": 15.437,
+                "start": 178.8300000000745,
+                "end": 6018.467000000179,
+                "topSelf": [
+                  ["(anonymous)", 123.49],
+                  ["contextChain", 51.94],
+                  ["fixedContainingBlock", 38.87],
+                  ["paint", 27.23],
+                  ["applyLayout", 16.54]
+                ]
+              },
+              "gpu": {
+                "frames": 35,
+                "total": 459.362,
+                "median": 11.388,
+                "p95": 37.697
+              },
+              "long": 15,
+              "video": {
+                "dropped": 1,
+                "total": 111,
+                "observedMs": 4767
+              },
+              "window": {
+                "start": 0,
+                "closed": 6010.10000000149,
+                "read": 6014.9000000003725,
+                "interactive": 1404.1000000014901,
+                "response": 165.30000000074506,
+                "clockBracketMs": 1.3999999985098839,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -56.754,
+              "cdpMedian": -0.761,
+              "cdpP95": 0.736,
+              "g11Cpu": -74.9,
+              "g11Median": -0.9,
+              "g11P95": -2.3,
+              "long": -3,
+              "dropped": 0,
+              "videoTotal": -4
+            }
+          },
+          {
+            "pair": 2,
+            "trial": 2,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 71,
+                "total": 446,
+                "median": 3.6,
+                "p95": 16
+              },
+              "cdp": {
+                "frames": 93,
+                "total": 606.737,
+                "median": 4.108,
+                "p95": 20.912,
+                "start": 1176.7369999997318,
+                "end": 6154.264999998733,
+                "topSelf": [
+                  ["(anonymous)", 115.38],
+                  ["fixedContainingBlock", 66.91],
+                  ["contextChain", 37.1],
+                  ["inspectGlb", 19.58],
+                  ["paint", 18.14]
+                ]
+              },
+              "gpu": {
+                "frames": 19,
+                "total": 183.689,
+                "median": 8.494,
+                "p95": 20.359
+              },
+              "long": 11,
+              "video": {
+                "dropped": 1,
+                "total": 35,
+                "observedMs": 3386
+              },
+              "window": {
+                "start": 0,
+                "closed": 6032,
+                "read": 6118.89999999851,
+                "interactive": 2742.5,
+                "response": 1165.0999999996275,
+                "clockBracketMs": 38.59999999962747,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 132,
+                "total": 771.3,
+                "median": 2.7,
+                "p95": 21.8
+              },
+              "cdp": {
+                "frames": 154,
+                "total": 750.873,
+                "median": 2.08,
+                "p95": 17.251,
+                "start": 208.2910000011325,
+                "end": 6019.718000000343,
+                "topSelf": [
+                  ["fixedContainingBlock", 163.88],
+                  ["(anonymous)", 135.91],
+                  ["contextChain", 52.69],
+                  ["paint", 18.47],
+                  ["inspectGlb", 17.77]
+                ]
+              },
+              "gpu": {
+                "frames": 39,
+                "total": 360.167,
+                "median": 7.378,
+                "p95": 26.313
+              },
+              "long": 18,
+              "video": {
+                "dropped": 1,
+                "total": 94,
+                "observedMs": 4868
+              },
+              "window": {
+                "start": 0,
+                "closed": 6010.200000001118,
+                "read": 6015.200000001118,
+                "interactive": 1242.0999999996275,
+                "response": 118.5,
+                "clockBracketMs": 2,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 144.136,
+              "cdpMedian": -2.028,
+              "cdpP95": -3.661,
+              "g11Cpu": 325.3,
+              "g11Median": -0.9,
+              "g11P95": 5.8,
+              "long": 7,
+              "dropped": 0,
+              "videoTotal": 59
+            }
+          },
+          {
+            "pair": 3,
+            "trial": 3,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 112,
+                "total": 601.5,
+                "median": 2.8,
+                "p95": 21.3
+              },
+              "cdp": {
+                "frames": 134,
+                "total": 671.056,
+                "median": 2.445,
+                "p95": 17.209,
+                "start": 153.285000000149,
+                "end": 6016.517000000924,
+                "topSelf": [
+                  ["(anonymous)", 118.79],
+                  ["fixedContainingBlock", 62.74],
+                  ["contextChain", 53],
+                  ["paint", 20.35],
+                  ["sampleScroll", 18.65]
+                ]
+              },
+              "gpu": {
+                "frames": 32,
+                "total": 344.315,
+                "median": 8.783,
+                "p95": 26.722
+              },
+              "long": 16,
+              "video": {
+                "dropped": 0,
+                "total": 107,
+                "observedMs": 4583
+              },
+              "window": {
+                "start": 0,
+                "closed": 6009.700000001118,
+                "read": 6012,
+                "interactive": 1597.300000000745,
+                "response": 139,
+                "clockBracketMs": 2.099999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 110,
+                "total": 591,
+                "median": 2.9,
+                "p95": 18.8
+              },
+              "cdp": {
+                "frames": 130,
+                "total": 690.772,
+                "median": 2.636,
+                "p95": 17.778,
+                "start": 136.8760000001639,
+                "end": 6015.084999999031,
+                "topSelf": [
+                  ["(anonymous)", 122.17],
+                  ["contextChain", 71.65],
+                  ["fixedContainingBlock", 59.7],
+                  ["paint", 19.38],
+                  ["applyLayout", 13.32]
+                ]
+              },
+              "gpu": {
+                "frames": 31,
+                "total": 344.289,
+                "median": 7.989,
+                "p95": 33.403
+              },
+              "long": 13,
+              "video": {
+                "dropped": 0,
+                "total": 106,
+                "observedMs": 4585
+              },
+              "window": {
+                "start": 0,
+                "closed": 6009,
+                "read": 6012.200000001118,
+                "interactive": 1611.300000000745,
+                "response": 118.30000000074506,
+                "clockBracketMs": 1.900000000372529,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 19.716,
+              "cdpMedian": 0.191,
+              "cdpP95": 0.569,
+              "g11Cpu": -10.5,
+              "g11Median": 0.1,
+              "g11P95": -2.5,
+              "long": -3,
+              "dropped": 0,
+              "videoTotal": -1
+            }
+          },
+          {
+            "pair": 4,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 127,
+                "total": 622.7,
+                "median": 2.3,
+                "p95": 16.3
+              },
+              "cdp": {
+                "frames": 149,
+                "total": 733.25,
+                "median": 2.492,
+                "p95": 17.178,
+                "start": 132.19800000078976,
+                "end": 6014.31799999997,
+                "topSelf": [
+                  ["(anonymous)", 146.25],
+                  ["contextChain", 53.78],
+                  ["fixedContainingBlock", 40.35],
+                  ["sampleScroll", 37.59],
+                  ["applyLayout", 23.81]
+                ]
+              },
+              "gpu": {
+                "frames": 37,
+                "total": 250.391,
+                "median": 3.807,
+                "p95": 20.412
+              },
+              "long": 18,
+              "video": {
+                "dropped": 1,
+                "total": 110,
+                "observedMs": 4717
+              },
+              "window": {
+                "start": 0,
+                "closed": 6008.39999999851,
+                "read": 6010.5999999996275,
+                "interactive": 1467.699999999255,
+                "response": 118.69999999925494,
+                "clockBracketMs": 2.5,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 114,
+                "total": 627.3,
+                "median": 2.8,
+                "p95": 19.8
+              },
+              "cdp": {
+                "frames": 136,
+                "total": 675.779,
+                "median": 2.523,
+                "p95": 17.042,
+                "start": 124.878999998793,
+                "end": 6024.649000000209,
+                "topSelf": [
+                  ["(anonymous)", 117.72],
+                  ["fixedContainingBlock", 68.7],
+                  ["contextChain", 57.04],
+                  ["paint", 23.77],
+                  ["inspectGlb", 17.04]
+                ]
+              },
+              "gpu": {
+                "frames": 33,
+                "total": 408.658,
+                "median": 4.569,
+                "p95": 38.225
+              },
+              "long": 14,
+              "video": {
+                "dropped": 1,
+                "total": 109,
+                "observedMs": 4635
+              },
+              "window": {
+                "start": 0,
+                "closed": 6016,
+                "read": 6021.5,
+                "interactive": 1550.0999999996275,
+                "response": 112.09999999962747,
+                "clockBracketMs": 1.900000000372529,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -57.471,
+              "cdpMedian": 0.031,
+              "cdpP95": -0.136,
+              "g11Cpu": 4.6,
+              "g11Median": 0.5,
+              "g11P95": 3.5,
+              "long": -4,
+              "dropped": 0,
+              "videoTotal": -1
+            }
+          },
+          {
+            "pair": 5,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 116,
+                "total": 598.5,
+                "median": 2.4,
+                "p95": 16
+              },
+              "cdp": {
+                "frames": 138,
+                "total": 650.914,
+                "median": 2.067,
+                "p95": 16.507,
+                "start": 128.95700000040233,
+                "end": 6018.393999999389,
+                "topSelf": [
+                  ["(anonymous)", 123],
+                  ["fixedContainingBlock", 55.67],
+                  ["contextChain", 49.33],
+                  ["applyLayout", 21.83],
+                  ["sampleScroll", 18.84]
+                ]
+              },
+              "gpu": {
+                "frames": 34,
+                "total": 445.164,
+                "median": 6.311,
+                "p95": 30.414
+              },
+              "long": 17,
+              "video": {
+                "dropped": 0,
+                "total": 108,
+                "observedMs": 4650
+              },
+              "window": {
+                "start": 0,
+                "closed": 6014.299999998882,
+                "read": 6016.0999999996275,
+                "interactive": 1538.2999999988824,
+                "response": 117.89999999850988,
+                "clockBracketMs": 1.699999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 108,
+                "total": 589.8,
+                "median": 2.8,
+                "p95": 18.3
+              },
+              "cdp": {
+                "frames": 130,
+                "total": 701.606,
+                "median": 2.541,
+                "p95": 16.982,
+                "start": 152.03199999965727,
+                "end": 6018.357000000775,
+                "topSelf": [
+                  ["(anonymous)", 123.69],
+                  ["fixedContainingBlock", 80.38],
+                  ["contextChain", 51.1],
+                  ["sampleScroll", 19.96],
+                  ["prepared.modelBuffer.blob.profileSync.bytes", 17.02]
+                ]
+              },
+              "gpu": {
+                "frames": 30,
+                "total": 389.822,
+                "median": 8.837,
+                "p95": 32.595
+              },
+              "long": 18,
+              "video": {
+                "dropped": 0,
+                "total": 105,
+                "observedMs": 4517
+              },
+              "window": {
+                "start": 0,
+                "closed": 6012.200000001118,
+                "read": 6015.300000000745,
+                "interactive": 1659.4000000003725,
+                "response": 140.90000000037253,
+                "clockBracketMs": 1.400000000372529,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 50.692,
+              "cdpMedian": 0.474,
+              "cdpP95": 0.475,
+              "g11Cpu": -8.7,
+              "g11Median": 0.4,
+              "g11P95": 2.3,
+              "long": 1,
+              "dropped": 0,
+              "videoTotal": -3
+            }
+          },
+          {
+            "pair": 6,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 114,
+                "total": 686.2,
+                "median": 3.4,
+                "p95": 20
+              },
+              "cdp": {
+                "frames": 134,
+                "total": 719.192,
+                "median": 2.526,
+                "p95": 15.446,
+                "start": 175.27500000037253,
+                "end": 6023.436000000685,
+                "topSelf": [
+                  ["(anonymous)", 146.95],
+                  ["fixedContainingBlock", 99.81],
+                  ["contextChain", 71.65],
+                  ["updateWorldMatrix", 17.65],
+                  ["container", 11.66]
+                ]
+              },
+              "gpu": {
+                "frames": 32,
+                "total": 346.812,
+                "median": 8.282,
+                "p95": 28.29
+              },
+              "long": 18,
+              "video": {
+                "dropped": 0,
+                "total": 88,
+                "observedMs": 4829
+              },
+              "window": {
+                "start": 0,
+                "closed": 6014.699999999255,
+                "read": 6019.0999999996275,
+                "interactive": 1325,
+                "response": 113.89999999850988,
+                "clockBracketMs": 3.599999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 67,
+                "total": 466.2,
+                "median": 2.9,
+                "p95": 19
+              },
+              "cdp": {
+                "frames": 90,
+                "total": 550.431,
+                "median": 3.072,
+                "p95": 26.038,
+                "start": 1433.1189999990165,
+                "end": 6081.773000000045,
+                "topSelf": [
+                  ["(anonymous)", 96.09],
+                  ["contextChain", 35.08],
+                  ["fixedContainingBlock", 33.18],
+                  ["inspectVrma", 22.21],
+                  ["inspectGlb", 18.07]
+                ]
+              },
+              "gpu": {
+                "frames": 16,
+                "total": 188.098,
+                "median": 9.842,
+                "p95": 44.697
+              },
+              "long": 14,
+              "video": {
+                "dropped": 2,
+                "total": 62,
+                "observedMs": 3533
+              },
+              "window": {
+                "start": 0,
+                "closed": 6054.200000001118,
+                "read": 6071.200000001118,
+                "interactive": 2616.4000000003725,
+                "response": 1422.7000000011176,
+                "clockBracketMs": 50.40000000037253,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -168.761,
+              "cdpMedian": 0.546,
+              "cdpP95": 10.592,
+              "g11Cpu": -220,
+              "g11Median": -0.5,
+              "g11P95": -1,
+              "long": -4,
+              "dropped": 2,
+              "videoTotal": -26
+            }
+          },
+          {
+            "pair": 7,
+            "trial": 2,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 63,
+                "total": 403.4,
+                "median": 2.6,
+                "p95": 17.9
+              },
+              "cdp": {
+                "frames": 104,
+                "total": 598.184,
+                "median": 2.038,
+                "p95": 22.519,
+                "start": 890.160000000149,
+                "end": 6019.808000000194,
+                "topSelf": [
+                  ["(anonymous)", 82.51],
+                  ["fixedContainingBlock", 45],
+                  ["contextChain", 39.33],
+                  ["inspectGlb", 20.23],
+                  ["sampleScroll", 18.36]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 205.262,
+                "median": 12.939,
+                "p95": 25.744
+              },
+              "long": 14,
+              "video": {
+                "dropped": 1,
+                "total": 79,
+                "observedMs": 3450
+              },
+              "window": {
+                "start": 0,
+                "closed": 6013,
+                "read": 6017.0999999996275,
+                "interactive": 2751.300000000745,
+                "response": 880.5999999996275,
+                "clockBracketMs": 27,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 117,
+                "total": 561.8,
+                "median": 2.6,
+                "p95": 17
+              },
+              "cdp": {
+                "frames": 138,
+                "total": 699.724,
+                "median": 2.884,
+                "p95": 17.418,
+                "start": 141.40400000102818,
+                "end": 6019.799000000581,
+                "topSelf": [
+                  ["(anonymous)", 174.4],
+                  ["fixedContainingBlock", 47.46],
+                  ["contextChain", 42],
+                  ["paint", 20.58],
+                  ["inspectGlb", 20.03]
+                ]
+              },
+              "gpu": {
+                "frames": 34,
+                "total": 414.665,
+                "median": 7.413,
+                "p95": 40.474
+              },
+              "long": 19,
+              "video": {
+                "dropped": 1,
+                "total": 104,
+                "observedMs": 4512
+              },
+              "window": {
+                "start": 0,
+                "closed": 6014.699999999255,
+                "read": 6016.799999998882,
+                "interactive": 1675,
+                "response": 127.09999999962747,
+                "clockBracketMs": 1.599999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 101.54,
+              "cdpMedian": 0.846,
+              "cdpP95": -5.101,
+              "g11Cpu": 158.4,
+              "g11Median": 0,
+              "g11P95": -0.9,
+              "long": 5,
+              "dropped": 0,
+              "videoTotal": 25
+            }
+          },
+          {
+            "pair": 8,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 123,
+                "total": 695.9,
+                "median": 2.9,
+                "p95": 20.2
+              },
+              "cdp": {
+                "frames": 143,
+                "total": 706.444,
+                "median": 2.268,
+                "p95": 14.115,
+                "start": 173.97700000181794,
+                "end": 6011.501000000164,
+                "topSelf": [
+                  ["(anonymous)", 149.2],
+                  ["fixedContainingBlock", 76.71],
+                  ["contextChain", 45.12],
+                  ["sampleScroll", 24.84],
+                  ["inspectGlb", 20.67]
+                ]
+              },
+              "gpu": {
+                "frames": 36,
+                "total": 393.643,
+                "median": 6.879,
+                "p95": 25.699
+              },
+              "long": 22,
+              "video": {
+                "dropped": 1,
+                "total": 115,
+                "observedMs": 4915
+              },
+              "window": {
+                "start": 0,
+                "closed": 6005.199999999255,
+                "read": 6007.299999998882,
+                "interactive": 1236.4000000003725,
+                "response": 129.59999999962747,
+                "clockBracketMs": 2.299999998882413,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 118,
+                "total": 661.6,
+                "median": 3,
+                "p95": 20.5
+              },
+              "cdp": {
+                "frames": 139,
+                "total": 689.8,
+                "median": 2.082,
+                "p95": 16.587,
+                "start": 143.7690000012517,
+                "end": 6015.524000000209,
+                "topSelf": [
+                  ["(anonymous)", 125.15],
+                  ["fixedContainingBlock", 54.43],
+                  ["contextChain", 49.58],
+                  ["applyLayout", 24.95],
+                  ["sampleScroll", 23.14]
+                ]
+              },
+              "gpu": {
+                "frames": 34,
+                "total": 406.718,
+                "median": 7.724,
+                "p95": 39.2
+              },
+              "long": 18,
+              "video": {
+                "dropped": 0,
+                "total": 110,
+                "observedMs": 4717
+              },
+              "window": {
+                "start": 0,
+                "closed": 6006.699999999255,
+                "read": 6011.5,
+                "interactive": 1465.699999999255,
+                "response": 129.59999999962747,
+                "clockBracketMs": 4.300000000745058,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -16.644,
+              "cdpMedian": -0.186,
+              "cdpP95": 2.472,
+              "g11Cpu": -34.3,
+              "g11Median": 0.1,
+              "g11P95": 0.3,
+              "long": -4,
+              "dropped": -1,
+              "videoTotal": -5
+            }
+          }
+        ]
+      }
+    },
+    "steady": {
+      "count": {
+        "AA": 8,
+        "AB": 8
+      },
+      "comparison": {
+        "cdpCpu": {
+          "AA": {
+            "min": -323.937,
+            "max": 27.981,
+            "median": -11.537
+          },
+          "AB": {
+            "min": -358.96,
+            "max": 77.582,
+            "median": -0.58
+          },
+          "aboveAA": [3, 7],
+          "belowAA": [2]
+        },
+        "cdpMedian": {
+          "AA": {
+            "min": -0.123,
+            "max": 0.033,
+            "median": -0.005
+          },
+          "AB": {
+            "min": -0.138,
+            "max": 0.01,
+            "median": -0.002
+          },
+          "aboveAA": [],
+          "belowAA": [2]
+        },
+        "cdpP95": {
+          "AA": {
+            "min": -2.614,
+            "max": 0.236,
+            "median": -0.269
+          },
+          "AB": {
+            "min": -2.569,
+            "max": 0.972,
+            "median": 0.002
+          },
+          "aboveAA": [3, 5, 7],
+          "belowAA": []
+        },
+        "g11Cpu": {
+          "AA": {
+            "min": -215,
+            "max": 45.3,
+            "median": 4.65
+          },
+          "AB": {
+            "min": -201.8,
+            "max": 130.3,
+            "median": 33.05
+          },
+          "aboveAA": [1, 3, 7],
+          "belowAA": []
+        },
+        "g11Median": {
+          "AA": {
+            "min": -0.6,
+            "max": 0.1,
+            "median": 0
+          },
+          "AB": {
+            "min": -0.4,
+            "max": 0.2,
+            "median": 0.05
+          },
+          "aboveAA": [3, 7],
+          "belowAA": []
+        },
+        "g11P95": {
+          "AA": {
+            "min": -1.4,
+            "max": 0.3,
+            "median": 0.05
+          },
+          "AB": {
+            "min": -1.6,
+            "max": 1,
+            "median": 0.2
+          },
+          "aboveAA": [7],
+          "belowAA": [6]
+        },
+        "long": {
+          "AA": {
+            "min": 0,
+            "max": 0,
+            "median": 0
+          },
+          "AB": {
+            "min": 0,
+            "max": 0,
+            "median": 0
+          },
+          "aboveAA": [],
+          "belowAA": []
+        },
+        "dropped": {
+          "AA": {
+            "min": 0,
+            "max": 0,
+            "median": 0
+          },
+          "AB": {
+            "min": 0,
+            "max": 0,
+            "median": 0
+          },
+          "aboveAA": [],
+          "belowAA": []
+        },
+        "videoTotal": {
+          "AA": {
+            "min": -1,
+            "max": 0,
+            "median": 0
+          },
+          "AB": {
+            "min": -1,
+            "max": 0,
+            "median": 0
+          },
+          "aboveAA": [],
+          "belowAA": []
+        }
+      },
+      "pairs": {
+        "AA": [
+          {
+            "pair": 1,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 468.7,
+                "median": 1.4,
+                "p95": 2.3
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 378.909,
+                "median": 1.034,
+                "p95": 2.337,
+                "start": 30682.02499999851,
+                "end": 37117.72699999809,
+                "topSelf": [
+                  ["(anonymous)", 41.26],
+                  ["same", 34.72],
+                  ["paint", 34.22],
+                  ["fixedContainingBlock", 26.62],
+                  ["applyLayout", 21]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 304.93,
+                "median": 2.493,
+                "p95": 3.306
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 31036,
+                "closed": 37045.5,
+                "read": 37107.29999999888,
+                "interactive": 2168.5,
+                "response": 940.5,
+                "clockBracketMs": 1.299999998882413,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 486.5,
+                "median": 1.4,
+                "p95": 2.4
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 376.407,
+                "median": 1.026,
+                "p95": 2.478,
+                "start": 15278.731000000611,
+                "end": 21971.25200000219,
+                "topSelf": [
+                  ["(anonymous)", 41],
+                  ["same", 35.23],
+                  ["fixedContainingBlock", 33.09],
+                  ["paint", 32],
+                  ["updateWorldMatrix", 27.51]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 306.89,
+                "median": 2.593,
+                "p95": 3.452
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 143,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 15894.800000000745,
+                "closed": 21897.300000000745,
+                "read": 21966,
+                "interactive": 7915.9000000003725,
+                "response": 6663.4000000003725,
+                "clockBracketMs": 1.5,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -2.502,
+              "cdpMedian": -0.008,
+              "cdpP95": 0.141,
+              "g11Cpu": 17.8,
+              "g11Median": 0,
+              "g11P95": 0.1,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": -1
+            }
+          },
+          {
+            "pair": 2,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 353,
+                "total": 693.4,
+                "median": 1.5,
+                "p95": 3.4
+              },
+              "cdp": {
+                "frames": 353,
+                "total": 705.125,
+                "median": 1.153,
+                "p95": 5.115,
+                "start": 20174.164999999106,
+                "end": 26780.560999998823,
+                "topSelf": [
+                  ["fixedContainingBlock", 101.82],
+                  ["(anonymous)", 94.41],
+                  ["contextChain", 60.45],
+                  ["paint", 47.41],
+                  ["rank2", 30.61]
+                ]
+              },
+              "gpu": {
+                "frames": 117,
+                "total": 1006.549,
+                "median": 10.692,
+                "p95": 15.312
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 20618.200000001118,
+                "closed": 26625.099999999627,
+                "read": 26773.200000001118,
+                "interactive": 1507.4000000003725,
+                "response": 106.70000000111759,
+                "clockBracketMs": 2.300000000745058,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 478.4,
+                "median": 1.4,
+                "p95": 2.4
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 381.188,
+                "median": 1.03,
+                "p95": 2.501,
+                "start": 12471.357999999076,
+                "end": 18910.354999998584,
+                "topSelf": [
+                  ["fixedContainingBlock", 37.46],
+                  ["same", 35.9],
+                  ["(anonymous)", 34.99],
+                  ["paint", 29.25],
+                  ["updateWorldMatrix", 19.1]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 296.245,
+                "median": 2.482,
+                "p95": 3.342
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 143,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 12813.099999999627,
+                "closed": 18813.699999999255,
+                "read": 18904.400000000373,
+                "interactive": 1569.9000000003725,
+                "response": 115.90000000037253,
+                "clockBracketMs": 1.5,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -323.937,
+              "cdpMedian": -0.123,
+              "cdpP95": -2.614,
+              "g11Cpu": -215,
+              "g11Median": -0.1,
+              "g11P95": -1,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": -1
+            }
+          },
+          {
+            "pair": 3,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 495.5,
+                "median": 1.4,
+                "p95": 2.5
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 381.329,
+                "median": 1.03,
+                "p95": 2.935,
+                "start": 15858.572999998927,
+                "end": 22585.547000000253,
+                "topSelf": [
+                  ["fixedContainingBlock", 42.17],
+                  ["paint", 36.53],
+                  ["(anonymous)", 35.78],
+                  ["same", 27.41],
+                  ["updateWorldMatrix", 17.7]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 277.624,
+                "median": 2.424,
+                "p95": 3.142
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5998
+              },
+              "window": {
+                "start": 16505.300000000745,
+                "closed": 22518,
+                "read": 22580.099999999627,
+                "interactive": 8474.900000000373,
+                "response": 6752.700000001118,
+                "clockBracketMs": 1.699999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 507.1,
+                "median": 1.4,
+                "p95": 2.6
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 361.2,
+                "median": 1.029,
+                "p95": 2.395,
+                "start": 12604.006999999285,
+                "end": 19145.7229999993,
+                "topSelf": [
+                  ["same", 33.96],
+                  ["(anonymous)", 29.76],
+                  ["fixedContainingBlock", 28.66],
+                  ["updateWorldMatrix", 27.21],
+                  ["paint", 21.56]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 299.286,
+                "median": 2.404,
+                "p95": 3.525
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 13057.10000000149,
+                "closed": 19064.300000000745,
+                "read": 19142.10000000149,
+                "interactive": 1479.2000000011176,
+                "response": 140.80000000074506,
+                "clockBracketMs": 1.400000000372529,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -20.129,
+              "cdpMedian": -0.001,
+              "cdpP95": -0.54,
+              "g11Cpu": 11.6,
+              "g11Median": 0,
+              "g11P95": 0.1,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 4,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 500.6,
+                "median": 1.4,
+                "p95": 2.6
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 389.482,
+                "median": 1.029,
+                "p95": 2.857,
+                "start": 12485.555999999866,
+                "end": 19010.029000001028,
+                "topSelf": [
+                  ["(anonymous)", 33.71],
+                  ["same", 30.2],
+                  ["paint", 27.63],
+                  ["fixedContainingBlock", 27.33],
+                  ["updateWorldMatrix", 26.96]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 313.034,
+                "median": 2.541,
+                "p95": 3.591
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6002
+              },
+              "window": {
+                "start": 12878.799999998882,
+                "closed": 18891.39999999851,
+                "read": 19003.199999999255,
+                "interactive": 1467.699999999255,
+                "response": 118.69999999925494,
+                "clockBracketMs": 1.199999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 545.9,
+                "median": 1.5,
+                "p95": 2.9
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 417.463,
+                "median": 1.041,
+                "p95": 3.093,
+                "start": 12526.055000001565,
+                "end": 18993.44000000134,
+                "topSelf": [
+                  ["(anonymous)", 61.48],
+                  ["paint", 47.71],
+                  ["fixedContainingBlock", 37.46],
+                  ["same", 30.92],
+                  ["applyLayout", 22.16]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 321.32,
+                "median": 2.488,
+                "p95": 3.735
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 12936,
+                "closed": 18947.400000000373,
+                "read": 18989.799999998882,
+                "interactive": 1571.4000000003725,
+                "response": 114.79999999888241,
+                "clockBracketMs": 1.799999998882413,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 27.981,
+              "cdpMedian": 0.012,
+              "cdpP95": 0.236,
+              "g11Cpu": 45.3,
+              "g11Median": 0.1,
+              "g11P95": 0.3,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 5,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 499.8,
+                "median": 1.4,
+                "p95": 2.7
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 399.998,
+                "median": 1.031,
+                "p95": 2.501,
+                "start": 12456.768999999389,
+                "end": 18975.10300000012,
+                "topSelf": [
+                  ["(anonymous)", 56.2],
+                  ["same", 48.2],
+                  ["paint", 32.37],
+                  ["fixedContainingBlock", 31.51],
+                  ["applyLayout", 20.38]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 322.706,
+                "median": 2.619,
+                "p95": 4
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6002
+              },
+              "window": {
+                "start": 12884.5,
+                "closed": 18899.599999999627,
+                "read": 18971,
+                "interactive": 1538.2999999988824,
+                "response": 117.89999999850988,
+                "clockBracketMs": 1.6000000014901161,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 497.5,
+                "median": 1.4,
+                "p95": 2.7
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 397.054,
+                "median": 1.034,
+                "p95": 2.414,
+                "start": 12462.878999998793,
+                "end": 18906.955999998376,
+                "topSelf": [
+                  ["same", 50.49],
+                  ["(anonymous)", 39.73],
+                  ["fixedContainingBlock", 36.01],
+                  ["paint", 25.59],
+                  ["updateWorldMatrix", 17.97]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 316.581,
+                "median": 2.537,
+                "p95": 3.653
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5981
+              },
+              "window": {
+                "start": 12820.599999999627,
+                "closed": 18826.5,
+                "read": 18902.300000000745,
+                "interactive": 1606.5,
+                "response": 126.30000000074506,
+                "clockBracketMs": 2,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -2.944,
+              "cdpMedian": 0.003,
+              "cdpP95": -0.087,
+              "g11Cpu": -2.3,
+              "g11Median": 0,
+              "g11P95": 0,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 6,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 625.6,
+                "median": 1.7,
+                "p95": 3.8
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 494.024,
+                "median": 1.044,
+                "p95": 3.994,
+                "start": 12704.64100000076,
+                "end": 19294.35099999979,
+                "topSelf": [
+                  ["(anonymous)", 43.8],
+                  ["paint", 42.76],
+                  ["same", 40.45],
+                  ["fixedContainingBlock", 26.32],
+                  ["applyLayout", 24.83]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 368.689,
+                "median": 2.683,
+                "p95": 5.906
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6001
+              },
+              "window": {
+                "start": 13195.599999999627,
+                "closed": 19213,
+                "read": 19290.099999999627,
+                "interactive": 1325,
+                "response": 113.89999999850988,
+                "clockBracketMs": 1.5,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 420.3,
+                "median": 1.1,
+                "p95": 2.4
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 332.572,
+                "median": 1.024,
+                "p95": 2.238,
+                "start": 12642.719000000507,
+                "end": 19158.441999999806,
+                "topSelf": [
+                  ["(anonymous)", 39.29],
+                  ["fixedContainingBlock", 30.1],
+                  ["applyLayout", 25.62],
+                  ["paint", 24.75],
+                  ["same", 19.73]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 315.772,
+                "median": 1.952,
+                "p95": 8.378
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6002
+              },
+              "window": {
+                "start": 13087,
+                "closed": 19099,
+                "read": 19155.199999999255,
+                "interactive": 1916.0999999996275,
+                "response": 586.7999999988824,
+                "clockBracketMs": 1,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -161.452,
+              "cdpMedian": -0.02,
+              "cdpP95": -1.756,
+              "g11Cpu": -205.3,
+              "g11Median": -0.6,
+              "g11P95": -1.4,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 7,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 562.2,
+                "median": 1.5,
+                "p95": 3
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 436.87,
+                "median": 1.037,
+                "p95": 3.171,
+                "start": 12565.131999999285,
+                "end": 19178.848999999464,
+                "topSelf": [
+                  ["same", 41.17],
+                  ["fixedContainingBlock", 37.2],
+                  ["paint", 36.22],
+                  ["(anonymous)", 30.32],
+                  ["applyLayout", 28.95]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 325.405,
+                "median": 2.516,
+                "p95": 5.174
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5982
+              },
+              "window": {
+                "start": 13093.5,
+                "closed": 19097.900000000373,
+                "read": 19174.400000000373,
+                "interactive": 1444.6000000014901,
+                "response": 124.5,
+                "clockBracketMs": 1.699999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 592,
+                "median": 1.6,
+                "p95": 3.2
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 455.233,
+                "median": 1.07,
+                "p95": 3.116,
+                "start": 16461.961000001058,
+                "end": 23716.321000000462,
+                "topSelf": [
+                  ["fixedContainingBlock", 43.53],
+                  ["(anonymous)", 42.67],
+                  ["same", 36.41],
+                  ["applyLayout", 36.1],
+                  ["updateWorldMatrix", 34.55]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 314.177,
+                "median": 2.588,
+                "p95": 4.702
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 17636,
+                "closed": 23656.400000000373,
+                "read": 23712.300000000745,
+                "interactive": 1426.800000000745,
+                "response": 150.90000000037253,
+                "clockBracketMs": 1.400000000372529,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 18.363,
+              "cdpMedian": 0.033,
+              "cdpP95": -0.055,
+              "g11Cpu": 29.8,
+              "g11Median": 0.1,
+              "g11P95": 0.2,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 8,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 612.3,
+                "median": 1.6,
+                "p95": 3.7
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 479.108,
+                "median": 1.086,
+                "p95": 3.792,
+                "start": 12578.785000000149,
+                "end": 19215.195000000298,
+                "topSelf": [
+                  ["(anonymous)", 41.51],
+                  ["fixedContainingBlock", 35.12],
+                  ["paint", 33.41],
+                  ["same", 29.64],
+                  ["beneathPlace", 24.58]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 373.74,
+                "median": 2.674,
+                "p95": 5.304
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 13151.400000000373,
+                "closed": 19155.299999998882,
+                "read": 19211.599999999627,
+                "interactive": 1236.4000000003725,
+                "response": 129.59999999962747,
+                "clockBracketMs": 1.6000000014901161,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 581.6,
+                "median": 1.5,
+                "p95": 3.3
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 449.026,
+                "median": 1.064,
+                "p95": 3.341,
+                "start": 13095.745000001043,
+                "end": 19496.96400000155,
+                "topSelf": [
+                  ["(anonymous)", 54.49],
+                  ["same", 49.46],
+                  ["paint", 44.1],
+                  ["fixedContainingBlock", 27.86],
+                  ["beneathPlace", 26.88]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 351.387,
+                "median": 2.622,
+                "p95": 5.276
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5984
+              },
+              "window": {
+                "start": 13430.200000001118,
+                "closed": 19436,
+                "read": 19493.700000001118,
+                "interactive": 2573.60000000149,
+                "response": 124.5,
+                "clockBracketMs": 3.199999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -30.082,
+              "cdpMedian": -0.022,
+              "cdpP95": -0.451,
+              "g11Cpu": -30.7,
+              "g11Median": -0.1,
+              "g11P95": -0.4,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          }
+        ],
+        "AB": [
+          {
+            "pair": 1,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 468.7,
+                "median": 1.4,
+                "p95": 2.3
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 378.909,
+                "median": 1.034,
+                "p95": 2.337,
+                "start": 30682.02499999851,
+                "end": 37117.72699999809,
+                "topSelf": [
+                  ["(anonymous)", 41.26],
+                  ["same", 34.72],
+                  ["paint", 34.22],
+                  ["fixedContainingBlock", 26.62],
+                  ["applyLayout", 21]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 304.93,
+                "median": 2.493,
+                "p95": 3.306
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 31036,
+                "closed": 37045.5,
+                "read": 37107.29999999888,
+                "interactive": 2168.5,
+                "response": 940.5,
+                "clockBracketMs": 1.299999998882413,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 532.4,
+                "median": 1.5,
+                "p95": 2.5
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 385.704,
+                "median": 1.035,
+                "p95": 2.556,
+                "start": 12518.131000000983,
+                "end": 19006.88300000131,
+                "topSelf": [
+                  ["(anonymous)", 54.38],
+                  ["paint", 37.08],
+                  ["same", 36.06],
+                  ["fixedContainingBlock", 23.03],
+                  ["applyLayout", 21.23]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 305.92,
+                "median": 2.587,
+                "p95": 3.71
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 12916.200000001118,
+                "closed": 18932.60000000149,
+                "read": 19002.300000000745,
+                "interactive": 1488.1000000014901,
+                "response": 352.1000000014901,
+                "clockBracketMs": 1.699999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 6.795,
+              "cdpMedian": 0.001,
+              "cdpP95": 0.219,
+              "g11Cpu": 63.7,
+              "g11Median": 0.1,
+              "g11P95": 0.2,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 2,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 353,
+                "total": 693.4,
+                "median": 1.5,
+                "p95": 3.4
+              },
+              "cdp": {
+                "frames": 353,
+                "total": 705.125,
+                "median": 1.153,
+                "p95": 5.115,
+                "start": 20174.164999999106,
+                "end": 26780.560999998823,
+                "topSelf": [
+                  ["fixedContainingBlock", 101.82],
+                  ["(anonymous)", 94.41],
+                  ["contextChain", 60.45],
+                  ["paint", 47.41],
+                  ["rank2", 30.61]
+                ]
+              },
+              "gpu": {
+                "frames": 117,
+                "total": 1006.549,
+                "median": 10.692,
+                "p95": 15.312
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 20618.200000001118,
+                "closed": 26625.099999999627,
+                "read": 26773.200000001118,
+                "interactive": 1507.4000000003725,
+                "response": 106.70000000111759,
+                "clockBracketMs": 2.300000000745058,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 500.1,
+                "median": 1.4,
+                "p95": 2.5
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 346.165,
+                "median": 1.015,
+                "p95": 2.546,
+                "start": 12574.81200000085,
+                "end": 19018.148000001907,
+                "topSelf": [
+                  ["(anonymous)", 33.92],
+                  ["fixedContainingBlock", 30.6],
+                  ["paint", 28.66],
+                  ["same", 21.98],
+                  ["applyLayout", 16.66]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 332.067,
+                "median": 2.673,
+                "p95": 3.594
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 143,
+                "observedMs": 5984
+              },
+              "window": {
+                "start": 12942.199999999255,
+                "closed": 18946.699999999255,
+                "read": 19010.199999999255,
+                "interactive": 1948.5,
+                "response": 113.5,
+                "clockBracketMs": 1.8999999985098839,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -358.96,
+              "cdpMedian": -0.138,
+              "cdpP95": -2.569,
+              "g11Cpu": -193.3,
+              "g11Median": -0.1,
+              "g11P95": -0.9,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": -1
+            }
+          },
+          {
+            "pair": 3,
+            "trial": 2,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 476.8,
+                "median": 1.3,
+                "p95": 2.5
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 342.783,
+                "median": 1.02,
+                "p95": 2.274,
+                "start": 28967.547000000253,
+                "end": 35753.99299999885,
+                "topSelf": [
+                  ["same", 33.55],
+                  ["updateWorldMatrix", 30.69],
+                  ["(anonymous)", 28.42],
+                  ["fixedContainingBlock", 27.14],
+                  ["paint", 26.63]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 308.803,
+                "median": 2.174,
+                "p95": 7.525
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 29672,
+                "closed": 35685.10000000149,
+                "read": 35747.60000000149,
+                "interactive": 8111.9000000003725,
+                "response": 6769.5,
+                "clockBracketMs": 10,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 528.1,
+                "median": 1.5,
+                "p95": 2.7
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 407.48,
+                "median": 1.03,
+                "p95": 2.64,
+                "start": 12477.457999998704,
+                "end": 18876.569000000134,
+                "topSelf": [
+                  ["(anonymous)", 57.84],
+                  ["paint", 35.53],
+                  ["fixedContainingBlock", 27.02],
+                  ["same", 26.61],
+                  ["applyLayout", 22.54]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 331.165,
+                "median": 2.719,
+                "p95": 4.365
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 12823.599999999627,
+                "closed": 18830.099999999627,
+                "read": 18872.199999999255,
+                "interactive": 1606.199999999255,
+                "response": 778.8000000007451,
+                "clockBracketMs": 1.300000000745058,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 64.697,
+              "cdpMedian": 0.01,
+              "cdpP95": 0.366,
+              "g11Cpu": 51.3,
+              "g11Median": 0.2,
+              "g11P95": 0.2,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 4,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 500.6,
+                "median": 1.4,
+                "p95": 2.6
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 389.482,
+                "median": 1.029,
+                "p95": 2.857,
+                "start": 12485.555999999866,
+                "end": 19010.029000001028,
+                "topSelf": [
+                  ["(anonymous)", 33.71],
+                  ["same", 30.2],
+                  ["paint", 27.63],
+                  ["fixedContainingBlock", 27.33],
+                  ["updateWorldMatrix", 26.96]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 313.034,
+                "median": 2.541,
+                "p95": 3.591
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6002
+              },
+              "window": {
+                "start": 12878.799999998882,
+                "closed": 18891.39999999851,
+                "read": 19003.199999999255,
+                "interactive": 1467.699999999255,
+                "response": 118.69999999925494,
+                "clockBracketMs": 1.199999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 541.4,
+                "median": 1.5,
+                "p95": 2.8
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 388.798,
+                "median": 1.03,
+                "p95": 2.642,
+                "start": 12484.303999999538,
+                "end": 18960.28500000015,
+                "topSelf": [
+                  ["(anonymous)", 40.62],
+                  ["paint", 34.75],
+                  ["fixedContainingBlock", 27.97],
+                  ["same", 25.53],
+                  ["applyLayout", 24.32]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 333.981,
+                "median": 2.835,
+                "p95": 4.035
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 12900.099999999627,
+                "closed": 18914.199999999255,
+                "read": 18956.299999998882,
+                "interactive": 1550.0999999996275,
+                "response": 112.09999999962747,
+                "clockBracketMs": 2.400000000372529,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -0.684,
+              "cdpMedian": 0.001,
+              "cdpP95": -0.215,
+              "g11Cpu": 40.8,
+              "g11Median": 0.1,
+              "g11P95": 0.2,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 5,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 499.8,
+                "median": 1.4,
+                "p95": 2.7
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 399.998,
+                "median": 1.031,
+                "p95": 2.501,
+                "start": 12456.768999999389,
+                "end": 18975.10300000012,
+                "topSelf": [
+                  ["(anonymous)", 56.2],
+                  ["same", 48.2],
+                  ["paint", 32.37],
+                  ["fixedContainingBlock", 31.51],
+                  ["applyLayout", 20.38]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 322.706,
+                "median": 2.619,
+                "p95": 4
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6002
+              },
+              "window": {
+                "start": 12884.5,
+                "closed": 18899.599999999627,
+                "read": 18971,
+                "interactive": 1538.2999999988824,
+                "response": 117.89999999850988,
+                "clockBracketMs": 1.6000000014901161,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 525.1,
+                "median": 1.4,
+                "p95": 3
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 399.522,
+                "median": 1.026,
+                "p95": 3.027,
+                "start": 12476.857000000775,
+                "end": 18901.770999999717,
+                "topSelf": [
+                  ["(anonymous)", 66.95],
+                  ["same", 32.47],
+                  ["fixedContainingBlock", 26.02],
+                  ["paint", 23.9],
+                  ["updateWorldMatrix", 22.16]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 360.744,
+                "median": 2.754,
+                "p95": 4.602
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 12817.5,
+                "closed": 18828.700000001118,
+                "read": 18897.60000000149,
+                "interactive": 1659.4000000003725,
+                "response": 140.90000000037253,
+                "clockBracketMs": 1.099999999627471,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -0.476,
+              "cdpMedian": -0.005,
+              "cdpP95": 0.526,
+              "g11Cpu": 25.3,
+              "g11Median": 0,
+              "g11P95": 0.3,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 6,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 625.6,
+                "median": 1.7,
+                "p95": 3.8
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 494.024,
+                "median": 1.044,
+                "p95": 3.994,
+                "start": 12704.64100000076,
+                "end": 19294.35099999979,
+                "topSelf": [
+                  ["(anonymous)", 43.8],
+                  ["paint", 42.76],
+                  ["same", 40.45],
+                  ["fixedContainingBlock", 26.32],
+                  ["applyLayout", 24.83]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 368.689,
+                "median": 2.683,
+                "p95": 5.906
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6001
+              },
+              "window": {
+                "start": 13195.599999999627,
+                "closed": 19213,
+                "read": 19290.099999999627,
+                "interactive": 1325,
+                "response": 113.89999999850988,
+                "clockBracketMs": 1.5,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 423.8,
+                "median": 1.3,
+                "p95": 2.2
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 332.741,
+                "median": 1.024,
+                "p95": 2.084,
+                "start": 12945.343000000343,
+                "end": 19297.860999999568,
+                "topSelf": [
+                  ["fixedContainingBlock", 32.09],
+                  ["paint", 29.03],
+                  ["(anonymous)", 24.22],
+                  ["same", 22.14],
+                  ["updateWorldMatrix", 19.34]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 182.866,
+                "median": 1.523,
+                "p95": 2.316
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 13239.200000001118,
+                "closed": 19247.5,
+                "read": 19294.300000000745,
+                "interactive": 2616.4000000003725,
+                "response": 1422.7000000011176,
+                "clockBracketMs": 1.299999998882413,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -161.283,
+              "cdpMedian": -0.02,
+              "cdpP95": -1.91,
+              "g11Cpu": -201.8,
+              "g11Median": -0.4,
+              "g11P95": -1.6,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 7,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 562.2,
+                "median": 1.5,
+                "p95": 3
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 436.87,
+                "median": 1.037,
+                "p95": 3.171,
+                "start": 12565.131999999285,
+                "end": 19178.848999999464,
+                "topSelf": [
+                  ["same", 41.17],
+                  ["fixedContainingBlock", 37.2],
+                  ["paint", 36.22],
+                  ["(anonymous)", 30.32],
+                  ["applyLayout", 28.95]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 325.405,
+                "median": 2.516,
+                "p95": 5.174
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5982
+              },
+              "window": {
+                "start": 13093.5,
+                "closed": 19097.900000000373,
+                "read": 19174.400000000373,
+                "interactive": 1444.6000000014901,
+                "response": 124.5,
+                "clockBracketMs": 1.699999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 359,
+                "total": 692.5,
+                "median": 1.7,
+                "p95": 4
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 514.452,
+                "median": 1.047,
+                "p95": 4.143,
+                "start": 15663.724999999627,
+                "end": 22408.485999999568,
+                "topSelf": [
+                  ["(anonymous)", 56.43],
+                  ["same", 46.04],
+                  ["fixedContainingBlock", 35.25],
+                  ["paint", 30.55],
+                  ["applyLayout", 28.84]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 376.688,
+                "median": 2.732,
+                "p95": 5.627
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 16324.5,
+                "closed": 22339,
+                "read": 22404.800000000745,
+                "interactive": 8189.4000000003725,
+                "response": 6660.9000000003725,
+                "clockBracketMs": 1.199999999254942,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 77.582,
+              "cdpMedian": 0.01,
+              "cdpP95": 0.972,
+              "g11Cpu": 130.3,
+              "g11Median": 0.2,
+              "g11P95": 1,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 8,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 360,
+                "total": 612.3,
+                "median": 1.6,
+                "p95": 3.7
+              },
+              "cdp": {
+                "frames": 360,
+                "total": 479.108,
+                "median": 1.086,
+                "p95": 3.792,
+                "start": 12578.785000000149,
+                "end": 19215.195000000298,
+                "topSelf": [
+                  ["(anonymous)", 41.51],
+                  ["fixedContainingBlock", 35.12],
+                  ["paint", 33.41],
+                  ["same", 29.64],
+                  ["beneathPlace", 24.58]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 373.74,
+                "median": 2.674,
+                "p95": 5.304
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 5983
+              },
+              "window": {
+                "start": 13151.400000000373,
+                "closed": 19155.299999998882,
+                "read": 19211.599999999627,
+                "interactive": 1236.4000000003725,
+                "response": 129.59999999962747,
+                "clockBracketMs": 1.6000000014901161,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 360,
+                "total": 628.4,
+                "median": 1.5,
+                "p95": 3.8
+              },
+              "cdp": {
+                "frames": 361,
+                "total": 459.573,
+                "median": 1.04,
+                "p95": 3.27,
+                "start": 12521.976999999955,
+                "end": 18982.212000001222,
+                "topSelf": [
+                  ["(anonymous)", 42.43],
+                  ["same", 40.39],
+                  ["paint", 39.03],
+                  ["applyLayout", 27.67],
+                  ["fixedContainingBlock", 25.26]
+                ]
+              },
+              "gpu": {
+                "frames": 120,
+                "total": 390.36,
+                "median": 2.856,
+                "p95": 5.456
+              },
+              "long": 0,
+              "video": {
+                "dropped": 0,
+                "total": 144,
+                "observedMs": 6000
+              },
+              "window": {
+                "start": 12906.5,
+                "closed": 18923.300000000745,
+                "read": 18978.400000000373,
+                "interactive": 1465.699999999255,
+                "response": 129.59999999962747,
+                "clockBracketMs": 1.3999999985098839,
+                "reportedClock": true
+              },
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -19.535,
+              "cdpMedian": -0.046,
+              "cdpP95": -0.522,
+              "g11Cpu": 16.1,
+              "g11Median": -0.1,
+              "g11P95": 0.1,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          }
+        ]
+      }
+    },
+    "spa": {
+      "count": {
+        "AA": 8,
+        "AB": 8
+      },
+      "comparison": {
+        "cdpCpu": {
+          "AA": {
+            "min": -83.495,
+            "max": 34.375,
+            "median": -30.211
+          },
+          "AB": {
+            "min": -14.22,
+            "max": 102.148,
+            "median": 13.108
+          },
+          "aboveAA": [3, 5, 7],
+          "belowAA": []
+        },
+        "cdpMedian": {
+          "AA": {
+            "min": 0,
+            "max": 0,
+            "median": 0
+          },
+          "AB": {
+            "min": 0,
+            "max": 0,
+            "median": 0
+          },
+          "aboveAA": [],
+          "belowAA": []
+        },
+        "cdpP95": {
+          "AA": {
+            "min": -2.17,
+            "max": 0.712,
+            "median": -0.839
+          },
+          "AB": {
+            "min": -2.206,
+            "max": 2.83,
+            "median": 1.038
+          },
+          "aboveAA": [1, 3, 5, 6, 7],
+          "belowAA": [8]
+        },
+        "g11Cpu": {
+          "AA": {
+            "min": -102.9,
+            "max": 46.8,
+            "median": -21.2
+          },
+          "AB": {
+            "min": -7.6,
+            "max": 161.8,
+            "median": 46.2
+          },
+          "aboveAA": [2, 3, 5, 7],
+          "belowAA": []
+        },
+        "g11Median": {
+          "AA": {
+            "min": -2,
+            "max": 0.3,
+            "median": -0.05
+          },
+          "AB": {
+            "min": -1.7,
+            "max": 0.4,
+            "median": 0.05
+          },
+          "aboveAA": [3],
+          "belowAA": []
+        },
+        "g11P95": {
+          "AA": {
+            "min": -3.9,
+            "max": 4.4,
+            "median": -0.65
+          },
+          "AB": {
+            "min": -3.1,
+            "max": 7.4,
+            "median": 1.45
+          },
+          "aboveAA": [7],
+          "belowAA": []
+        },
+        "long": {
+          "AA": {
+            "min": -2,
+            "max": 3,
+            "median": -0.5
+          },
+          "AB": {
+            "min": 2,
+            "max": 6,
+            "median": 3
+          },
+          "aboveAA": [5, 6, 7],
+          "belowAA": []
+        },
+        "dropped": {
+          "AA": {
+            "min": 0,
+            "max": 0,
+            "median": 0
+          },
+          "AB": {
+            "min": 0,
+            "max": 0,
+            "median": 0
+          },
+          "aboveAA": [],
+          "belowAA": []
+        },
+        "videoTotal": {
+          "AA": {
+            "min": -8,
+            "max": 4,
+            "median": 0.5
+          },
+          "AB": {
+            "min": -7,
+            "max": 5,
+            "median": 0.5
+          },
+          "aboveAA": [6],
+          "belowAA": []
+        }
+      },
+      "pairs": {
+        "AA": [
+          {
+            "pair": 1,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 87,
+                "total": 322.8,
+                "median": 2.2,
+                "p95": 16.2
+              },
+              "cdp": {
+                "frames": 291,
+                "total": 266.096,
+                "median": 0,
+                "p95": 3.362,
+                "start": 37658.40699999966,
+                "end": 44067.87799999863,
+                "topSelf": [
+                  ["fixedContainingBlock", 70.36],
+                  ["(anonymous)", 67.58],
+                  ["rank2", 11.88],
+                  ["contextChain", 10.63],
+                  ["applyLayout", 5.28]
+                ]
+              },
+              "gpu": {
+                "frames": 20,
+                "total": 219.067,
+                "median": 16.005,
+                "p95": 18.82
+              },
+              "long": 11,
+              "video": {
+                "dropped": 0,
+                "total": 23,
+                "observedMs": 1018
+              },
+              "window": {
+                "start": 38057.5,
+                "closed": 44062.199999999255,
+                "read": 44063.699999999255,
+                "interactive": 2168.5,
+                "response": 940.5,
+                "clockBracketMs": 1.5,
+                "reportedClock": true
+              },
+              "flightPx": 78.91226462225312,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 76,
+                "total": 309,
+                "median": 2.5,
+                "p95": 14.3
+              },
+              "cdp": {
+                "frames": 291,
+                "total": 238.081,
+                "median": 0,
+                "p95": 4.074,
+                "start": 22521.787000000477,
+                "end": 28851.677000001073,
+                "topSelf": [
+                  ["fixedContainingBlock", 73.59],
+                  ["(anonymous)", 49.85],
+                  ["contextChain", 8.79],
+                  ["capture", 8.06],
+                  ["paint", 5.37]
+                ]
+              },
+              "gpu": {
+                "frames": 14,
+                "total": 167.889,
+                "median": 14.968,
+                "p95": 17.887
+              },
+              "long": 11,
+              "video": {
+                "dropped": 0,
+                "total": 16,
+                "observedMs": 717
+              },
+              "window": {
+                "start": 22838.800000000745,
+                "closed": 28846.300000000745,
+                "read": 28847.800000000745,
+                "interactive": 7915.9000000003725,
+                "response": 6663.4000000003725,
+                "clockBracketMs": 1.599999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 100.41547600975471,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -28.015,
+              "cdpMedian": 0,
+              "cdpP95": 0.712,
+              "g11Cpu": -13.8,
+              "g11Median": 0.3,
+              "g11P95": -1.9,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": -7
+            }
+          },
+          {
+            "pair": 2,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 73,
+                "total": 265.1,
+                "median": 1.9,
+                "p95": 13.4
+              },
+              "cdp": {
+                "frames": 298,
+                "total": 253.023,
+                "median": 0,
+                "p95": 4.341,
+                "start": 27368.740999998525,
+                "end": 33832.6799999997,
+                "topSelf": [
+                  ["fixedContainingBlock", 71.79],
+                  ["(anonymous)", 66.65],
+                  ["contextChain", 15.98],
+                  ["sampleScroll", 10.3],
+                  ["same", 5.58]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 200.819,
+                "median": 14.266,
+                "p95": 17.16
+              },
+              "long": 10,
+              "video": {
+                "dropped": 0,
+                "total": 17,
+                "observedMs": 783
+              },
+              "window": {
+                "start": 27813.900000000373,
+                "closed": 33827.20000000112,
+                "read": 33828.70000000112,
+                "interactive": 1507.4000000003725,
+                "response": 106.70000000111759,
+                "clockBracketMs": 3.200000001117587,
+                "reportedClock": true
+              },
+              "flightPx": 184.97982364639125,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 79,
+                "total": 280.6,
+                "median": 1.9,
+                "p95": 15.5
+              },
+              "cdp": {
+                "frames": 300,
+                "total": 227.275,
+                "median": 0,
+                "p95": 3.734,
+                "start": 19575.226999999955,
+                "end": 25985.9729999993,
+                "topSelf": [
+                  ["fixedContainingBlock", 63.64],
+                  ["(anonymous)", 56.93],
+                  ["contextChain", 10.81],
+                  ["rank2", 9.08],
+                  ["paint", 6.61]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 151.339,
+                "median": 15.286,
+                "p95": 18.284
+              },
+              "long": 8,
+              "video": {
+                "dropped": 0,
+                "total": 17,
+                "observedMs": 750
+              },
+              "window": {
+                "start": 19971.300000000745,
+                "closed": 25980.199999999255,
+                "read": 25981.699999999255,
+                "interactive": 1569.9000000003725,
+                "response": 115.90000000037253,
+                "clockBracketMs": 2.400000000372529,
+                "reportedClock": true
+              },
+              "flightPx": 225.41809245544155,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -25.748,
+              "cdpMedian": 0,
+              "cdpP95": -0.607,
+              "g11Cpu": 15.5,
+              "g11Median": 0,
+              "g11P95": 2.1,
+              "long": -2,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          },
+          {
+            "pair": 3,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 80,
+                "total": 292,
+                "median": 2.2,
+                "p95": 13.1
+              },
+              "cdp": {
+                "frames": 297,
+                "total": 258.255,
+                "median": 0,
+                "p95": 4.139,
+                "start": 23175.572999998927,
+                "end": 29504.425999999046,
+                "topSelf": [
+                  ["(anonymous)", 69.91],
+                  ["fixedContainingBlock", 60.9],
+                  ["contextChain", 11.37],
+                  ["paint", 9.21],
+                  ["rank2", 7.25]
+                ]
+              },
+              "gpu": {
+                "frames": 16,
+                "total": 157.167,
+                "median": 13.266,
+                "p95": 18.543
+              },
+              "long": 10,
+              "video": {
+                "dropped": 0,
+                "total": 18,
+                "observedMs": 817
+              },
+              "window": {
+                "start": 23489.800000000745,
+                "closed": 29499.599999999627,
+                "read": 29501.300000000745,
+                "interactive": 8474.900000000373,
+                "response": 6752.700000001118,
+                "clockBracketMs": 2.099999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 150.3981126382783,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 72,
+                "total": 338.8,
+                "median": 2.5,
+                "p95": 17.5
+              },
+              "cdp": {
+                "frames": 301,
+                "total": 292.63,
+                "median": 0,
+                "p95": 4.277,
+                "start": 19755.88899999857,
+                "end": 26306.661999998614,
+                "topSelf": [
+                  ["fixedContainingBlock", 92.84],
+                  ["(anonymous)", 72.49],
+                  ["contextChain", 15.22],
+                  ["beneathPlace", 9.44],
+                  ["nearestScroller", 7.03]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 211.191,
+                "median": 14.988,
+                "p95": 20.042
+              },
+              "long": 8,
+              "video": {
+                "dropped": 0,
+                "total": 17,
+                "observedMs": 800
+              },
+              "window": {
+                "start": 20290.800000000745,
+                "closed": 26297.200000001118,
+                "read": 26301.10000000149,
+                "interactive": 1479.2000000011176,
+                "response": 140.80000000074506,
+                "clockBracketMs": 6,
+                "reportedClock": true
+              },
+              "flightPx": 85.38499666949693,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 34.375,
+              "cdpMedian": 0,
+              "cdpP95": 0.138,
+              "g11Cpu": 46.8,
+              "g11Median": 0.3,
+              "g11P95": 4.4,
+              "long": -2,
+              "dropped": 0,
+              "videoTotal": -1
+            }
+          },
+          {
+            "pair": 4,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 98,
+                "total": 365.4,
+                "median": 2.2,
+                "p95": 14.8
+              },
+              "cdp": {
+                "frames": 299,
+                "total": 312.998,
+                "median": 0,
+                "p95": 5.302,
+                "start": 19581.997999999672,
+                "end": 25994.404000001028,
+                "topSelf": [
+                  ["fixedContainingBlock", 85.91],
+                  ["(anonymous)", 80.14],
+                  ["contextChain", 12.17],
+                  ["applyLayout", 10.91],
+                  ["same", 8.3]
+                ]
+              },
+              "gpu": {
+                "frames": 21,
+                "total": 291.206,
+                "median": 15.859,
+                "p95": 21.455
+              },
+              "long": 10,
+              "video": {
+                "dropped": 0,
+                "total": 25,
+                "observedMs": 1083
+              },
+              "window": {
+                "start": 19987,
+                "closed": 25989.89999999851,
+                "read": 25991.299999998882,
+                "interactive": 1467.699999999255,
+                "response": 118.69999999925494,
+                "clockBracketMs": 1.3999999985098839,
+                "reportedClock": true
+              },
+              "flightPx": 61.270775335034315,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 78,
+                "total": 313.8,
+                "median": 2.2,
+                "p95": 14.3
+              },
+              "cdp": {
+                "frames": 296,
+                "total": 252.243,
+                "median": 0,
+                "p95": 4.049,
+                "start": 19554.914000000805,
+                "end": 25904.710000000894,
+                "topSelf": [
+                  ["fixedContainingBlock", 69.92],
+                  ["(anonymous)", 66.18],
+                  ["contextChain", 12.29],
+                  ["capture", 5.73],
+                  ["paint", 5.66]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 220.809,
+                "median": 15.727,
+                "p95": 18.015
+              },
+              "long": 12,
+              "video": {
+                "dropped": 0,
+                "total": 17,
+                "observedMs": 800
+              },
+              "window": {
+                "start": 19896.299999998882,
+                "closed": 25898.299999998882,
+                "read": 25902,
+                "interactive": 1571.4000000003725,
+                "response": 114.79999999888241,
+                "clockBracketMs": 2,
+                "reportedClock": true
+              },
+              "flightPx": 84.40669688191585,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -60.755,
+              "cdpMedian": 0,
+              "cdpP95": -1.253,
+              "g11Cpu": -51.6,
+              "g11Median": 0,
+              "g11P95": -0.5,
+              "long": 2,
+              "dropped": 0,
+              "videoTotal": -8
+            }
+          },
+          {
+            "pair": 5,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 74,
+                "total": 329.4,
+                "median": 3.1,
+                "p95": 15.5
+              },
+              "cdp": {
+                "frames": 293,
+                "total": 281.568,
+                "median": 0,
+                "p95": 4.955,
+                "start": 19525.17100000009,
+                "end": 25935.337999999523,
+                "topSelf": [
+                  ["fixedContainingBlock", 97.02],
+                  ["(anonymous)", 63.52],
+                  ["beneathPlace", 7.94],
+                  ["contextChain", 7.3],
+                  ["sampleScroll", 6.97]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 206.182,
+                "median": 16.561,
+                "p95": 18.041
+              },
+              "long": 9,
+              "video": {
+                "dropped": 0,
+                "total": 17,
+                "observedMs": 785
+              },
+              "window": {
+                "start": 19927,
+                "closed": 25931.299999998882,
+                "read": 25932.799999998882,
+                "interactive": 1538.2999999988824,
+                "response": 117.89999999850988,
+                "clockBracketMs": 1.400000000372529,
+                "reportedClock": true
+              },
+              "flightPx": 69.6053642924254,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 89,
+                "total": 342,
+                "median": 2.5,
+                "p95": 18.8
+              },
+              "cdp": {
+                "frames": 291,
+                "total": 281,
+                "median": 0,
+                "p95": 4.797,
+                "start": 19519.61199999973,
+                "end": 25869.219999998808,
+                "topSelf": [
+                  ["fixedContainingBlock", 73.18],
+                  ["(anonymous)", 71.67],
+                  ["contextChain", 9.28],
+                  ["same", 7.43],
+                  ["fixedAncestor", 7.41]
+                ]
+              },
+              "gpu": {
+                "frames": 18,
+                "total": 272.038,
+                "median": 15.455,
+                "p95": 18.471
+              },
+              "long": 12,
+              "video": {
+                "dropped": 0,
+                "total": 21,
+                "observedMs": 950
+              },
+              "window": {
+                "start": 19855.699999999255,
+                "closed": 25863,
+                "read": 25864.5,
+                "interactive": 1606.5,
+                "response": 126.30000000074506,
+                "clockBracketMs": 4.099999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 228.3685514962601,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -0.568,
+              "cdpMedian": 0,
+              "cdpP95": -0.158,
+              "g11Cpu": 12.6,
+              "g11Median": -0.6,
+              "g11P95": 3.3,
+              "long": 3,
+              "dropped": 0,
+              "videoTotal": 4
+            }
+          },
+          {
+            "pair": 6,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 71,
+                "total": 363.2,
+                "median": 3.8,
+                "p95": 16.9
+              },
+              "cdp": {
+                "frames": 294,
+                "total": 295.612,
+                "median": 0,
+                "p95": 5.396,
+                "start": 19855.523000000045,
+                "end": 26434.721999999136,
+                "topSelf": [
+                  ["fixedContainingBlock", 81.43],
+                  ["(anonymous)", 58.28],
+                  ["contextChain", 13.14],
+                  ["fixedAncestor", 7.76],
+                  ["rank2", 7.39]
+                ]
+              },
+              "gpu": {
+                "frames": 13,
+                "total": 179.31,
+                "median": 14.098,
+                "p95": 21.17
+              },
+              "long": 9,
+              "video": {
+                "dropped": 0,
+                "total": 15,
+                "observedMs": 717
+              },
+              "window": {
+                "start": 20427.799999998882,
+                "closed": 26428.39999999851,
+                "read": 26431.199999999255,
+                "interactive": 1325,
+                "response": 113.89999999850988,
+                "clockBracketMs": 1.400000000372529,
+                "reportedClock": true
+              },
+              "flightPx": 92.64140506080759,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 79,
+                "total": 260.3,
+                "median": 1.8,
+                "p95": 13
+              },
+              "cdp": {
+                "frames": 307,
+                "total": 212.117,
+                "median": 0,
+                "p95": 3.226,
+                "start": 19688.219000000507,
+                "end": 26052.865000000224,
+                "topSelf": [
+                  ["fixedContainingBlock", 80.66],
+                  ["(anonymous)", 38.96],
+                  ["same", 11.93],
+                  ["applyLayout", 7.41],
+                  ["rank2", 7.34]
+                ]
+              },
+              "gpu": {
+                "frames": 17,
+                "total": 145.551,
+                "median": 8.853,
+                "p95": 20.713
+              },
+              "long": 9,
+              "video": {
+                "dropped": 0,
+                "total": 19,
+                "observedMs": 833
+              },
+              "window": {
+                "start": 20038.5,
+                "closed": 26049,
+                "read": 26050.400000000373,
+                "interactive": 1916.0999999996275,
+                "response": 586.7999999988824,
+                "clockBracketMs": 1.099999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 96.64422360923207,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -83.495,
+              "cdpMedian": 0,
+              "cdpP95": -2.17,
+              "g11Cpu": -102.9,
+              "g11Median": -2,
+              "g11P95": -3.9,
+              "long": 0,
+              "dropped": 0,
+              "videoTotal": 4
+            }
+          },
+          {
+            "pair": 7,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 81,
+                "total": 365.4,
+                "median": 2.7,
+                "p95": 14
+              },
+              "cdp": {
+                "frames": 294,
+                "total": 330.356,
+                "median": 0,
+                "p95": 5.543,
+                "start": 19756.5979999993,
+                "end": 26269.387999998406,
+                "topSelf": [
+                  ["fixedContainingBlock", 94.64],
+                  ["(anonymous)", 71.05],
+                  ["contextChain", 11.27],
+                  ["paint", 9.64],
+                  ["applyLayout", 8.77]
+                ]
+              },
+              "gpu": {
+                "frames": 16,
+                "total": 232.406,
+                "median": 15.31,
+                "p95": 17.312
+              },
+              "long": 10,
+              "video": {
+                "dropped": 0,
+                "total": 19,
+                "observedMs": 883
+              },
+              "window": {
+                "start": 20252.900000000373,
+                "closed": 26263.5,
+                "read": 26265.200000001118,
+                "interactive": 1444.6000000014901,
+                "response": 124.5,
+                "clockBracketMs": 2.300000000745058,
+                "reportedClock": true
+              },
+              "flightPx": 98.03901611930134,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 83,
+                "total": 336.8,
+                "median": 2.6,
+                "p95": 12.4
+              },
+              "cdp": {
+                "frames": 295,
+                "total": 276.212,
+                "median": 0,
+                "p95": 4.472,
+                "start": 24329.178000001237,
+                "end": 30843.91300000064,
+                "topSelf": [
+                  ["fixedContainingBlock", 83],
+                  ["(anonymous)", 59.8],
+                  ["applyLayout", 9.69],
+                  ["overlaySlot", 6.76],
+                  ["paint", 6.74]
+                ]
+              },
+              "gpu": {
+                "frames": 17,
+                "total": 198.495,
+                "median": 15.439,
+                "p95": 18.864
+              },
+              "long": 9,
+              "video": {
+                "dropped": 0,
+                "total": 20,
+                "observedMs": 880
+              },
+              "window": {
+                "start": 24826.60000000149,
+                "closed": 30835.300000000745,
+                "read": 30838,
+                "interactive": 1426.800000000745,
+                "response": 150.90000000037253,
+                "clockBracketMs": 1.699999999254942,
+                "reportedClock": true
+              },
+              "flightPx": 111.47057772015728,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -54.144,
+              "cdpMedian": 0,
+              "cdpP95": -1.071,
+              "g11Cpu": -28.6,
+              "g11Median": -0.1,
+              "g11P95": -1.6,
+              "long": -1,
+              "dropped": 0,
+              "videoTotal": 1
+            }
+          },
+          {
+            "pair": 8,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 76,
+                "total": 381.5,
+                "median": 2.7,
+                "p95": 18.1
+              },
+              "cdp": {
+                "frames": 287,
+                "total": 327.746,
+                "median": 0,
+                "p95": 6.777,
+                "start": 19783.460000000894,
+                "end": 26279.811000000685,
+                "topSelf": [
+                  ["(anonymous)", 100.55],
+                  ["fixedContainingBlock", 98.02],
+                  ["flush", 9.23],
+                  ["contextChain", 8.35],
+                  ["applyLayout", 7.52]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 196.627,
+                "median": 14.022,
+                "p95": 16.542
+              },
+              "long": 11,
+              "video": {
+                "dropped": 0,
+                "total": 18,
+                "observedMs": 832
+              },
+              "window": {
+                "start": 20265.699999999255,
+                "closed": 26271.900000000373,
+                "read": 26276.599999999627,
+                "interactive": 1236.4000000003725,
+                "response": 129.59999999962747,
+                "clockBracketMs": 3.099999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 96.01936272220372,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 84,
+                "total": 343.3,
+                "median": 2.3,
+                "p95": 17.3
+              },
+              "cdp": {
+                "frames": 293,
+                "total": 295.339,
+                "median": 0,
+                "p95": 4.872,
+                "start": 20110.840000001714,
+                "end": 26506.338000001386,
+                "topSelf": [
+                  ["fixedContainingBlock", 84.66],
+                  ["(anonymous)", 66.58],
+                  ["rank2", 12.89],
+                  ["applyLayout", 11.96],
+                  ["beneathPlace", 10.86]
+                ]
+              },
+              "gpu": {
+                "frames": 18,
+                "total": 198.01,
+                "median": 13.929,
+                "p95": 20.549
+              },
+              "long": 10,
+              "video": {
+                "dropped": 0,
+                "total": 21,
+                "observedMs": 967
+              },
+              "window": {
+                "start": 20497.900000000373,
+                "closed": 26500.60000000149,
+                "read": 26503.300000000745,
+                "interactive": 2573.60000000149,
+                "response": 124.5,
+                "clockBracketMs": 1.099999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 80.21643086830777,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -32.407,
+              "cdpMedian": 0,
+              "cdpP95": -1.905,
+              "g11Cpu": -38.2,
+              "g11Median": -0.4,
+              "g11P95": -0.8,
+              "long": -1,
+              "dropped": 0,
+              "videoTotal": 3
+            }
+          }
+        ],
+        "AB": [
+          {
+            "pair": 1,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 87,
+                "total": 322.8,
+                "median": 2.2,
+                "p95": 16.2
+              },
+              "cdp": {
+                "frames": 291,
+                "total": 266.096,
+                "median": 0,
+                "p95": 3.362,
+                "start": 37658.40699999966,
+                "end": 44067.87799999863,
+                "topSelf": [
+                  ["fixedContainingBlock", 70.36],
+                  ["(anonymous)", 67.58],
+                  ["rank2", 11.88],
+                  ["contextChain", 10.63],
+                  ["applyLayout", 5.28]
+                ]
+              },
+              "gpu": {
+                "frames": 20,
+                "total": 219.067,
+                "median": 16.005,
+                "p95": 18.82
+              },
+              "long": 11,
+              "video": {
+                "dropped": 0,
+                "total": 23,
+                "observedMs": 1018
+              },
+              "window": {
+                "start": 38057.5,
+                "closed": 44062.199999999255,
+                "read": 44063.699999999255,
+                "interactive": 2168.5,
+                "response": 940.5,
+                "clockBracketMs": 1.5,
+                "reportedClock": true
+              },
+              "flightPx": 78.91226462225312,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 86,
+                "total": 358.8,
+                "median": 2.1,
+                "p95": 14.1
+              },
+              "cdp": {
+                "frames": 280,
+                "total": 268.873,
+                "median": 0,
+                "p95": 5.643,
+                "start": 19679.4990000017,
+                "end": 26090.795000001788,
+                "topSelf": [
+                  ["(anonymous)", 76.87],
+                  ["fixedContainingBlock", 56.4],
+                  ["contextChain", 11.96],
+                  ["capture", 11.46],
+                  ["rank2", 7.29]
+                ]
+              },
+              "gpu": {
+                "frames": 16,
+                "total": 223.674,
+                "median": 15.646,
+                "p95": 18.275
+              },
+              "long": 14,
+              "video": {
+                "dropped": 0,
+                "total": 18,
+                "observedMs": 817
+              },
+              "window": {
+                "start": 20079.400000000373,
+                "closed": 26083.200000001118,
+                "read": 26085.60000000149,
+                "interactive": 1488.1000000014901,
+                "response": 352.1000000014901,
+                "clockBracketMs": 5.199999999254942,
+                "reportedClock": true
+              },
+              "flightPx": 58.65605021276578,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 2.777,
+              "cdpMedian": 0,
+              "cdpP95": 2.281,
+              "g11Cpu": 36,
+              "g11Median": -0.1,
+              "g11P95": -2.1,
+              "long": 3,
+              "dropped": 0,
+              "videoTotal": -5
+            }
+          },
+          {
+            "pair": 2,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 73,
+                "total": 265.1,
+                "median": 1.9,
+                "p95": 13.4
+              },
+              "cdp": {
+                "frames": 298,
+                "total": 253.023,
+                "median": 0,
+                "p95": 4.341,
+                "start": 27368.740999998525,
+                "end": 33832.6799999997,
+                "topSelf": [
+                  ["fixedContainingBlock", 71.79],
+                  ["(anonymous)", 66.65],
+                  ["contextChain", 15.98],
+                  ["sampleScroll", 10.3],
+                  ["same", 5.58]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 200.819,
+                "median": 14.266,
+                "p95": 17.16
+              },
+              "long": 10,
+              "video": {
+                "dropped": 0,
+                "total": 17,
+                "observedMs": 783
+              },
+              "window": {
+                "start": 27813.900000000373,
+                "closed": 33827.20000000112,
+                "read": 33828.70000000112,
+                "interactive": 1507.4000000003725,
+                "response": 106.70000000111759,
+                "clockBracketMs": 3.200000001117587,
+                "reportedClock": true
+              },
+              "flightPx": 184.97982364639125,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 75,
+                "total": 347.4,
+                "median": 2.1,
+                "p95": 15.7
+              },
+              "cdp": {
+                "frames": 280,
+                "total": 268.802,
+                "median": 0,
+                "p95": 5.018,
+                "start": 19674.852000001818,
+                "end": 26086.450000001118,
+                "topSelf": [
+                  ["fixedContainingBlock", 83.47],
+                  ["(anonymous)", 65.41],
+                  ["contextChain", 12.69],
+                  ["applyLayout", 10.43],
+                  ["capture", 6.06]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 207.033,
+                "median": 16.694,
+                "p95": 20.068
+              },
+              "long": 12,
+              "video": {
+                "dropped": 0,
+                "total": 16,
+                "observedMs": 750
+              },
+              "window": {
+                "start": 20074,
+                "closed": 26080.799999998882,
+                "read": 26082.299999998882,
+                "interactive": 1948.5,
+                "response": 113.5,
+                "clockBracketMs": 2,
+                "reportedClock": true
+              },
+              "flightPx": 81.15581229425669,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 15.779,
+              "cdpMedian": 0,
+              "cdpP95": 0.677,
+              "g11Cpu": 82.3,
+              "g11Median": 0.2,
+              "g11P95": 2.3,
+              "long": 2,
+              "dropped": 0,
+              "videoTotal": -1
+            }
+          },
+          {
+            "pair": 3,
+            "trial": 2,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 73,
+                "total": 294.3,
+                "median": 2,
+                "p95": 16.7
+              },
+              "cdp": {
+                "frames": 298,
+                "total": 257.864,
+                "median": 0,
+                "p95": 3.463,
+                "start": 36397.97900000028,
+                "end": 42823.5,
+                "topSelf": [
+                  ["fixedContainingBlock", 97.68],
+                  ["(anonymous)", 57.15],
+                  ["contextChain", 7.92],
+                  ["rank2", 4.99],
+                  ["nearestScroller", 4.86]
+                ]
+              },
+              "gpu": {
+                "frames": 16,
+                "total": 114.879,
+                "median": 2.491,
+                "p95": 19.067
+              },
+              "long": 9,
+              "video": {
+                "dropped": 0,
+                "total": 19,
+                "observedMs": 850
+              },
+              "window": {
+                "start": 36814.70000000112,
+                "closed": 42818.20000000112,
+                "read": 42819.70000000112,
+                "interactive": 8111.9000000003725,
+                "response": 6769.5,
+                "clockBracketMs": 1.400000000372529,
+                "reportedClock": true
+              },
+              "flightPx": 94.38300488609231,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 101,
+                "total": 405.6,
+                "median": 2.4,
+                "p95": 15.3
+              },
+              "cdp": {
+                "frames": 279,
+                "total": 360.012,
+                "median": 0,
+                "p95": 6.293,
+                "start": 19514.180999999866,
+                "end": 25921.133999999613,
+                "topSelf": [
+                  ["fixedContainingBlock", 101.24],
+                  ["(anonymous)", 96.53],
+                  ["contextChain", 11.88],
+                  ["applyLayout", 11.81],
+                  ["paint", 10.48]
+                ]
+              },
+              "gpu": {
+                "frames": 20,
+                "total": 246.873,
+                "median": 15.285,
+                "p95": 17.527
+              },
+              "long": 12,
+              "video": {
+                "dropped": 0,
+                "total": 23,
+                "observedMs": 1017
+              },
+              "window": {
+                "start": 19909.199999999255,
+                "closed": 25915.5,
+                "read": 25916.900000000373,
+                "interactive": 1606.199999999255,
+                "response": 778.8000000007451,
+                "clockBracketMs": 8.400000000372529,
+                "reportedClock": true
+              },
+              "flightPx": 63.09461289033517,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 102.148,
+              "cdpMedian": 0,
+              "cdpP95": 2.83,
+              "g11Cpu": 111.3,
+              "g11Median": 0.4,
+              "g11P95": -1.4,
+              "long": 3,
+              "dropped": 0,
+              "videoTotal": 4
+            }
+          },
+          {
+            "pair": 4,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 98,
+                "total": 365.4,
+                "median": 2.2,
+                "p95": 14.8
+              },
+              "cdp": {
+                "frames": 299,
+                "total": 312.998,
+                "median": 0,
+                "p95": 5.302,
+                "start": 19581.997999999672,
+                "end": 25994.404000001028,
+                "topSelf": [
+                  ["fixedContainingBlock", 85.91],
+                  ["(anonymous)", 80.14],
+                  ["contextChain", 12.17],
+                  ["applyLayout", 10.91],
+                  ["same", 8.3]
+                ]
+              },
+              "gpu": {
+                "frames": 21,
+                "total": 291.206,
+                "median": 15.859,
+                "p95": 21.455
+              },
+              "long": 10,
+              "video": {
+                "dropped": 0,
+                "total": 25,
+                "observedMs": 1083
+              },
+              "window": {
+                "start": 19987,
+                "closed": 25989.89999999851,
+                "read": 25991.299999998882,
+                "interactive": 1467.699999999255,
+                "response": 118.69999999925494,
+                "clockBracketMs": 1.3999999985098839,
+                "reportedClock": true
+              },
+              "flightPx": 61.270775335034315,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 83,
+                "total": 369,
+                "median": 2.5,
+                "p95": 16.7
+              },
+              "cdp": {
+                "frames": 276,
+                "total": 308.535,
+                "median": 0,
+                "p95": 4.907,
+                "start": 19771.332999998704,
+                "end": 26235.117999998853,
+                "topSelf": [
+                  ["fixedContainingBlock", 83],
+                  ["(anonymous)", 75.53],
+                  ["contextChain", 12.59],
+                  ["same", 12.5],
+                  ["beneathPlace", 10.3]
+                ]
+              },
+              "gpu": {
+                "frames": 16,
+                "total": 240.562,
+                "median": 15.479,
+                "p95": 18.366
+              },
+              "long": 12,
+              "video": {
+                "dropped": 0,
+                "total": 18,
+                "observedMs": 798
+              },
+              "window": {
+                "start": 20218.299999998882,
+                "closed": 26230.799999998882,
+                "read": 26232.299999998882,
+                "interactive": 1550.0999999996275,
+                "response": 112.09999999962747,
+                "clockBracketMs": 1.5,
+                "reportedClock": true
+              },
+              "flightPx": 127.85348995071715,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -4.463,
+              "cdpMedian": 0,
+              "cdpP95": -0.395,
+              "g11Cpu": 3.6,
+              "g11Median": 0.3,
+              "g11P95": 1.9,
+              "long": 2,
+              "dropped": 0,
+              "videoTotal": -7
+            }
+          },
+          {
+            "pair": 5,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 74,
+                "total": 329.4,
+                "median": 3.1,
+                "p95": 15.5
+              },
+              "cdp": {
+                "frames": 293,
+                "total": 281.568,
+                "median": 0,
+                "p95": 4.955,
+                "start": 19525.17100000009,
+                "end": 25935.337999999523,
+                "topSelf": [
+                  ["fixedContainingBlock", 97.02],
+                  ["(anonymous)", 63.52],
+                  ["beneathPlace", 7.94],
+                  ["contextChain", 7.3],
+                  ["sampleScroll", 6.97]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 206.182,
+                "median": 16.561,
+                "p95": 18.041
+              },
+              "long": 9,
+              "video": {
+                "dropped": 0,
+                "total": 17,
+                "observedMs": 785
+              },
+              "window": {
+                "start": 19927,
+                "closed": 25931.299999998882,
+                "read": 25932.799999998882,
+                "interactive": 1538.2999999988824,
+                "response": 117.89999999850988,
+                "clockBracketMs": 1.400000000372529,
+                "reportedClock": true
+              },
+              "flightPx": 69.6053642924254,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 91,
+                "total": 385.8,
+                "median": 2.6,
+                "p95": 17.1
+              },
+              "cdp": {
+                "frames": 277,
+                "total": 320.343,
+                "median": 0,
+                "p95": 6.176,
+                "start": 19507.940999999642,
+                "end": 25920.87199999951,
+                "topSelf": [
+                  ["(anonymous)", 89.19],
+                  ["fixedContainingBlock", 73],
+                  ["applyLayout", 12.11],
+                  ["contextChain", 11.16],
+                  ["rank2", 9.21]
+                ]
+              },
+              "gpu": {
+                "frames": 18,
+                "total": 273.507,
+                "median": 16.642,
+                "p95": 22.582
+              },
+              "long": 15,
+              "video": {
+                "dropped": 0,
+                "total": 21,
+                "observedMs": 933
+              },
+              "window": {
+                "start": 19910,
+                "closed": 25915.60000000149,
+                "read": 25917.200000001118,
+                "interactive": 1659.4000000003725,
+                "response": 140.90000000037253,
+                "clockBracketMs": 1.6000000014901161,
+                "reportedClock": true
+              },
+              "flightPx": 57.66628681270908,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 38.775,
+              "cdpMedian": 0,
+              "cdpP95": 1.221,
+              "g11Cpu": 56.4,
+              "g11Median": -0.5,
+              "g11P95": 1.6,
+              "long": 6,
+              "dropped": 0,
+              "videoTotal": 4
+            }
+          },
+          {
+            "pair": 6,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 71,
+                "total": 363.2,
+                "median": 3.8,
+                "p95": 16.9
+              },
+              "cdp": {
+                "frames": 294,
+                "total": 295.612,
+                "median": 0,
+                "p95": 5.396,
+                "start": 19855.523000000045,
+                "end": 26434.721999999136,
+                "topSelf": [
+                  ["fixedContainingBlock", 81.43],
+                  ["(anonymous)", 58.28],
+                  ["contextChain", 13.14],
+                  ["fixedAncestor", 7.76],
+                  ["rank2", 7.39]
+                ]
+              },
+              "gpu": {
+                "frames": 13,
+                "total": 179.31,
+                "median": 14.098,
+                "p95": 21.17
+              },
+              "long": 9,
+              "video": {
+                "dropped": 0,
+                "total": 15,
+                "observedMs": 717
+              },
+              "window": {
+                "start": 20427.799999998882,
+                "closed": 26428.39999999851,
+                "read": 26431.199999999255,
+                "interactive": 1325,
+                "response": 113.89999999850988,
+                "clockBracketMs": 1.400000000372529,
+                "reportedClock": true
+              },
+              "flightPx": 92.64140506080759,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 90,
+                "total": 379.1,
+                "median": 2.1,
+                "p95": 18.2
+              },
+              "cdp": {
+                "frames": 271,
+                "total": 306.05,
+                "median": 0,
+                "p95": 6.251,
+                "start": 19959.435999998823,
+                "end": 26295.026999998838,
+                "topSelf": [
+                  ["fixedContainingBlock", 89.52],
+                  ["(anonymous)", 71.6],
+                  ["same", 12.54],
+                  ["rank2", 9.3],
+                  ["contextChain", 7.14]
+                ]
+              },
+              "gpu": {
+                "frames": 17,
+                "total": 166.119,
+                "median": 15.292,
+                "p95": 17.26
+              },
+              "long": 13,
+              "video": {
+                "dropped": 0,
+                "total": 20,
+                "observedMs": 867
+              },
+              "window": {
+                "start": 20276.700000001118,
+                "closed": 26281.10000000149,
+                "read": 26284.5,
+                "interactive": 2616.4000000003725,
+                "response": 1422.7000000011176,
+                "clockBracketMs": 3.099999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 90.12112075562531,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 10.438,
+              "cdpMedian": 0,
+              "cdpP95": 0.855,
+              "g11Cpu": 15.9,
+              "g11Median": -1.7,
+              "g11P95": 1.3,
+              "long": 4,
+              "dropped": 0,
+              "videoTotal": 5
+            }
+          },
+          {
+            "pair": 7,
+            "trial": 1,
+            "order": ["A0", "A1", "B"],
+            "A": {
+              "g11": {
+                "frames": 81,
+                "total": 365.4,
+                "median": 2.7,
+                "p95": 14
+              },
+              "cdp": {
+                "frames": 294,
+                "total": 330.356,
+                "median": 0,
+                "p95": 5.543,
+                "start": 19756.5979999993,
+                "end": 26269.387999998406,
+                "topSelf": [
+                  ["fixedContainingBlock", 94.64],
+                  ["(anonymous)", 71.05],
+                  ["contextChain", 11.27],
+                  ["paint", 9.64],
+                  ["applyLayout", 8.77]
+                ]
+              },
+              "gpu": {
+                "frames": 16,
+                "total": 232.406,
+                "median": 15.31,
+                "p95": 17.312
+              },
+              "long": 10,
+              "video": {
+                "dropped": 0,
+                "total": 19,
+                "observedMs": 883
+              },
+              "window": {
+                "start": 20252.900000000373,
+                "closed": 26263.5,
+                "read": 26265.200000001118,
+                "interactive": 1444.6000000014901,
+                "response": 124.5,
+                "clockBracketMs": 2.300000000745058,
+                "reportedClock": true
+              },
+              "flightPx": 98.03901611930134,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 92,
+                "total": 527.2,
+                "median": 3,
+                "p95": 21.4
+              },
+              "cdp": {
+                "frames": 247,
+                "total": 416.928,
+                "median": 0,
+                "p95": 8.041,
+                "start": 23124.912000000477,
+                "end": 29579.028999999166,
+                "topSelf": [
+                  ["fixedContainingBlock", 126.37],
+                  ["(anonymous)", 83.87],
+                  ["paint", 19.33],
+                  ["contextChain", 12.53],
+                  ["seal", 9.94]
+                ]
+              },
+              "gpu": {
+                "frames": 18,
+                "total": 239.804,
+                "median": 14.022,
+                "p95": 16.174
+              },
+              "long": 16,
+              "video": {
+                "dropped": 0,
+                "total": 20,
+                "observedMs": 917
+              },
+              "window": {
+                "start": 23563.300000000745,
+                "closed": 29572.5,
+                "read": 29574.599999999627,
+                "interactive": 8189.4000000003725,
+                "response": 6660.9000000003725,
+                "clockBracketMs": 3.700000001117587,
+                "reportedClock": true
+              },
+              "flightPx": 81.15918001064327,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": 86.572,
+              "cdpMedian": 0,
+              "cdpP95": 2.498,
+              "g11Cpu": 161.8,
+              "g11Median": 0.3,
+              "g11P95": 7.4,
+              "long": 6,
+              "dropped": 0,
+              "videoTotal": 1
+            }
+          },
+          {
+            "pair": 8,
+            "trial": 1,
+            "order": ["B", "A1", "A0"],
+            "A": {
+              "g11": {
+                "frames": 76,
+                "total": 381.5,
+                "median": 2.7,
+                "p95": 18.1
+              },
+              "cdp": {
+                "frames": 287,
+                "total": 327.746,
+                "median": 0,
+                "p95": 6.777,
+                "start": 19783.460000000894,
+                "end": 26279.811000000685,
+                "topSelf": [
+                  ["(anonymous)", 100.55],
+                  ["fixedContainingBlock", 98.02],
+                  ["flush", 9.23],
+                  ["contextChain", 8.35],
+                  ["applyLayout", 7.52]
+                ]
+              },
+              "gpu": {
+                "frames": 15,
+                "total": 196.627,
+                "median": 14.022,
+                "p95": 16.542
+              },
+              "long": 11,
+              "video": {
+                "dropped": 0,
+                "total": 18,
+                "observedMs": 832
+              },
+              "window": {
+                "start": 20265.699999999255,
+                "closed": 26271.900000000373,
+                "read": 26276.599999999627,
+                "interactive": 1236.4000000003725,
+                "response": 129.59999999962747,
+                "clockBracketMs": 3.099999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 96.01936272220372,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "B": {
+              "g11": {
+                "frames": 89,
+                "total": 373.9,
+                "median": 2.5,
+                "p95": 15
+              },
+              "cdp": {
+                "frames": 275,
+                "total": 313.526,
+                "median": 0,
+                "p95": 4.571,
+                "start": 19622.93500000052,
+                "end": 26098.547000000253,
+                "topSelf": [
+                  ["(anonymous)", 83.62],
+                  ["fixedContainingBlock", 62.54],
+                  ["contextChain", 14.19],
+                  ["paint", 12.92],
+                  ["applyLayout", 10.47]
+                ]
+              },
+              "gpu": {
+                "frames": 16,
+                "total": 194.683,
+                "median": 14.236,
+                "p95": 17.049
+              },
+              "long": 14,
+              "video": {
+                "dropped": 0,
+                "total": 18,
+                "observedMs": 883
+              },
+              "window": {
+                "start": 20073,
+                "closed": 26091.199999999255,
+                "read": 26095.5,
+                "interactive": 1465.699999999255,
+                "response": 129.59999999962747,
+                "clockBracketMs": 2.099999999627471,
+                "reportedClock": true
+              },
+              "flightPx": 54.098788850381155,
+              "visibleDuringSearch": true,
+              "invalid": []
+            },
+            "delta": {
+              "cdpCpu": -14.22,
+              "cdpMedian": 0,
+              "cdpP95": -2.206,
+              "g11Cpu": -7.6,
+              "g11Median": -0.2,
+              "g11P95": -3.1,
+              "long": 3,
+              "dropped": 0,
+              "videoTotal": 0
+            }
+          }
+        ]
+      }
+    }
+  },
+  "exclusions": [
+    {
+      "pair": 1,
+      "trial": 1,
+      "label": "A0",
+      "invalid": {
+        "startup": ["ad", "no video frames"]
+      }
+    },
+    {
+      "pair": 1,
+      "trial": 1,
+      "label": "A1",
+      "invalid": {
+        "startup": ["model or probe missing", "six-second window overrun", "no video frames", "CDP coverage"]
+      }
+    },
+    {
+      "pair": 2,
+      "trial": 1,
+      "label": "A0",
+      "invalid": {
+        "startup": ["ad"]
+      }
+    },
+    {
+      "pair": 3,
+      "trial": 1,
+      "label": "A0",
+      "invalid": {
+        "startup": ["model or probe missing", "six-second window overrun", "no video frames", "CDP coverage"]
+      }
+    },
+    {
+      "pair": 3,
+      "trial": 1,
+      "label": "B",
+      "invalid": {},
+      "error": "Error: g11 world missing"
+    },
+    {
+      "pair": 3,
+      "trial": 2,
+      "label": "A0",
+      "invalid": {
+        "startup": ["model or probe missing", "six-second window overrun", "no video frames", "CDP coverage"]
+      }
+    },
+    {
+      "pair": 3,
+      "trial": 2,
+      "label": "A1",
+      "invalid": {
+        "startup": ["ad"]
+      }
+    },
+    {
+      "pair": 7,
+      "trial": 1,
+      "label": "A1",
+      "invalid": {
+        "startup": ["model or probe missing", "six-second window overrun", "no video frames", "CDP coverage"]
+      }
+    },
+    {
+      "pair": 7,
+      "trial": 1,
+      "label": "B",
+      "invalid": {
+        "startup": ["model or probe missing", "six-second window overrun", "no video frames", "CDP coverage"]
+      }
+    }
+  ],
+  "environment": [
+    {
+      "pair": 1,
+      "trial": 1,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 54.65
+    },
+    {
+      "pair": 1,
+      "trial": 1,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 39.96
+    },
+    {
+      "pair": 1,
+      "trial": 1,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 31.6
+    },
+    {
+      "pair": 1,
+      "trial": 2,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 40.85
+    },
+    {
+      "pair": 1,
+      "trial": 2,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 49.79
+    },
+    {
+      "pair": 1,
+      "trial": 2,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 31.29
+    },
+    {
+      "pair": 2,
+      "trial": 1,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 49.97
+    },
+    {
+      "pair": 2,
+      "trial": 1,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 38.21
+    },
+    {
+      "pair": 2,
+      "trial": 1,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 30.76
+    },
+    {
+      "pair": 2,
+      "trial": 2,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 36.05
+    },
+    {
+      "pair": 2,
+      "trial": 2,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 39.71
+    },
+    {
+      "pair": 2,
+      "trial": 2,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 30.14
+    },
+    {
+      "pair": 3,
+      "trial": 1,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 47.53
+    },
+    {
+      "pair": 3,
+      "trial": 1,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 29.2
+    },
+    {
+      "pair": 3,
+      "trial": 1,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 42.38
+    },
+    {
+      "pair": 3,
+      "trial": 2,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 33.94
+    },
+    {
+      "pair": 3,
+      "trial": 2,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 30.84
+    },
+    {
+      "pair": 3,
+      "trial": 2,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.600000000000023,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 47.41
+    },
+    {
+      "pair": 3,
+      "trial": 3,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 33.46
+    },
+    {
+      "pair": 3,
+      "trial": 3,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 38.92
+    },
+    {
+      "pair": 3,
+      "trial": 3,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 37.94
+    },
+    {
+      "pair": 4,
+      "trial": 1,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 31.08
+    },
+    {
+      "pair": 4,
+      "trial": 1,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 33.25
+    },
+    {
+      "pair": 4,
+      "trial": 1,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 34.88
+    },
+    {
+      "pair": 5,
+      "trial": 1,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 40.62
+    },
+    {
+      "pair": 5,
+      "trial": 1,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 35.28
+    },
+    {
+      "pair": 5,
+      "trial": 1,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 37.41
+    },
+    {
+      "pair": 6,
+      "trial": 1,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 38.47
+    },
+    {
+      "pair": 6,
+      "trial": 1,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 67.47
+    },
+    {
+      "pair": 6,
+      "trial": 1,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 24.09
+    },
+    {
+      "pair": 7,
+      "trial": 1,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 46.12
+    },
+    {
+      "pair": 7,
+      "trial": 1,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 40.58
+    },
+    {
+      "pair": 7,
+      "trial": 1,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 34
+    },
+    {
+      "pair": 7,
+      "trial": 2,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 41.5
+    },
+    {
+      "pair": 7,
+      "trial": 2,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 42.45
+    },
+    {
+      "pair": 7,
+      "trial": 2,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 43.65
+    },
+    {
+      "pair": 8,
+      "trial": 1,
+      "label": "B",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 36.9
+    },
+    {
+      "pair": 8,
+      "trial": 1,
+      "label": "A1",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 45.77
+    },
+    {
+      "pair": 8,
+      "trial": 1,
+      "label": "A0",
+      "environment": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "p": 16.69999999999999,
+        "screenX": -4000,
+        "screenY": 0,
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1,
+        "visible": "visible",
+        "browser": "153.0.8010.12"
+      },
+      "backgroundCpu": 48.42
+    }
+  ]
+}

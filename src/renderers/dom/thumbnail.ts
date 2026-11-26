@@ -1,6 +1,6 @@
 /** Capture already rendered pixels. Never starts a second media player/decoder. */
 export async function captureLayerThumbnail(doc: Document, id: string): Promise<string | undefined> {
-  const root = doc.getElementById('web-world-themes-decorations')?.shadowRoot;
+  const root = doc.getElementById('around-decorations')?.shadowRoot;
   const layer = [...(root?.querySelectorAll<HTMLElement>('[data-image-id]') ?? [])].find(
     (node) => node.dataset.imageId === id,
   );

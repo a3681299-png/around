@@ -1,0 +1,194 @@
+{
+  "delta": {
+    "median": 2,
+    "p95": 2.100000001490116
+  },
+  "runs": [
+    {
+      "label": "after",
+      "eligible": true,
+      "phases": {
+        "no-character:steady": {
+          "cpu": {
+            "count": 867,
+            "median": 0,
+            "p95": 0,
+            "max": 2.700000001117587
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "video": {
+            "total": 141,
+            "dropped": 0,
+            "counterReset": false
+          },
+          "frame": {
+            "count": 874,
+            "median": 6.9315,
+            "p95": 7.452,
+            "max": 13.586
+          },
+          "clock": {
+            "source": "document-start-main-world-raf-timestamps",
+            "timeOrigin": 1793852624351.4,
+            "start": 14293.199999999255,
+            "end": 20309.299999998882,
+            "originalProbeStart": 14293.199999999255,
+            "originalProbeFrameCount": 867,
+            "beforeExtensionFrames": 0
+          },
+          "committedClock": null,
+          "kinds": {
+            "setTimeout": 15
+          },
+          "cpuMs": 25.09999999962747,
+          "accountedCpuMs": 25.09999999962747,
+          "start": {
+            "video": {
+              "total": 290,
+              "dropped": 10,
+              "paused": false,
+              "time": 11.945264,
+              "ready": 4
+            },
+            "model": null,
+            "media": null,
+            "modelErrors": null,
+            "hidden": false,
+            "ad": false,
+            "viewport": {
+              "width": 1920,
+              "height": 1080,
+              "dpr": 1
+            }
+          },
+          "finish": {
+            "video": {
+              "total": 431,
+              "dropped": 10,
+              "paused": false,
+              "time": 17.819498,
+              "ready": 4
+            },
+            "model": null,
+            "media": null,
+            "modelErrors": null,
+            "hidden": false,
+            "ad": false,
+            "viewport": {
+              "width": 1920,
+              "height": 1080,
+              "dpr": 1
+            }
+          },
+          "hiddenSamples": 0,
+          "adSamples": 0,
+          "modelSamples": 0,
+          "trace": {
+            "file": "calibration-after-no-character-steady-0.trace.json.gz",
+            "sha256": "c7f71d32fc1325cdc226a2daad62ff6c30b04893a1adf9d4f5767001879c259a"
+          },
+          "valid": true
+        }
+      }
+    },
+    {
+      "label": "busy",
+      "eligible": true,
+      "phases": {
+        "no-character:steady": {
+          "cpu": {
+            "count": 863,
+            "median": 2,
+            "p95": 2.100000001490116,
+            "max": 4.599999999627471
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "video": {
+            "total": 143,
+            "dropped": 0,
+            "counterReset": false
+          },
+          "frame": {
+            "count": 869,
+            "median": 6.947,
+            "p95": 7.854,
+            "max": 90.309
+          },
+          "clock": {
+            "source": "document-start-main-world-raf-timestamps",
+            "timeOrigin": 1793852714791.2,
+            "start": 13942,
+            "end": 19959.599999999627,
+            "originalProbeStart": 13942,
+            "originalProbeFrameCount": 863,
+            "beforeExtensionFrames": 0
+          },
+          "committedClock": null,
+          "kinds": {
+            "raf": 862,
+            "promise": 862,
+            "setTimeout": 15
+          },
+          "cpuMs": 1766.4999999981374,
+          "accountedCpuMs": 1766.4999999981374,
+          "start": {
+            "video": {
+              "total": 304,
+              "dropped": 8,
+              "paused": false,
+              "time": 12.5361,
+              "ready": 4
+            },
+            "model": null,
+            "media": null,
+            "modelErrors": null,
+            "hidden": false,
+            "ad": false,
+            "viewport": {
+              "width": 1920,
+              "height": 1080,
+              "dpr": 1
+            }
+          },
+          "finish": {
+            "video": {
+              "total": 447,
+              "dropped": 8,
+              "paused": false,
+              "time": 18.507432,
+              "ready": 4
+            },
+            "model": null,
+            "media": null,
+            "modelErrors": null,
+            "hidden": false,
+            "ad": false,
+            "viewport": {
+              "width": 1920,
+              "height": 1080,
+              "dpr": 1
+            }
+          },
+          "hiddenSamples": 0,
+          "adSamples": 0,
+          "modelSamples": 0,
+          "trace": {
+            "file": "calibration-busy-no-character-steady-0.trace.json.gz",
+            "sha256": "f4da3c822594dba56c5bb140b0d597370feab4f06430514e0cd683e6f744e2ab"
+          },
+          "valid": true
+        }
+      }
+    }
+  ]
+}

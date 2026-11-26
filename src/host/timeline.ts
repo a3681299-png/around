@@ -1,6 +1,13 @@
 import { SIGNAL_REGISTRY } from '../signals/registry';
 import { createWorldRecorder } from '../world/recording';
-import { createTakeSampler, parseSignalTake, takeDuration, TAKE_LIMITS, type SignalTake } from '../world/takes';
+import {
+  createTakeSampler,
+  parseSignalTake,
+  takeDuration,
+  takeInput,
+  TAKE_LIMITS,
+  type SignalTake,
+} from '../world/takes';
 import type { SignalRule } from '../signals/keyframes';
 import { signalValue } from '../world/signals';
 import { evaluateLayout } from '../world/layout';
@@ -9,6 +16,7 @@ import { scrollProgress } from '../world/keyframes';
 import { evaluateWorld, initialWorldState } from '../world/evaluate';
 import {
   WORLD_RUNTIME_VERSION,
+  type WorldApproach,
   type WorldInput,
   type WorldScene,
   type WorldState,
@@ -164,7 +172,7 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
     cancel();
     if (recording?.inputs.length)
       take = parseSignalTake({
-        format: 'ww-signal-take',
+        format: 'around-signal-take',
         formatVersion: 1,
         runtimeVersion: WORLD_RUNTIME_VERSION,
         id: recordingId,
@@ -300,7 +308,7 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
         emit(true);
         return;
       }
-      if (!binding) throw new Error('先に素材を配置してテーマをONにしてください。');
+      if (!binding) throw new Error('先に素材を配置し、「作品を表示する」をONにしてください。');
       if (value.type === 'record') {
         live();
         binding.refresh();
@@ -414,12 +422,13 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
           scene.signalRules?.some(
             (rule) => rule.enabled && SIGNAL_REGISTRY.definition(rule.source.signal)?.historyDependent,
           );
-        recordInput(scene, input, boundary || Boolean(historyDependent));
+        recordInput(scene, takeInput(input), boundary || Boolean(historyDependent));
         persistentSignature = signature;
       }
       if (observers.size || mode === 'recording') emit(false, false);
     },
-    preview(scene: WorldScene) {
+    /** `approach`: the live Host restriction for this frame; it joins the previewed frame only. */
+    preview(scene: WorldScene, approach?: WorldApproach) {
       if (source === 'live') return undefined;
       if (source === 'signal') {
         if (!latest) return undefined;
@@ -431,7 +440,12 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
         );
         const state = initialWorldState();
         if (preview.pointer) state.motion = { bodies: {}, pointer: preview.pointer };
-        const result = evaluateWorld(scene, state, preview.input);
+        const signal = takeInput(preview.input),
+          result = evaluateWorld(
+            scene,
+            state,
+            approach ? { ...signal, environment: { ...signal.environment, approach } } : signal,
+          );
         progress = signalPosition;
         return { ...result, input: preview.input };
       }
@@ -445,7 +459,7 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
         sampler = createTakeSampler(scene, take);
         samplerScene = scene;
       }
-      const result = sampler.at(positionMs);
+      const result = sampler.at(positionMs, approach);
       progress = driverValue(scene, result.input, result.state);
       emit(false, false);
       return result;

@@ -1,0 +1,121 @@
+{
+  "rawArtifact": {
+    "file": "performance-raw.json.gz",
+    "sha256": "f3585878e66a5bafdb1130156918de64fed6d8c81f0564660656d721fe6a0376",
+    "bytes": 347859
+  },
+  "runs": [
+    {
+      "label": "plain",
+      "build": {
+        "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\g14-verify",
+        "revision": "ed03b29c75e7997fa13d1d781350e84751131c1a",
+        "dirtySource": false,
+        "probe": "isolated-world-v3",
+        "asyncContinuations": "lowered-promises",
+        "busyMs": 0,
+        "busyAfterAwait": false,
+        "disableInk": false
+      },
+      "browser": "153.0.8010.12",
+      "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "model": false,
+      "hostCpuBefore": 0.04849765258215962,
+      "phases": {
+        "calibration": {
+          "cpuMs": {
+            "n": 820,
+            "median": 1,
+            "p95": 1.7000000029802322,
+            "max": 2.8999999910593033
+          },
+          "cpuTotalMs": 868.2999996095896,
+          "cpuMeanMs": 1.05890243854828,
+          "intervalMs": {
+            "n": 820,
+            "median": 6.75,
+            "p95": 13.700000002980232,
+            "max": 24.099999994039536
+          },
+          "callbacks": 1663,
+          "kinds": {
+            "raf": 819,
+            "microtask": 819,
+            "setTimeout": 25
+          },
+          "rawKey": "calibration/plain/calibration"
+        }
+      },
+      "networkErrors": [
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "rest": {
+        "x": 116,
+        "y": 431
+      }
+    },
+    {
+      "label": "busy",
+      "build": {
+        "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\g14-verify",
+        "revision": "ed03b29c75e7997fa13d1d781350e84751131c1a",
+        "dirtySource": false,
+        "probe": "isolated-world-v3",
+        "asyncContinuations": "lowered-promises",
+        "busyMs": 2,
+        "busyAfterAwait": false,
+        "disableInk": false
+      },
+      "browser": "153.0.8010.12",
+      "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "model": false,
+      "hostCpuBefore": 0.08356948083195209,
+      "phases": {
+        "calibration": {
+          "cpuMs": {
+            "n": 873,
+            "median": 2.9000000059604645,
+            "p95": 3.5,
+            "max": 4.4000000059604645
+          },
+          "cpuTotalMs": 2568.0999997258186,
+          "cpuMeanMs": 2.9416953032369055,
+          "intervalMs": {
+            "n": 873,
+            "median": 6.9000000059604645,
+            "p95": 8.200000002980232,
+            "max": 19.399999991059303
+          },
+          "callbacks": 2640,
+          "kinds": {
+            "raf": 1744,
+            "microtask": 872,
+            "setTimeout": 24
+          },
+          "rawKey": "calibration/busy/calibration"
+        }
+      },
+      "networkErrors": [
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "rest": {
+        "x": 116,
+        "y": 449.8984375
+      }
+    }
+  ]
+}

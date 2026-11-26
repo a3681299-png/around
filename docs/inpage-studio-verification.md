@@ -95,7 +95,7 @@
 - スクロールでプレイヤー基準の素材が追従。検索によるSPA遷移から戻っても編集を維持。
 - 編集終了後の幅復帰、保存作品の再読み込み、Studio再起動、強さ0%でのUI・作品・CSSの撤去。
 
-実行は `WW_LIVE_STUDIO_WORKSPACE=1 npm test -- tests/studio-workspace-live.spec.ts --grep "production in-page"`。再現記録は `.work/verification/studio-live-inpage.json`、ログは `inpage-live.log`。YouTubeの動画の完全再現や長期的なDOM互換を保証する検証ではない。
+実行は `AROUND_LIVE_STUDIO_WORKSPACE=1 npm test -- tests/studio-workspace-live.spec.ts --grep "production in-page"`。再現記録は `.work/verification/studio-live-inpage.json`、ログは `inpage-live.log`。YouTubeの動画の完全再現や長期的なDOM互換を保証する検証ではない。
 
 ## 性能
 

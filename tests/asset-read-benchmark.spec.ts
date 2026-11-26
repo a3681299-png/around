@@ -49,21 +49,21 @@ function image30MB() {
   ];
   const end = chunk('IEND', Buffer.alloc(0));
   const padding = 30_000_000 - parts.reduce((n, p) => n + p.length, 0) - end.length - 12;
-  return Buffer.concat([...parts, chunk('wwPD', Buffer.alloc(padding)), end]);
+  return Buffer.concat([...parts, chunk('aroundPD', Buffer.alloc(padding)), end]);
 }
 
 test('opt-in saved-source benchmark on real YouTube: reload and same-tab redisplay, five trials each', async () => {
   test.skip(
-    process.env.WW_ASSET_READ_BENCH !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_ASSET_READ_BENCH !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit real YouTube, physical GPU and private 54.5MiB VRM measurement; not a CI fixture.',
   );
   test.setTimeout(900_000);
-  const label = process.env.WW_ASSET_READ_LABEL ?? 'before';
+  const label = process.env.AROUND_ASSET_READ_LABEL ?? 'before';
   if (!/^[a-z0-9-]+$/.test(label)) throw new Error('Invalid benchmark label');
   await mkdir('.work/verification', { recursive: true });
   const image = '.work/verification/asset-read-30mb.png';
   await writeFile(image, image30MB());
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-c3-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-c3-')), false, {
     headed: true,
     width: 1920,
     height: 1080,
@@ -75,18 +75,17 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
   try {
     const control = await context.newPage();
     await control.goto('chrome://extensions/');
-    const item = control.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = control.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const extension = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await control.goto(`chrome-extension://${extension}/diagnostics/asset-benchmark.html`);
     const assets: AssetMetadata[] = [];
-    for (const file of [process.env.WW_VRM_FILE!, image, 'tests/fixtures/motion/petal.png']) {
+    for (const file of [process.env.AROUND_VRM_FILE!, image, 'tests/fixtures/motion/petal.png']) {
       await control.locator('#file').setInputFiles(path.resolve(file));
       assets.push(
         await control.evaluate(async () => {
-          const id = await (globalThis as any).wwAssetBench.seed();
-          return (await chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'get-metadata', id }))
-            .value;
+          const id = await (globalThis as any).aroundAssetBench.seed();
+          return (await chrome.runtime.sendMessage({ type: 'around:assets', action: 'get-metadata', id })).value;
         }),
       );
     }
@@ -114,14 +113,14 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
       }));
       return parseDesign(doc);
     };
-    await control.evaluate(async () => chrome.storage.local.set({ 'webWorldThemes.enabled': true }));
+    await control.evaluate(async () => chrome.storage.local.set({ 'around.showArtwork': true }));
     const page = await context.newPage();
     await page.addInitScript(() => {
       (globalThis as any).__c3Paints = [];
       const seen = new WeakSet<Element>();
       let observed: ShadowRoot | undefined;
       const ready = () => {
-        const host = document.querySelector('#web-world-themes-decorations'),
+        const host = document.querySelector('#around-decorations'),
           root = host?.shadowRoot;
         if (root && observed !== root) {
           observed = root;
@@ -153,7 +152,7 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
     ] as const) {
       const doc = documentFor(asset);
       const set = (value: typeof doc) =>
-        control.evaluate(async (value) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': value }), value);
+        control.evaluate(async (value) => chrome.storage.local.set({ 'around.design.youtube': value }), value);
       await set(doc);
       for (let run = 0; run < 5; run++) {
         await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
@@ -169,8 +168,8 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
             await expect(page.locator('[data-image-id="image-c3-1"]')).toHaveCount(0);
             if (kind === 'vrm')
               idleModelStats = await page
-                .locator('#web-world-themes-decorations')
-                .evaluate((element: HTMLElement) => JSON.parse(element.dataset.wwModelStats!));
+                .locator('#around-decorations')
+                .evaluate((element: HTMLElement) => JSON.parse(element.dataset.aroundModelStats!));
             start = await page.evaluate(() => {
               (globalThis as any).__c3Paints = [];
               return performance.now();
@@ -223,8 +222,8 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
             ...(kind === 'vrm'
               ? {
                   modelStats: await page
-                    .locator('#web-world-themes-decorations')
-                    .evaluate((element: HTMLElement) => JSON.parse(element.dataset.wwModelStats!)),
+                    .locator('#around-decorations')
+                    .evaluate((element: HTMLElement) => JSON.parse(element.dataset.aroundModelStats!)),
                   ...(idleModelStats ? { idleModelStats } : {}),
                 }
               : {}),

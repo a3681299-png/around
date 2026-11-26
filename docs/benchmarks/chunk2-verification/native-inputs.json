@@ -1,0 +1,280 @@
+{
+  "operation-live-fix.log": [
+    {
+      "currentTime": 68.908941,
+      "duration": 214.941,
+      "readyState": 1,
+      "seekable": [[0, 214.941]]
+    },
+    {
+      "box": {
+        "x": 120,
+        "y": 431.75,
+        "width": 52,
+        "height": 40
+      },
+      "quieter": 0.12335536320201601,
+      "events": [
+        {
+          "type": "mousedown",
+          "x": 135,
+          "y": 451,
+          "target": "<div class=\"ytp-volume-slider-handle\" style=\"left: 40px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        },
+        {
+          "type": "mouseup",
+          "x": 153,
+          "y": 451,
+          "target": "<div class=\"ytp-volume-slider-handle\" style=\"left: 25.2px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        }
+      ]
+    },
+    {
+      "currentTime": 74.980213,
+      "duration": 214.941,
+      "readyState": 1,
+      "seekable": [[0, 214.941]]
+    },
+    {
+      "box": {
+        "x": 120,
+        "y": 431.75,
+        "width": 52,
+        "height": 40
+      },
+      "quieter": 0.12335536320201601,
+      "events": [
+        {
+          "type": "mousedown",
+          "x": 135,
+          "y": 451,
+          "target": "<div class=\"ytp-volume-slider-handle\" style=\"left: 25.2px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        },
+        {
+          "type": "mouseup",
+          "x": 153,
+          "y": 451,
+          "target": "<div class=\"ytp-volume-slider-handle\" style=\"left: 25.2px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        }
+      ]
+    },
+    {
+      "before": {
+        "seekFraction": 0.32059467947018017,
+        "volume": 0.27754956720453605,
+        "comment": "sign-in-gated; real text entry unavailable in this fresh signed-out profile"
+      },
+      "after": {
+        "seekFraction": 0.3488409051786304,
+        "volume": 0.27754956720453605,
+        "comment": "sign-in-gated; real text entry unavailable in this fresh signed-out profile"
+      }
+    }
+  ],
+  "operation-live-head.log": [
+    {
+      "currentTime": 74.980213,
+      "duration": 214.941,
+      "readyState": 1,
+      "seekable": [[0, 214.941]]
+    },
+    {
+      "box": {
+        "x": 120,
+        "y": 431.75,
+        "width": 52,
+        "height": 40
+      },
+      "quieter": 0.12335536320201601,
+      "events": [
+        {
+          "type": "mousedown",
+          "x": 135,
+          "y": 451,
+          "target": "<div class=\"ytp-volume-slider-handle\" style=\"left: 40px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        },
+        {
+          "type": "mouseup",
+          "x": 153,
+          "y": 451,
+          "target": "<div class=\"ytp-volume-slider-handle\" style=\"left: 25.2px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        }
+      ]
+    },
+    {
+      "currentTime": 74.980213,
+      "duration": 214.941,
+      "readyState": 1,
+      "seekable": [[0, 214.941]]
+    },
+    {
+      "box": {
+        "x": 120,
+        "y": 431.75,
+        "width": 52,
+        "height": 40
+      },
+      "quieter": 0.12335536320201601,
+      "events": [
+        {
+          "type": "mousedown",
+          "x": 135,
+          "y": 451,
+          "target": "<div class=\"ytp-volume-slider-handle\" style=\"left: 25.2px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        },
+        {
+          "type": "mouseup",
+          "x": 153,
+          "y": 451,
+          "target": "<div class=\"ytp-volume-slider-handle\" style=\"left: 25.2px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        }
+      ]
+    },
+    {
+      "before": {
+        "seekFraction": 0.3488409051786304,
+        "volume": 0.27754956720453605,
+        "comment": "sign-in-gated; real text entry unavailable in this fresh signed-out profile"
+      },
+      "after": {
+        "seekFraction": 0.3488409051786304,
+        "volume": 0.27754956720453605,
+        "comment": "sign-in-gated; real text entry unavailable in this fresh signed-out profile"
+      }
+    }
+  ],
+  "operation-volume-fault.log": [
+    {
+      "currentTime": 75.188731,
+      "duration": 214.941,
+      "readyState": 1,
+      "seekable": [[0, 214.941]]
+    },
+    {
+      "box": {
+        "x": 128,
+        "y": 398,
+        "width": 52,
+        "height": 40
+      },
+      "quieter": 0.4405548685786286,
+      "events": [
+        {
+          "type": "mousedown",
+          "x": 143,
+          "y": 418,
+          "target": "<div class=\"ytp-volume-panel ytp-volume-control-hover\" role=\"slider\" aria-valuemin=\"0\" aria-valuemax=\"100\" tabindex=\"0\" aria-valuenow=\"100\" aria-valuetext=\"100% volume\" aria-label=\"Volume\"><div class=\"ytp-volume-slider\" draggable=\"true\" style=\"touch-",
+          "slider": {
+            "x": 128,
+            "y": 308,
+            "width": 52,
+            "height": 40
+          }
+        },
+        {
+          "type": "mouseup",
+          "x": 161,
+          "y": 418,
+          "target": "<div class=\"ytp-timed-markers-container\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 341.75,
+            "width": 0,
+            "height": 40
+          }
+        }
+      ]
+    }
+  ],
+  "operation-volume-target-fault.log": [
+    {
+      "currentTime": 75.188731,
+      "duration": 214.941,
+      "readyState": 1,
+      "seekable": [[0, 214.941]]
+    },
+    {
+      "box": {
+        "x": 120,
+        "y": 431.75,
+        "width": 52,
+        "height": 40
+      },
+      "quieter": 0.4405548685786286,
+      "events": [
+        {
+          "type": "mousedown",
+          "x": 135,
+          "y": 451,
+          "target": "<div id=\"verification-nonvolume\" style=\"position: fixed; z-index: 2147483647; pointer-events: auto; width: 12px; height: 12px; left: 129.6px; top: 445.75px;\"></div>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 52,
+            "height": 40
+          }
+        },
+        {
+          "type": "mouseup",
+          "x": 153,
+          "y": 451,
+          "target": "<span class=\"ytp-time-current\">1:15</span>",
+          "slider": {
+            "x": 120,
+            "y": 431.75,
+            "width": 0,
+            "height": 40
+          }
+        }
+      ]
+    }
+  ]
+}

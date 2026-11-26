@@ -4,9 +4,11 @@ import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
 import { changeAssets, getAsset, keepAssetLease, type AssetLease, type StoredAsset } from '../assets/repository';
 import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata, type AssetInfo } from '../assets/validation';
 import { validateAssetBytes } from '../assets/validate-bytes';
-import { validateDesignAssets } from '../assets/design-assets';
+import { validateDocumentAssets } from '../assets/design-assets';
+import { sameModelInfo } from '../models/types';
+import { designAssetIds } from '../design/references';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
-import { saveDesign } from '../storage/designs';
+import { saveDesign } from '../browser/design-store';
 import { installTakeStorage } from '../browser/take-repository';
 import { createAssetTransfers } from '../assets/transfers';
 import { createWorkQueue } from '../assets/work-queue';
@@ -53,11 +55,11 @@ const assetRead = createAssetReadService({
     const row = await getAsset(id);
     if (!row) return false;
     if (row.leases.some((lease) => lease.tabId === host.tab && lease.documentId === host.document)) return true;
-    const key = 'webWorldThemes.design.youtube',
+    const key = 'around.design.youtube',
       values = await chrome.storage.local.get(key);
     if (!values[key]) return false;
     try {
-      return parseDesign(values[key]).decorations.some((layer) => layer.assetId === id);
+      return designAssetIds(parseDesign(values[key])).includes(id);
     } catch {
       return false;
     }
@@ -140,7 +142,7 @@ async function owner(message: Record<string, unknown>, sender: chrome.runtime.Me
     const context = contexts.find(
       (entry) => entry.documentUrl === sender.url && entry.documentUrl?.split('?')[0] === studioURL,
     );
-    if (!context) throw new Error('Studioのタブが見つかりません。');
+    if (!context) throw new Error('エディターのタブが見つかりません。');
     return { session: message['session'], tabId: context.tabId, documentId: 'studio:' + context.tabId };
   }
   return {
@@ -154,9 +156,9 @@ async function prune(current?: AssetLease): Promise<void> {
   const values = await chrome.storage.local.get(null);
   const references = new Set<string>();
   for (const [key, value] of Object.entries(values)) {
-    if (!key.startsWith('webWorldThemes.design.')) continue;
+    if (!key.startsWith('around.design.')) continue;
     try {
-      parseDesign(value).decorations.forEach((item) => references.add(item.assetId));
+      designAssetIds(parseDesign(value)).forEach((id) => references.add(id));
     } catch {
       return;
     } // A future document version may reference assets we cannot see.
@@ -264,9 +266,18 @@ async function importBatch(
       const put = new Map<string, StoredAsset>();
       for (const asset of assets) {
         const existing = combined.get(asset.id);
-        const next = existing
+        let next = existing
           ? { ...existing, leases: [...existing.leases.filter((entry) => entry.session !== lease.session), lease] }
           : asset;
+        if (existing?.model?.vrm && !existing.model.vrm.body && asset.model?.vrm?.body) {
+          if (!sameModelInfo(existing.model, asset.model)) throw new Error('既存素材の情報が一致しません。');
+          // The SHA and all other facts match. Add the newly measured body without replacing
+          // the original record, its name, blob or other sessions' leases.
+          next = {
+            ...next,
+            model: { ...existing.model, vrm: { ...existing.model.vrm, body: asset.model.vrm.body } },
+          };
+        }
         combined.set(asset.id, next);
         put.set(asset.id, next);
       }
@@ -279,6 +290,8 @@ async function importBatch(
       return { value: undefined, put: [...put.values()] };
     }),
   );
+  // A read may already have cached the legacy row before this import measured it.
+  for (const asset of assets) sourceRows.delete(asset.id);
   return assets.map(({ blob: _blob, leases: _leases, ...metadata }) => metadata);
 }
 
@@ -302,7 +315,12 @@ const studioTransfer = createStudioTransferService({
   importBatch,
 });
 self.addEventListener('message', (event) => studioTransfer.receive(event as unknown as StudioTransferEvent));
-const backups = createBackupService({ pageURL: backupPageURL(), client: (id) => workerClients.get(id), enqueue });
+const backups = createBackupService({
+  pageURL: backupPageURL(),
+  client: (id) => workerClients.get(id),
+  enqueue,
+  assetsChanged: (ids) => ids.forEach((id) => sourceRows.delete(id)),
+});
 self.addEventListener('message', (event) => backups.receive(event as unknown as StudioTransferEvent));
 
 async function handle(
@@ -386,13 +404,16 @@ async function handle(
   } else if (message['action'] === 'save' || message['action'] === 'validate') {
     const design = parseDesign(message['design']);
     const assets = new Map<string, AssetMetadata>();
-    for (const id of new Set(design.decorations.map((layer) => layer.assetId))) {
+    for (const id of designAssetIds(design)) {
       const asset = await getAsset(id);
       if (asset) assets.set(id, asset);
     }
-    validateDesignAssets(design.decorations, assets);
+    validateDocumentAssets(design, assets);
     if (message['action'] === 'validate') return undefined;
-    await saveDesign(design);
+    const revision = message['revision'];
+    if (revision !== undefined && (typeof revision !== 'number' || !Number.isSafeInteger(revision) || revision < 0))
+      throw new Error('保存する編集の版が不正です。');
+    await saveDesign(design, typeof revision === 'number' ? { sessionId: lease.session, revision } : undefined);
   } else throw new Error('未対応の素材操作です。');
   // Cleanup is secondary to a successful save; a failed cleanup retains assets.
   await profileAsync(trace, 'store.prune-after-command', () => prune(lease)).catch(() => undefined);

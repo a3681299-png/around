@@ -18,3 +18,40 @@ v1: カードの色・枠・角丸。v2: ロックのない画像。v3: ロッ�
 `chain-expected.json`は移行チェーンへの変更前、`d1a552e`のパーサーで読み込んだ全14件の結果。
 移行後の結果との完全一致をテストする固定の比較対象であり、テスト実行時には再生成しない。
 v1〜v11すべてで履歴由来の入力を確保できたが、利用者が実際に保存した過去のJSONによる確認は引き続き未実施。
+
+UI1（v13）では `history-v12.json` を追加した。v12で `renderMode` を導入した `tests/design-migrations.spec.ts` の
+「v12 renderMode keeps normal by omission…」が、最初に `parseDesign` へ渡して受理された入力（雰囲気レイヤー2枚とグループ）である。
+その期待値は変更前の `29b8d5b` のパーサーで取得し、`chain-expected.json` へ加えた。
+
+`css-expected.json` は、変更前の `29b8d5b` の `compileDesign` で全fixtureを組み立てたCSS。
+v13の着せ替えを追加したレンダラーでも、既存作品の見た目（CSS）がバイト単位で変わらないことを確かめる固定の比較対象。
+
+R3-1b（v14）では `history-v13.json` を追加した。v13を導入した `3e18edc` の `tests/vrm-data.spec.ts` の
+「VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip」が、最初に `parseDesign` へ渡して受理された入力（VRMの3Dレイヤー1枚）である。
+取得には `scripts/capture-design-chain-fixtures.mjs` を1件だけに絞った使い捨ての写しを使った（そのテストが `three` を読むため、`three`・`@pixiv` を外部として扱う1行を足した。元のスクリプトは変えていない）。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v13.json`）は、変更前の `133f88b` のパーサーと `compileDesign` で取った。
+v14への版上げで、`chain-expected.json` の全件の `schemaVersion` を14にした（ほかの値は変えていない）。
+
+塊3（v15）では `history-v14.json` を追加した。v14を導入した `8003738` の `tests/character-data.spec.ts` の
+「v14 character roundtrips; clip indices then address its motions」が、最初に `parseDesign` へ渡して受理された入力（キャラ付きの VRM の3Dレイヤー1枚。層の名前が "Trusie" だが、テストの中の名前の文字列だけで、モデルや素材は含まない）である。
+取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先だけ `.work/capture` に変えた）で行った。元のスクリプトは変えていない。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v14.json`）は、変更前の `3a41aa2` のパーサーと `compileDesign` で取った。
+v15への版上げで、`chain-expected.json` の全件の `schemaVersion` を15にした（ほかの値は変えていない）。
+
+ミルドの動きの続き（v16）では `history-v15.json` を追加した。v15を導入した `83601bb` の `tests/character-v15.spec.ts` の
+「v15 roundtrips personality and the switches; absent keys keep v14 behaviour」が、最初に `parseDesign` へ渡して受理された入力（キャラ付きの VRM の3Dレイヤー1枚。層の名前 "Trusie" はテストの中の文字列だけで、モデルや素材は含まない）である。
+取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先を `.work/capture` に、`three`・`@pixiv` を外部に）で行った。元のスクリプトは変えていない。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v15.json`）は、変更前の `e0b14ca` のパーサーと `compileDesign` で取った。
+v16への版上げで、`chain-expected.json` の全件の `schemaVersion` を16にした（ほかの値は変えていない）。
+
+奥行きの土台（v17）では `history-v16.json` を追加した。v16を導入した `e6e958d` の `tests/character-data.spec.ts` の
+「a motion hips height roundtrips at its limit and stays absent when not given」が、最初に `parseDesign` へ渡して受理された入力（キャラ付きの VRM の3Dレイヤー1枚。名前の文字列だけで、モデルや素材は含まない）である。
+取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先だけ `.work/capture` に変えた）で行った。元のスクリプトは変えていない。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v16.json`）は、変更前の `43ec318` のパーサーと `compileDesign` で取った。
+v17への版上げで、`chain-expected.json` の全件の `schemaVersion` を17にした（ほかの値は変えていない）。
+
+部屋に住む（v18）では `history-v17.json` を追加した。v17を導入した `18b8b6f` の `tests/space-data.spec.ts` の
+「v17 roundtrips the space and a room-depth layer; omission keeps every layer in front」が、最初に `parseDesign` へ渡して受理された入力（奥と手前の画像レイヤー2枚と `space`。部屋の素材は ID の文字列だけで、素材そのものは含まない）である。
+取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先を `.work/capture` に、`three`・`@pixiv` を外部に）で行った。元のスクリプトは変えていない。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v17.json`）は、変更前の `bd06c2a`（`src/design` は `eb43889` と同じ）のパーサーと `compileDesign` で取った。
+v18への版上げで、`chain-expected.json` の全件の `schemaVersion` を18にした（ほかの値は変えていない）。

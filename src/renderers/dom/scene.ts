@@ -1,11 +1,12 @@
 import { captureGeometry } from '../../host/anchors';
-import { WORLD_MODE } from '../../host/world-options';
+import type { PageIdentity } from '../../host/page-identity';
+import { LAYERING, SPACE_BREAK, WORLD_MODE } from '../../host/world-options';
 import { evaluateLayout } from '../../world/layout';
 import { legacyLayout } from './legacy-evaluation';
 import { assertWorldParity } from './parity';
 import { createModelRenderer } from '../three/models';
 import { createMediaController } from '../../media/controller';
-import { clearAssetSources } from '../../assets/client';
+import type { AssetPort } from '../../assets/port';
 import { createEffectController, type EffectTarget } from './effects';
 import type { PlaybackSource } from '../../signals/types';
 import {
@@ -15,6 +16,7 @@ import {
   moveGroup,
   resizePlacement,
   rotatePlacement,
+  type Bounds,
   type PlacementChange,
   type PlacementSample,
   type Point,
@@ -22,7 +24,7 @@ import {
 import { editableSceneSamples, placementFrame, snapTargets } from '../../design/frames';
 import { effectivelyLocked, groupMovable, parentGroup, rootLayers } from '../../world/hierarchy';
 import { snapMove, type Guide } from '../../design/layout';
-import { renderModeOf, type DesignTarget, type Decoration, type GroupLayer } from '../../design/types';
+import { depthOf, renderModeOf, type DesignTarget, type Decoration, type GroupLayer } from '../../design/types';
 import type { SignalRule } from '../../signals/keyframes';
 import type { TimelineHost } from '../../host/timeline';
 import type { WorldLayout } from '../../world/types';
@@ -42,13 +44,42 @@ export interface ImageEditing {
   error(message: string): void;
 }
 
+// Editing marks are ruled (docs/around-studio-design-system): 1px cobalt with a white edge, square
+// handles. They use Gesso's values whatever the colour scheme, since they sit over any picture.
+// Handles keep a 14px hit area around their 12px square; rotation is a square with its glyph,
+// because a circle means 保存済み.
+/** The artwork's size after a gesture: its own size by the gesture's proportion (drawn reduced, the
+ * gesture started from the drawn size). Drawn as authored, exactly the gesture's size. */
+const authoredSize = (own: number, drawn: number, result: number) =>
+  own === drawn || drawn <= 0 ? result : Math.round(((own * result) / drawn) * 10) / 10;
+/**
+ * A beneath paint needs no hold for a pending read when no control that is not proven to paint
+ * over it is near (docs/layering-plan.md, chunk 4): within 40 px, the distance at which the G1.2
+ * approach takes a control as near. Unknown places hold every paint, as before.
+ */
+const BENEATH_NEAR_PX = 40;
+function beneathSettled(
+  unproven: readonly { left: number; top: number; width: number; height: number }[] | 'everywhere',
+  bounds: { left: number; top: number; right: number; bottom: number } | undefined,
+) {
+  if (unproven === 'everywhere' || !bounds) return false;
+  return !unproven.some(
+    (r) =>
+      r.left < bounds.right + BENEATH_NEAR_PX &&
+      r.left + r.width > bounds.left - BENEATH_NEAR_PX &&
+      r.top < bounds.bottom + BENEATH_NEAR_PX &&
+      r.top + r.height > bounds.top - BENEATH_NEAR_PX,
+  );
+}
+
 const CSS = `
-:host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:var(--ww-decoration-z,2147482000) !important; clip-path:var(--ww-decoration-clip,none) !important; }
+:host { --cobalt:#2b51b8; --ink-muted:#53575f; --edge:rgba(255,255,255,.85); --rotate:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3E%3Cpath d='M5 3A2 2 0 1 1 3 1' fill='none' stroke='black' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M2.6 0L4.2 1L2.6 2Z'/%3E%3C/svg%3E"); }
+:host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:var(--around-decoration-z,2147482000) !important; clip-path:var(--around-decoration-clip,none) !important; }
 * { box-sizing:border-box; }
 .image, .selection-frame { position:absolute; transform-origin:center; pointer-events:none; touch-action:none; }
 .composition { position:absolute; pointer-events:none; }
 .group-content { position:absolute; inset:0; pointer-events:none; isolation:isolate; }
-.selection-frame[data-group] { border-style:dashed; border-color:#196f95; }
+.selection-frame[data-group] { border-style:dashed; box-shadow:none; outline:1px dashed var(--edge); }
 .group-edge { display:none; position:absolute; }
 .selection-frame[data-group-movable] .group-edge { display:block; pointer-events:auto; cursor:move; }
 [data-group-edge="top"], [data-group-edge="bottom"] { left:0; right:0; height:8px; }
@@ -57,29 +88,37 @@ const CSS = `
 [data-group-edge="left"] { left:-4px; } [data-group-edge="right"] { right:-4px; }
 [hidden] { display:none !important; }
 .image[data-editable] { pointer-events:auto; cursor:move; }
-.selection-frame { z-index:1000; border:2px solid #6350ca; box-shadow:0 0 0 1px white, inset 0 0 0 1px white; }
-.selection-frame[data-locked] { border-color:#966000; border-style:dashed; }
-.group-frame { position:absolute; border:1px dashed #6350ca; box-shadow:0 0 0 1px white; pointer-events:none; z-index:1001; }
-.guide { position:absolute; background:#ce267e; box-shadow:0 0 0 1px #ffffffbb; pointer-events:none; z-index:1002; }
+:host(:not([data-around-model-press])) .image[data-video-hover] { pointer-events:none; }
+.selection-frame { z-index:1000; border:1px solid var(--cobalt); box-shadow:0 0 0 1px var(--edge), inset 0 0 0 1px var(--edge); }
+.selection-frame[data-locked] { border-color:var(--ink-muted); border-style:dashed; box-shadow:none; outline:1px dashed var(--edge); }
+.group-frame { position:absolute; border:1px dashed var(--cobalt); box-shadow:0 0 0 1px var(--edge); pointer-events:none; z-index:1001; }
+.guide { position:absolute; background:var(--cobalt); box-shadow:0 0 0 1px var(--edge); pointer-events:none; z-index:1002; }
 .media, img, canvas, svg, video { display:block; width:100%; height:100%; border:0; user-select:none; pointer-events:none; }
-.handle { display:none; position:absolute; width:14px; height:14px; padding:0; border:2px solid #6350ca; box-shadow:0 0 0 1px white; border-radius:2px; background:white; touch-action:none; }
+.handle { display:none; position:absolute; width:14px; height:14px; padding:0; border:0; background:transparent; touch-action:none; }
+.handle::before { content:''; position:absolute; inset:1px; box-sizing:border-box; border:1px solid var(--cobalt); background:white; box-shadow:0 0 0 1px var(--edge); }
+[data-handle="rotate"]::after { content:''; position:absolute; inset:3px; background:var(--cobalt); -webkit-mask:var(--rotate) center / 100% 100% no-repeat; mask:var(--rotate) center / 100% 100% no-repeat; }
 .selection-frame[data-transformable] .handle { display:block; pointer-events:auto; }
 [data-handle="nw"] { left:-7px; top:-7px; cursor:nwse-resize; }
 [data-handle="ne"] { right:-7px; top:-7px; cursor:nesw-resize; }
 [data-handle="sw"] { left:-7px; bottom:-7px; cursor:nesw-resize; }
 [data-handle="se"] { right:-7px; bottom:-7px; cursor:nwse-resize; }
-[data-handle="rotate"] { left:calc(50% - 7px); top:-32px; border-radius:50%; cursor:grab; }
+[data-handle="rotate"] { left:calc(50% - 7px); top:-32px; cursor:grab; }
 `;
 
 // Plane hosts reuse the screen CSS; later !important rules in the same sheet win.
 const PAGE_CSS =
   CSS +
-  ':host{position:absolute!important;inset:auto!important;left:var(--ww-page-left,0)!important;top:var(--ww-page-top,0)!important;width:1px!important;height:1px!important;overflow:visible!important}';
+  ':host{position:absolute!important;inset:auto!important;left:var(--around-page-left,0)!important;top:var(--around-page-top,0)!important;width:1px!important;height:1px!important;overflow:visible!important}';
 // One opacity on the whole plane bounds the composite of any number of atmosphere layers.
 const ATMOSPHERE_CSS =
   CSS +
   `:host{opacity:${ATMOSPHERE_ALPHA_CAP}!important;clip-path:none!important;filter:none!important}*{filter:none!important;backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important}.image,.image[data-editable],.composition{pointer-events:none!important}`;
-type Plane = { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot };
+// Under the content (an adapter's underlay slot), atmosphere covers nothing, so it needs neither
+// the opacity cap nor the clip; it still takes no input and keeps the effect restrictions.
+const UNDERLAY_CSS =
+  CSS +
+  `:host{clip-path:none!important;filter:none!important}*{filter:none!important;backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important}.image,.image[data-editable],.composition{pointer-events:none!important}`;
+type Plane = { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot; under?: boolean };
 const ATMOSPHERE = 0,
   PAGE = 1,
   SCREEN = 2;
@@ -87,10 +126,19 @@ const ATMOSPHERE = 0,
 /** Shared layer layout/gestures; media decoding and playback live in media/. */
 export function createImageRenderer(
   doc: Document,
+  assets: AssetPort,
   anchors: readonly DesignTarget[],
   playback?: PlaybackSource,
   timeline?: TimelineHost,
   safety?: OperationGuardHost,
+  /** The site adapter's page identity: a new page starts each character's autonomy again. */
+  page?: PageIdentity,
+  /** The depth foundation (docs/depth-foundation.md): the room's place under the page's content,
+   * while the backdrop is open. Artwork whose every root is `depth: 'room'` is drawn there, over
+   * the room and under the UI, without the guard: the browser's stacking keeps the UI over it. */
+  backdrop?: () => { parent: HTMLElement; zIndex: number; after?: Element } | 'pending' | undefined,
+  /** v18: the layer whose character is living in the room now; its front drawing waits. */
+  away?: () => string | undefined,
 ) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
@@ -117,8 +165,21 @@ export function createImageRenderer(
     }
   >();
   const compositions = new Map<string, { node: HTMLDivElement; content: HTMLDivElement; controls: HTMLDivElement }>();
-  let videoSlot: { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot } | undefined;
+  let videoSlot:
+    | {
+        host: HTMLElement;
+        content: HTMLElement;
+        shadow: ShadowRoot;
+        /** the selector written into its rule */ barsHidden?: string;
+        /** the overlay cut-outs last written on its content */ contentClip?: string;
+      }
+    | undefined;
   let pagePlane: Plane | undefined, atmospherePlane: Plane | undefined;
+  /** Mixed artwork's room-depth roots, behind the UI (docs/depth-foundation.md). */
+  let roomPlane: Plane | undefined;
+  /** This draw's place behind the UI: the room's, 'pending' while it loads or hides, undefined
+   * without a room (room-depth roots are then drawn in front, guarded, as before v16). */
+  let behind: ReturnType<NonNullable<typeof backdrop>> | undefined;
   const createPlane = (id: string, css: string, gestures: boolean): Plane => {
     const planeHost = doc.createElement('div');
     planeHost.id = id;
@@ -134,6 +195,9 @@ export function createImageRenderer(
   // Document-origin offset of the page plane, corrected from its measured position.
   let pageOffset = { left: 0, top: 0 };
   let lastLayout: WorldLayout | undefined;
+  /** The roots the last protected draw put on the beneath plane (chunk 4). */
+  let beneathRoots: ReadonlySet<string> = new Set();
+  let videoHoverBounds: Bounds[] = [];
   let gesture:
     | {
         pointerId: number;
@@ -145,9 +209,21 @@ export function createImageRenderer(
       }
     | undefined;
 
+  /** This draw's place behind the UI (room-only artwork), and the guard it runs under otherwise. */
+  let room: ReturnType<NonNullable<typeof backdrop>> | undefined,
+    guard: OperationGuardHost | undefined = safety;
+  const roomPlace = () => {
+    if (!backdrop || editing || !images.length) return undefined;
+    if (images.some((layer) => depthOf(layer) !== 'room') || groups.some((group) => depthOf(group) !== 'room'))
+      return undefined;
+    const place = backdrop();
+    // Nothing behind the UI shows in fullscreen: room-depth artwork waits, like the room.
+    return place && doc.fullscreenElement ? 'pending' : place;
+  };
   // The last values written to the host; identical frames skip the attribute writes.
   let writtenClip = '',
     writtenSafety = '';
+  let recordedIssues: unknown, recordedStopped: string | undefined;
   // Set when the effect session applies its final layout (and protection) inside a draw.
   let effectLayoutApplied = false;
   const applyLayout = (
@@ -156,6 +232,17 @@ export function createImageRenderer(
     protect = true,
   ) => {
     lastLayout = layout;
+    // Positions are collected first and written once at the end, after the plane adjustments
+    // below, and only where they differ from what the element has: an unchanged frame writes
+    // nothing, and no read in between sees half-written geometry (G1.3, c1).
+    const staged = new Map<HTMLElement, Record<string, string>>();
+    const stage = (element: HTMLElement, values: Record<string, string>) => {
+      const current = staged.get(element);
+      if (current) Object.assign(current, values);
+      else staged.set(element, { ...values });
+    };
+    const stagedPx = (element: HTMLElement, key: 'left' | 'top') =>
+      parseFloat(staged.get(element)?.[key] ?? element.style[key]);
     const parents = new Map(layout.groups.map((group) => [group.layer.id, group]));
     for (const group of layout.groups) {
       const entry = compositions.get(group.layer.id);
@@ -169,8 +256,9 @@ export function createImageRenderer(
         height: `${p.heightPx}px`,
         transform: `rotate(${p.rotationDeg}deg)`,
       };
-      Object.assign(entry.node.style, geometry);
-      Object.assign(entry.controls.style, geometry);
+      stage(entry.node, geometry);
+      // A hidden handle (not selected for editing) is placed by the draw that shows it.
+      if (!entry.controls.hidden) stage(entry.controls, geometry);
     }
     for (const layer of layout.layers) {
       const entry = nodes.get(layer.layer.id);
@@ -180,26 +268,91 @@ export function createImageRenderer(
         point = layer.position;
       const parentAngle = layer.parentId ? (parents.get(layer.parentId)?.layer.placement.rotationDeg ?? 0) : 0;
       const size = { width: `${p.widthPx}px`, height: `${p.heightPx}px` };
-      Object.assign(entry.node.style, size, {
+      stage(entry.node, {
+        ...size,
         left: `${local.x}px`,
         top: `${local.y}px`,
         transform: `translate(-50%, -50%) rotate(${rotation(p.rotationDeg - parentAngle)}deg)`,
       });
-      Object.assign(entry.controls.style, size, {
-        left: `${point.x}px`,
-        top: `${point.y}px`,
-        transform: `translate(-50%, -50%) rotate(${p.rotationDeg}deg)`,
-      });
+      if (!entry.controls.hidden)
+        stage(entry.controls, {
+          ...size,
+          left: `${point.x}px`,
+          top: `${point.y}px`,
+          transform: `translate(-50%, -50%) rotate(${p.rotationDeg}deg)`,
+        });
     }
-    if (safety && protect) {
+    // Room-only artwork (draw's `room`) is behind the UI: no reads, no clip, no stop.
+    if (safety && protect && !room) {
       const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
+      // Mixed artwork (docs/depth-foundation.md): while the artwork has a room, its room-depth roots
+      // go behind the UI on their own plane, outside every guard step below (no slot, no clip, no
+      // commit); the guard sees only what is in front.
+      const roomRoot = (id: string) => behind !== undefined && depthOf(roots.get(id)!.layer) === 'room';
+      const frontRoots = layout.roots.filter((id) => !roomRoot(id));
+      const frontLayers = layout.layers.filter((l) => !roomRoot(l.parentId ?? l.layer.id));
       const needsVideoSlot =
         Boolean(doc.fullscreenElement) ||
-        layout.roots.some((id) => {
+        frontRoots.some((id) => {
           const anchor = roots.get(id)!.layer.placement.anchor;
           return anchor.kind === 'surface' && anchor.target === 'video-player';
         });
-      const slot = needsVideoSlot ? safety.source.videoSlot() : undefined;
+      // Chunk 4 (LAYERING, docs/layering-plan.md): the player's plane goes under its controls by
+      // stacking order instead of over them with the bands cut out. Editing too (it flickered the
+      // cut-out way, chunk 4 follow-up): its handles go with the artwork under the controls, which keep their clicks by
+      // stacking order; a press on a handle is claimed after a fresh read (editorClaims).
+      // Where the paints that can go under the controls are (the player's; every root in
+      // fullscreen, one plane), widened by BENEATH_NEAR_PX: only a control there can hold a paint
+      // for a pending read (beneathSettled), so only those need a proof now.
+      const near = frontLayers.flatMap((l) => {
+        const anchor = roots.get(l.parentId ?? l.layer.id)?.layer.placement.anchor,
+          b = l.bounds;
+        return (doc.fullscreenElement || (anchor?.kind === 'surface' && anchor.target === 'video-player')) && b
+          ? [
+              {
+                left: b.left - BENEATH_NEAR_PX,
+                top: b.top - BENEATH_NEAR_PX,
+                width: b.right - b.left + 2 * BENEATH_NEAR_PX,
+                height: b.bottom - b.top + 2 * BENEATH_NEAR_PX,
+              },
+            ]
+          : [];
+      });
+      const offered = LAYERING && needsVideoSlot ? safety.source.beneathSlot?.(near) : undefined;
+      // The cut-out way stays as the way out (chunk 4): while a shown player control that is not
+      // proven to paint over the plane meets the player's artwork (the autoplay card when a video
+      // ends), the stacking order cannot keep it clear, and that draw is cut out as before.
+      const beneath =
+        offered &&
+        !offered.unprovenShown.some((box) =>
+          frontLayers.some((l) => {
+            const root = l.parentId ?? l.layer.id,
+              anchor = roots.get(root)?.layer.placement.anchor,
+              b = l.bounds;
+            return (
+              anchor?.kind === 'surface' &&
+              anchor.target === 'video-player' &&
+              b !== undefined &&
+              b.left < box.left + box.width &&
+              b.right > box.left &&
+              b.top < box.top + box.height &&
+              b.bottom > box.top
+            );
+          }),
+        )
+          ? offered
+          : undefined;
+      const slot = beneath
+        ? { parent: beneath.parent, rect: beneath.rect, top: 0, bottom: 0, zIndex: beneath.zIndex }
+        : needsVideoSlot
+          ? safety.source.videoSlot()
+          : undefined;
+      // Which way each protected draw took, on the document (the trace build only).
+      AROUND_GUARD_TRACE: if (LAYERING && needsVideoSlot) {
+        const way = `${beneath ? 'beneath' : offered ? 'way-out' : slot ? 'cutout' : 'none'}${editing ? (editing.locked ? '/locked' : '/editing') : ''}`;
+        const seen = (doc.documentElement.dataset['aroundLayeringWays'] ?? '').split('|').filter(Boolean);
+        if (seen[seen.length - 1] !== way) doc.documentElement.dataset['aroundLayeringWays'] = [...seen, way].join('|');
+      }
       // Explicit editing only: the verified video centre (no menu, error or advert over it), where
       // screen- and page-plane handles may take input over the video. The bands and any native
       // control in the centre stay native: they are cut from the clip and refused at input time.
@@ -209,8 +362,8 @@ export function createImageRenderer(
       // centre is the exception, and every gesture there is claimed after a fresh read.
       const { regions, path } = protectionClip(safety.source.capture(), Boolean(editing), editorRegion);
       const clip = path ? `path('${path}')` : 'inset(100%)';
-      if (clip !== writtenClip || host!.style.getPropertyValue('--ww-decoration-clip') !== clip) {
-        host!.style.setProperty('--ww-decoration-clip', clip);
+      if (clip !== writtenClip || host!.style.getPropertyValue('--around-decoration-clip') !== clip) {
+        host!.style.setProperty('--around-decoration-clip', clip);
         writtenClip = clip;
       }
       // Read once at the start of this draw, before this renderer's own writes.
@@ -228,7 +381,7 @@ export function createImageRenderer(
       const pageSlot =
         overlaySlot &&
         !doc.fullscreenElement &&
-        layout.roots.some((id) => pageAnchored(id) && !atmosphereRoot(id) && !(slot && videoAnchored(id)))
+        frontRoots.some((id) => pageAnchored(id) && !atmosphereRoot(id) && !(slot && videoAnchored(id)))
           ? safety.source.pageSlot()
           : undefined;
       const rootBounds = (id: string) =>
@@ -251,14 +404,15 @@ export function createImageRenderer(
         slot
           ? // The player-local plane keeps its native-underlay order; only when it is unavailable
             // does a player-anchored root follow the page instead of the screen plane.
-            layout.roots.filter((id) => fullscreenPlane || (videoAnchored(id) && !atmosphereRoot(id)))
+            frontRoots.filter((id) => fullscreenPlane || (videoAnchored(id) && !atmosphereRoot(id)))
           : [],
       );
       // Planes stack atmosphere < page < screen. A root never moves below an earlier root:
-      // one that would is drawn on the screen plane as normal, clipped artwork.
+      // one that would is drawn on the screen plane as normal, clipped artwork. Room roots are
+      // behind all of them, whatever their order.
       const planes = new Map<string, number>();
       let floor = ATMOSPHERE;
-      for (const id of layout.roots) {
+      for (const id of frontRoots) {
         if (localRoots.has(id)) continue;
         let plane = atmosphereRoot(id) && overlaySlot ? ATMOSPHERE : pageAnchored(id) && pageSlot ? PAGE : SCREEN;
         if (plane < floor) plane = SCREEN;
@@ -267,9 +421,18 @@ export function createImageRenderer(
       }
       const inPlane = (id: string, plane: number) => planes.get(id) === plane;
       const used = new Set(planes.values());
-      if (used.has(ATMOSPHERE))
-        atmospherePlane ??= createPlane('web-world-themes-atmosphere-decorations', ATMOSPHERE_CSS, false);
-      if (used.has(PAGE)) pagePlane ??= createPlane('web-world-themes-page-decorations', PAGE_CSS, true);
+      // Fullscreen keeps every root in the player's own plane; the underlay is the page's.
+      const underlay = used.has(ATMOSPHERE) && !doc.fullscreenElement ? safety.source.underlaySlot() : undefined;
+      if (atmospherePlane && Boolean(atmospherePlane.under) !== Boolean(underlay)) {
+        // The two places use different CSS (the cap); rebuild rather than restyle in place.
+        atmospherePlane.host.remove();
+        atmospherePlane = undefined;
+      }
+      if (used.has(ATMOSPHERE) && !atmospherePlane) {
+        atmospherePlane = createPlane('around-atmosphere-decorations', underlay ? UNDERLAY_CSS : ATMOSPHERE_CSS, false);
+        atmospherePlane.under = Boolean(underlay);
+      }
+      if (used.has(PAGE)) pagePlane ??= createPlane('around-page-decorations', PAGE_CSS, true);
       const parent = host!.parentElement;
       // DOM order in the shared overlay parent is the paint order: atmosphere, page, screen.
       for (const [plane, value] of [
@@ -281,13 +444,45 @@ export function createImageRenderer(
           plane.host.remove();
           continue;
         }
+        if (value === ATMOSPHERE && underlay) {
+          // First in its parent: painted before (under) every sibling of the same stacking level.
+          if (plane.host.parentElement !== underlay.parent || plane.host !== underlay.parent.firstChild)
+            underlay.parent.insertBefore(plane.host, underlay.parent.firstChild);
+          plane.host.style.setProperty('--around-decoration-z', String(underlay.zIndex));
+          continue;
+        }
         const before = value === PAGE ? host! : (used.has(PAGE) && pagePlane?.host) || host!;
         if (plane.host.parentElement !== parent || plane.host.nextSibling !== before)
           parent.insertBefore(plane.host, before);
-        if (overlaySlot) plane.host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
+        if (overlaySlot) plane.host.style.setProperty('--around-decoration-z', String(overlaySlot.zIndex));
       }
       if (!used.has(PAGE)) pagePlane = undefined;
       if (!used.has(ATMOSPHERE)) atmospherePlane = undefined;
+      // The room plane: right after the room's canvas at its level (under the page's content), or
+      // out of the page while the room is loading or hidden ('pending').
+      const roomRoots = new Set(layout.roots.filter(roomRoot));
+      if (roomRoots.size) {
+        roomPlane ??= createPlane('around-room-decorations', UNDERLAY_CSS, false);
+        if (behind && behind !== 'pending') {
+          const after = behind.after?.parentElement === behind.parent ? behind.after : undefined;
+          if (SPACE_BREAK === 'stacking') {
+            // A broken build (AROUND_SPACE_BREAK=stacking): over the UI, unguarded, to see the tests fail.
+            if (roomPlane.host.parentElement !== behind.parent || roomPlane.host.nextSibling)
+              behind.parent.append(roomPlane.host);
+            roomPlane.host.style.setProperty('--around-decoration-z', '2147482000');
+          } else {
+            if (
+              roomPlane.host.parentElement !== behind.parent ||
+              (after ? roomPlane.host.previousElementSibling !== after : roomPlane.host !== behind.parent.firstChild)
+            )
+              behind.parent.insertBefore(roomPlane.host, after ? after.nextSibling : behind.parent.firstChild);
+            roomPlane.host.style.setProperty('--around-decoration-z', String(behind.zIndex));
+          }
+        } else roomPlane.host.remove();
+      } else if (roomPlane) {
+        roomPlane.host.remove();
+        roomPlane = undefined;
+      }
       // Reading scroll offsets forces layout after this draw's writes; only the page plane needs them.
       const scroll = pagePlane ? { x: view.scrollX, y: view.scrollY } : { x: 0, y: 0 };
       let pageRegions: ReturnType<typeof pagePaintRegions> = [];
@@ -298,8 +493,8 @@ export function createImageRenderer(
           dy = -scroll.y - r.top;
         if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
           pageOffset = { left: pageOffset.left + dx, top: pageOffset.top + dy };
-          pagePlane.host.style.setProperty('--ww-page-left', `${pageOffset.left}px`);
-          pagePlane.host.style.setProperty('--ww-page-top', `${pageOffset.top}px`);
+          pagePlane.host.style.setProperty('--around-page-left', `${pageOffset.left}px`);
+          pagePlane.host.style.setProperty('--around-page-top', `${pageOffset.top}px`);
         }
         const bounds = layout.roots
           .filter((id) => inPlane(id, PAGE))
@@ -318,36 +513,104 @@ export function createImageRenderer(
           .map((r) => `M${r.left + scroll.x} ${r.top + scroll.y}h${r.width}v${r.height}h${-r.width}Z`)
           .join('');
         const pageClip = pagePath ? `path('${pagePath}')` : 'inset(100%)';
-        if (pagePlane.host.style.getPropertyValue('--ww-decoration-clip') !== pageClip)
-          pagePlane.host.style.setProperty('--ww-decoration-clip', pageClip);
+        if (pagePlane.host.style.getPropertyValue('--around-decoration-clip') !== pageClip)
+          pagePlane.host.style.setProperty('--around-decoration-clip', pageClip);
       }
       if (localRoots.size && !videoSlot) {
         const localHost = doc.createElement('div');
-        localHost.id = 'web-world-themes-video-decorations';
+        localHost.id = 'around-video-decorations';
         const localShadow = localHost.attachShadow({ mode: 'open' }),
           style = doc.createElement('style'),
           content = doc.createElement('div');
         style.textContent =
           CSS +
-          ':host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:var(--ww-local-z,1)!important}.image{pointer-events:none!important}.image[data-editable]{pointer-events:auto!important}';
+          ':host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:var(--around-local-z,1)!important}.image{pointer-events:none!important}.image[data-editable]{pointer-events:auto!important}';
         content.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
         localShadow.append(style, content);
         wireGestures(localShadow);
         videoSlot = { host: localHost, content, shadow: localShadow };
       }
       if (slot && videoSlot) {
-        if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
-        videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
-        videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
+        if (beneath) {
+          // Directly after the media, at its level: the proofs (paintsAbove) are made against the
+          // media and hold for this plane only while nothing of the player's sits in between.
+          // A rebuilt player or a moved media is followed here, from this draw's own read.
+          if (
+            videoSlot.host.parentElement !== beneath.parent ||
+            videoSlot.host.previousElementSibling !== beneath.after
+          )
+            beneath.parent.insertBefore(videoSlot.host, beneath.after.nextSibling);
+        } else if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
+        videoSlot.host.style.setProperty('--around-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
+        videoSlot.host.style.setProperty('--around-local-z', String(slot.zIndex));
+        // What can be pressed over the picture (end screen cards, the "next" card, the cards
+        // teaser, products, an advert's links) is normally above this plane by stacking order.
+        // So it stays clear even where an overlay's own z-index were lower: the plane's content
+        // is clipped around every visible pressable overlay too (an intersection with the band
+        // clip on the host, which keeps the bars' class switch exact). The player's own bars and
+        // its whole-player gesture surface are the bands' business, not holes here.
+        const holes = safety.source
+          .capture()
+          .surfaces.filter(
+            (surface) =>
+              surface.id.startsWith('player.overlay.') &&
+              !(beneath && surface.aboveBeneath) &&
+              surface.availability.visible &&
+              surface.shape.width > 0 &&
+              surface.shape.height > 0,
+          )
+          .map((surface) => {
+            const s = surface.protectedEnvelope;
+            const x = Math.round(s.left - slot.rect.left),
+              y = Math.round(s.top - slot.rect.top);
+            return `M${x} ${y}h${Math.round(s.width)}v${Math.round(s.height)}h${-Math.round(s.width)}Z`;
+          });
+        const w = Math.ceil(slot.rect.width),
+          h = Math.ceil(slot.rect.height);
+        const contentClip = holes.length ? `path(evenodd, "M0 0H${w}V${h}H0Z${holes.join('')}")` : '';
+        // Compared with what was written (the browser normalises the style's own text).
+        if (videoSlot.contentClip !== contentClip) {
+          videoSlot.contentClip = contentClip;
+          videoSlot.content.style.clipPath = contentClip;
+        }
+        // G1, the control bands only while the bars are shown (chunk 3, docs/autonomy-plan.md):
+        // the band clip above stays the default. Only while the player carries the adapter's
+        // "bars hidden" class does the plane drop it, and that is decided by the browser's own
+        // style recalculation, not by this draw: when the class goes, the clip is back for the
+        // very frame the bars start to appear, whatever the timing of our rAF or observers.
+        // Class names only (the adapter's, checked here): never a selector of anyone else's. Under
+        // any "kept" class (an advert showing its own parts in the bands) the clip stays.
+        const name = /^[A-Za-z][\w-]*$/;
+        const hidden = slot.barsHiddenClass && name.test(slot.barsHiddenClass) ? slot.barsHiddenClass : '';
+        const kept = (slot.barsKeptClasses ?? []).filter((c) => name.test(c));
+        const selector = hidden ? `.${hidden}${kept.map((c) => `:not(.${c})`).join('')}` : '';
+        if (videoSlot.barsHidden !== selector) {
+          videoSlot.barsHidden = selector;
+          let rule = videoSlot.shadow.querySelector<HTMLStyleElement>('style[data-bars]');
+          if (!rule) {
+            rule = doc.createElement('style');
+            rule.dataset['bars'] = '';
+            videoSlot.shadow.append(rule);
+          }
+          rule.textContent = selector ? `:host-context(${selector}){clip-path:none!important}` : '';
+        }
       }
       // One presentation container preserves scoped z-index/tie ordering and
       // keeps a group's masks/opacity on the original, un-cloned subtree.
       let localIndex = 0,
         globalIndex = 0;
       let pageIndex = 0,
-        atmosphereIndex = 0;
+        atmosphereIndex = 0,
+        roomIndex = 0;
       for (const id of layout.roots) {
         const node = nodes.get(id)?.node ?? compositions.get(id)!.node;
+        if (roomRoots.has(id)) {
+          // Viewport coordinates, like the screen plane: the room plane is fixed to the viewport.
+          if (roomPlane!.content.children[roomIndex] !== node)
+            roomPlane!.content.insertBefore(node, roomPlane!.content.children[roomIndex] ?? null);
+          roomIndex++;
+          continue;
+        }
         const local = localRoots.has(id),
           page = inPlane(id, PAGE),
           atmosphere = inPlane(id, ATMOSPHERE),
@@ -360,47 +623,77 @@ export function createImageRenderer(
                 : imageLayer!,
           index = local ? localIndex++ : page ? pageIndex++ : atmosphere ? atmosphereIndex++ : globalIndex++;
         if (container.children[index] !== node) container.insertBefore(node, container.children[index] ?? null);
-        if (local && slot) {
-          node.style.left = parseFloat(node.style.left) - slot.rect.left + 'px';
-          node.style.top = parseFloat(node.style.top) - slot.rect.top + 'px';
-        }
-        if (page) {
-          node.style.left = parseFloat(node.style.left) + scroll.x + 'px';
-          node.style.top = parseFloat(node.style.top) + scroll.y + 'px';
-        }
+        if (local && slot)
+          stage(node, {
+            left: stagedPx(node, 'left') - slot.rect.left + 'px',
+            top: stagedPx(node, 'top') - slot.rect.top + 'px',
+          });
+        if (page)
+          stage(node, {
+            left: stagedPx(node, 'left') + scroll.x + 'px',
+            top: stagedPx(node, 'top') + scroll.y + 'px',
+          });
       }
       // Editor handles own only their visible authored bounds, inside the same
       // native clip. Drag/volume bands never become editor-owned.
-      for (const entry of [...nodes.values(), ...compositions.values()]) {
-        const id = entry.controls.dataset.frameId!,
-          parentId = layout.layers.find((l) => l.layer.id === id)?.parentId;
+      // One lookup table per layout, not a search of every layer per handle (c2).
+      const parentIds = new Map(layout.layers.map((l) => [l.layer.id, l.parentId]));
+      // The maps are keyed by the handle's frame id (data-frame-id), which a DOM read would repeat.
+      for (const [id, entry] of [...nodes, ...compositions]) {
+        const parentId = parentIds.get(id);
         const local = localRoots.has(parentId ?? id),
           page = inPlane(parentId ?? id, PAGE),
           root = local ? videoSlot!.shadow : page ? pagePlane!.shadow : shadow!;
         if (entry.controls.parentNode !== root) root.append(entry.controls);
-        if (local && slot) {
-          entry.controls.style.left = parseFloat(entry.controls.style.left) - slot.rect.left + 'px';
-          entry.controls.style.top = parseFloat(entry.controls.style.top) - slot.rect.top + 'px';
-        }
-        if (page) {
-          entry.controls.style.left = parseFloat(entry.controls.style.left) + scroll.x + 'px';
-          entry.controls.style.top = parseFloat(entry.controls.style.top) + scroll.y + 'px';
-        }
+        if (entry.controls.hidden) continue;
+        if (local && slot)
+          stage(entry.controls, {
+            left: stagedPx(entry.controls, 'left') - slot.rect.left + 'px',
+            top: stagedPx(entry.controls, 'top') - slot.rect.top + 'px',
+          });
+        if (page)
+          stage(entry.controls, {
+            left: stagedPx(entry.controls, 'left') + scroll.x + 'px',
+            top: stagedPx(entry.controls, 'top') + scroll.y + 'px',
+          });
       }
       if (!localRoots.size) {
         videoSlot?.host.remove();
         videoSlot = undefined;
       }
+      // Which roots this draw put under the controls: an editor press on them is claimed that way.
+      beneathRoots = beneath ? localRoots : new Set();
       const localIds = new Set<string>();
+      videoHoverBounds = [];
       for (const layer of layout.layers) {
         const entry = nodes.get(layer.layer.id);
         if (!entry) continue;
-        if (localRoots.has(layer.parentId ?? layer.layer.id)) {
+        const root = layer.parentId ?? layer.layer.id;
+        if (localRoots.has(root)) {
           localIds.add(layer.layer.id);
         }
+        // A screen-plane model over the video would take hover away from the player. When the
+        // resulting native changes hold the model, hover returns and can restart the same loop.
+        // Let the player keep hover here. An explicit press still uses the real editor hit test.
+        const b = layer.bounds;
+        const passHover =
+          editorRegion &&
+          layer.layer.kind === 'model3d' &&
+          layer.layer.placement.anchor.kind === 'viewport' &&
+          inPlane(root, SCREEN) &&
+          !layer.locked &&
+          layer.visible &&
+          b &&
+          b.right > editorRegion.left &&
+          b.bottom > editorRegion.top &&
+          b.left < editorRegion.left + editorRegion.width &&
+          b.top < editorRegion.top + editorRegion.height;
+        entry.node.toggleAttribute('data-video-hover', Boolean(passHover));
+        if (passHover) videoHoverBounds.push(b);
       }
+      // Room-depth paints are not the guard's: the stacking order keeps the UI over them.
       const blocked = safety.commit(
-        layout.layers
+        frontLayers
           .filter((l) => l.layer.visible && (!l.frame || l.visible))
           .map((layer) => {
             const root = layer.parentId ?? layer.layer.id,
@@ -413,6 +706,8 @@ export function createImageRenderer(
               (local || atmosphere || (page ? pageRegions.length > 0 : regions.length > 0));
             return {
               id: layer.layer.id,
+              root,
+              ...(layer.layer.name ? { name: layer.layer.name } : {}),
               bounds: layer.bounds ?? { left: 0, top: 0, right: 0, bottom: 0 },
               opacity: layer.effectiveOpacity,
               // The atmosphere plane takes no input; its handles stay on the clipped screen plane.
@@ -425,7 +720,9 @@ export function createImageRenderer(
               composition: !verified
                 ? ('unsupported' as const)
                 : local
-                  ? ('native-underlay' as const)
+                  ? beneath
+                    ? ('native-beneath' as const)
+                    : ('native-underlay' as const)
                   : atmosphere
                     ? ('atmosphere' as const)
                     : page
@@ -442,6 +739,9 @@ export function createImageRenderer(
               animated:
                 layer.layer.kind === 'animation' ||
                 Boolean(layer.layer.effects?.some((e) => e.enabled && e.bindings.length)),
+              ...(localIds.has(layer.layer.id) && beneath
+                ? { settled: beneathSettled(beneath.unproven, layer.bounds) }
+                : {}),
               ...(localIds.has(layer.layer.id) && slot
                 ? {
                     clip: {
@@ -455,10 +755,20 @@ export function createImageRenderer(
             };
           }),
       );
-      const record = JSON.stringify({ stopped: safety.snapshot().stopped, issues: safety.snapshot().issues });
-      if (record !== writtenSafety || host!.dataset.wwSafety !== record) {
-        host!.dataset.wwSafety = record;
-        writtenSafety = record;
+      // The guard keeps the same issues array while nothing changed: serialise only on a change (c3).
+      const status = safety.snapshot();
+      if (
+        status.issues !== recordedIssues ||
+        status.stopped !== recordedStopped ||
+        host!.dataset.aroundSafety !== writtenSafety
+      ) {
+        const record = JSON.stringify({ stopped: status.stopped, issues: status.issues });
+        recordedIssues = status.issues;
+        recordedStopped = status.stopped;
+        if (record !== writtenSafety || host!.dataset.aroundSafety !== record) {
+          host!.dataset.aroundSafety = record;
+          writtenSafety = record;
+        }
       }
       for (const layer of layout.layers) {
         const entry = nodes.get(layer.layer.id);
@@ -480,6 +790,10 @@ export function createImageRenderer(
         else if (!stopped && wasStopped) entry.media.update(layer.layer, layer.visible);
       }
     }
+    // Reading an inline value is a declaration lookup, not a style or layout read.
+    for (const [element, values] of staged)
+      for (const key in values)
+        if (element.style.getPropertyValue(key) !== values[key]) element.style.setProperty(key, values[key]!);
     const selected =
       editing && editing.selectedIds.length > 1
         ? [...layout.groups, ...layout.layers].filter(
@@ -531,17 +845,70 @@ export function createImageRenderer(
 
   const draw = () => {
     if (!host) return;
-    safety?.sample(view.performance.now());
-    const overlaySlot = safety?.source.overlaySlot();
-    const parent = overlaySlot?.parent ?? doc.fullscreenElement ?? doc.body ?? doc.documentElement;
-    if (overlaySlot) host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
-    if (host.parentElement !== parent) parent.append(host);
+    const place = (room = roomPlace());
+    behind = backdrop?.();
+    // Nothing behind the UI shows in fullscreen: room-depth roots wait there, like the room.
+    if (behind && doc.fullscreenElement) behind = 'pending';
+    guard = place ? undefined : safety;
+    guard?.sample(view.performance.now());
+    const overlaySlot = guard?.source.overlaySlot();
+    if (place === 'pending') {
+      // The room is loading or hidden: room-only artwork is not drawn (never in front, unguarded).
+      host.remove();
+      return;
+    }
+    if (place) {
+      // Behind the UI: right after the room's canvas, at its level, so the room is under the
+      // artwork and the page's content is over both. No clip: there is nothing it could cover.
+      const after = place.after?.parentElement === place.parent ? place.after : undefined;
+      if (SPACE_BREAK === 'stacking') {
+        // A broken build (AROUND_SPACE_BREAK=stacking): over the UI, unguarded, to see the tests fail.
+        if (host.parentElement !== place.parent || host.nextSibling) place.parent.append(host);
+        host.style.setProperty('--around-decoration-z', '2147482000');
+      } else if (
+        host.parentElement !== place.parent ||
+        (after ? host.previousElementSibling !== after : host !== place.parent.firstChild)
+      )
+        place.parent.insertBefore(host, after ? after.nextSibling : place.parent.firstChild);
+      if (SPACE_BREAK !== 'stacking') host.style.setProperty('--around-decoration-z', String(place.zIndex));
+      if (host.style.getPropertyValue('--around-decoration-clip') !== 'none') {
+        host.style.setProperty('--around-decoration-clip', 'none');
+        writtenClip = 'none';
+      }
+      // A verdict from a guarded draw before the room appeared no longer applies.
+      if (host.dataset.aroundSafety !== undefined) {
+        delete host.dataset.aroundSafety;
+        writtenSafety = '';
+        recordedIssues = recordedStopped = undefined;
+      }
+      for (const plane of [pagePlane, atmospherePlane, roomPlane]) plane?.host.remove();
+      pagePlane = atmospherePlane = roomPlane = undefined;
+      videoSlot?.host.remove();
+      videoSlot = undefined;
+      beneathRoots = new Set();
+      for (const [id, entry] of [...nodes, ...compositions]) {
+        const root = parentGroup(groups, id) ? undefined : entry.node;
+        if (root && root.parentNode !== imageLayer) imageLayer!.append(root);
+        if (entry.controls.parentNode !== shadow) shadow!.append(entry.controls);
+      }
+      for (const entry of nodes.values())
+        if (entry.node.hasAttribute('data-safety-limited')) {
+          entry.node.removeAttribute('data-safety-limited');
+          entry.node.style.visibility = entry.node.style.pointerEvents = '';
+        }
+    } else {
+      const parent = overlaySlot?.parent ?? doc.fullscreenElement ?? doc.body ?? doc.documentElement;
+      if (overlaySlot) host.style.setProperty('--around-decoration-z', String(overlaySlot.zIndex));
+      if (host.parentElement !== parent) parent.append(host);
+    }
     const nextObserved = new Set<Element>();
     const effectTargets: EffectTarget[] = [];
     const geometry = captureGeometry(doc, anchors),
       scene = { decorations: images, groups, ...(signalRules.length ? { signalRules } : {}) };
     const layout = WORLD_MODE === 'legacy' ? legacyLayout(scene, geometry) : evaluateLayout(scene, geometry);
-    if (WORLD_MODE === 'compare') assertWorldParity(layout, legacyLayout(scene, geometry), 'layout');
+    // The legacy layout predates reduced parts (a miniplayer): it is compared only where they agree.
+    if (WORLD_MODE === 'compare' && !geometry.reducedParts)
+      assertWorldParity(layout, legacyLayout(scene, geometry), 'layout');
     const layouts = new Map(layout.groups.map((group) => [group.layer.id, group]));
     const layerLayouts = new Map(layout.layers.map((layer) => [layer.layer.id, layer]));
     // Composite parents are evaluated first; descendants share the same effect stage.
@@ -576,13 +943,15 @@ export function createImageRenderer(
       const renderable = layouts.get(group.id)!.renderable;
       effectTargets.push({ layer, element: entry.content, frame: rect, renderable, visibility() {} });
     }
+    const awayId = editing ? undefined : away?.();
     for (const item of images) {
       const entry = nodes.get(item.id);
       if (!entry) continue;
       const evaluated = layerLayouts.get(item.id)!,
         rect = evaluated.frame;
       const parent = parentGroup(groups, item.id);
-      const visible = evaluated.visible,
+      // The resident in the room is drawn there (by the room's renderer), not here.
+      const visible = evaluated.visible && item.id !== awayId,
         locked = evaluated.locked;
       entry.node.hidden = !visible || !rect;
       const selected = Boolean(editing?.selectedIds.includes(item.id));
@@ -593,10 +962,10 @@ export function createImageRenderer(
       if (item.placement.anchor.kind === 'surface') {
         const id = item.placement.anchor.target;
         const target = anchors.find((candidate) => candidate.id === id);
-        const element = target && doc.querySelector(`[data-ww-surface~="${target.surface}"]`);
+        const element = target && doc.querySelector(`[data-around-surface~="${target.surface}"]`);
         if (element) nextObserved.add(element);
       }
-      if (!rect) {
+      if (!rect || item.id === awayId) {
         entry.media.update(item, false);
         continue;
       }
@@ -650,7 +1019,7 @@ export function createImageRenderer(
         scene,
         geometry,
         layout,
-        ...(safety ? { safety } : {}),
+        ...(guard ? { safety: guard } : {}),
         ...(gesture ? { holdTransforms: true } : {}),
       });
     } finally {
@@ -670,9 +1039,8 @@ export function createImageRenderer(
       });
   };
 
-  const onPointerDown = (event: PointerEvent) => {
+  const beginPointerGesture = (event: PointerEvent, target: Element | undefined) => {
     if (!editing || editing.locked || event.button !== 0) return;
-    const target = event.target instanceof Element ? event.target : undefined;
     const wrapper = target?.closest<HTMLDivElement>('[data-image-id], [data-frame-id]');
     const originalId = wrapper?.dataset.imageId ?? wrapper?.dataset.frameId;
     const parent = originalId && parentGroup(groups, originalId),
@@ -685,7 +1053,10 @@ export function createImageRenderer(
     // A handle can lag behind native geometry (an asynchronous scroll moves the page under the
     // screen plane). A fresh read must find no protected control under the point; otherwise the
     // guard hides the artwork and the next press reaches the native control.
-    if (safety && !safety.claim({ x: event.clientX, y: event.clientY })) return;
+    // On the beneath plane (chunk 4) the press reached the handle under every proven surface.
+    const root = (id && parentGroup(groups, id)?.id) || id;
+    if (safety && !safety.claim({ x: event.clientX, y: event.clientY }, Boolean(root && beneathRoots.has(root))))
+      return;
     event.preventDefault();
     event.stopPropagation();
     const mode = target?.getAttribute('data-handle') ?? 'move';
@@ -720,6 +1091,25 @@ export function createImageRenderer(
     draw();
     node.setPointerCapture(event.pointerId);
   };
+  const onPointerDown = (event: PointerEvent) =>
+    beginPointerGesture(event, event.target instanceof Element ? event.target : undefined);
+  const onVideoModelPress = (event: PointerEvent) => {
+    if (!host || !shadow || !editing || editing.locked || !event.isTrusted || event.button !== 0) return;
+    const { clientX: x, clientY: y } = event;
+    if (!videoHoverBounds.some((b) => x >= b.left && x < b.right && y >= b.top && y < b.bottom)) return;
+    if (event.composedPath().includes(host)) return;
+    // Restore hit testing only for this synchronous lookup. This honours the native clip,
+    // rotation and paint order without dispatching a hover transition or probing on mousemove.
+    host.toggleAttribute('data-around-model-press', true);
+    const target = doc.elementFromPoint(x, y) === host ? shadow.elementFromPoint(x, y) : null;
+    host.removeAttribute('data-around-model-press');
+    const node = target?.closest<HTMLElement>('.image[data-video-hover]');
+    if (!node) return;
+    beginPointerGesture(event, node);
+    // An additive press can deselect without starting a drag. The click still belongs to the
+    // editor, so keep its release and click from reaching the video in that case too.
+    if (event.defaultPrevented && !gesture) node.setPointerCapture(event.pointerId);
+  };
   const onPointerMove = (event: PointerEvent) => {
     if (!gesture || !editing || editing.locked || event.pointerId !== gesture.pointerId) return;
     event.preventDefault();
@@ -753,8 +1143,11 @@ export function createImageRenderer(
                 0,
                 Math.min(1, base.placement.y + (-dx * Math.sin(angle) + dy * Math.cos(angle)) / base.frame.height),
               ),
-              widthPx: p.widthPx,
-              heightPx: p.heightPx,
+              // The gesture starts from the size as drawn, which a reduced part (a miniplayer, the
+              // adapter's PART_REDUCED_ATTRIBUTE) makes smaller than the artwork's: the artwork keeps its own
+              // size, changed by the gesture's proportion. Drawn as authored, that is p itself.
+              widthPx: authoredSize(base.placement.widthPx, start.placement.widthPx, p.widthPx),
+              heightPx: authoredSize(base.placement.heightPx, start.placement.heightPx, p.heightPx),
               rotationDeg: rotation(base.placement.rotationDeg + rotation(p.rotationDeg - start.placement.rotationDeg)),
             },
           };
@@ -838,16 +1231,17 @@ export function createImageRenderer(
   };
   const mount = () => {
     host = doc.createElement('div');
-    host.id = 'web-world-themes-decorations';
+    host.id = 'around-decorations';
     shadow = host.attachShadow({ mode: 'open' });
     const style = doc.createElement('style');
     style.textContent = CSS;
     shadow.append(style);
     media = createMediaController(
       doc,
+      assets.load,
       (message) => editing?.error(message),
       (stats) => {
-        if (host) host.dataset.wwMediaStats = JSON.stringify(stats);
+        if (host) host.dataset.aroundMediaStats = JSON.stringify(stats);
       },
     );
     models = createModelRenderer(
@@ -857,16 +1251,18 @@ export function createImageRenderer(
         if (message.includes('コンテキスト')) safety?.pause(message);
       },
       (stats) => {
-        if (host) host.dataset.wwModelStats = JSON.stringify(stats);
+        if (host) host.dataset.aroundModelStats = JSON.stringify(stats);
       },
       shadow,
-      undefined,
+      assets.load,
       undefined,
       () =>
         safety?.pause(
-          'WebGLコンテキストが失われたため3Dの描画を停止しました。',
+          'ブラウザーが3Dの描画を打ち切ったため、3Dモデルの表示を止めました。',
           true,
           images.filter((i) => i.kind === 'model3d').map((i) => i.id),
+          [],
+          'しばらくすると、自動で描き直します。',
         ),
     );
     effects = createEffectController(
@@ -876,9 +1272,13 @@ export function createImageRenderer(
       // Effect frames run outside draw(), so they read the composition slot themselves.
       (layout) => {
         effectLayoutApplied = true;
-        applyLayout(layout, safety?.source.overlaySlot());
+        applyLayout(layout, guard?.source.overlaySlot());
       },
       (frame) => models?.evaluate(frame),
+      // The slot reads computed styles of the overlay's ancestors; read before this frame's style
+      // writes, the read needs no style recalculation, and the layout below reuses it (same task).
+      () => guard?.source.overlaySlot(),
+      page,
     );
     imageLayer = doc.createElement('div');
     imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
@@ -895,6 +1295,7 @@ export function createImageRenderer(
       return node;
     });
     wireGestures(shadow);
+    view.addEventListener('pointerdown', onVideoModelPress, true);
     observer = new ResizeObserver(refresh);
     view.addEventListener('resize', onViewChange);
     view.addEventListener('blur', onBlur);
@@ -914,7 +1315,7 @@ export function createImageRenderer(
     models = undefined;
     media?.destroy();
     media = undefined;
-    clearAssetSources();
+    assets.clear();
     gesture = undefined;
     if (frame !== undefined) view.cancelAnimationFrame(frame);
     frame = undefined;
@@ -925,12 +1326,14 @@ export function createImageRenderer(
     view.removeEventListener('blur', onBlur);
     doc.removeEventListener('scroll', onViewChange, true);
     doc.removeEventListener('fullscreenchange', onViewChange);
+    view.removeEventListener('pointerdown', onVideoModelPress, true);
     host?.remove();
     videoSlot?.host.remove();
     videoSlot = undefined;
     pagePlane?.host.remove();
     atmospherePlane?.host.remove();
-    pagePlane = atmospherePlane = undefined;
+    roomPlane?.host.remove();
+    pagePlane = atmospherePlane = roomPlane = undefined;
     host = undefined;
     shadow = undefined;
     groupFrame = undefined;
@@ -941,6 +1344,7 @@ export function createImageRenderer(
     images = [];
     groups = [];
     lastLayout = undefined;
+    videoHoverBounds = [];
   };
   return {
     update(next: readonly Decoration[], nextGroups: readonly GroupLayer[] = [], nextRules: readonly SignalRule[] = []) {

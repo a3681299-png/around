@@ -102,7 +102,7 @@ const stats = (samples) => {
   };
 };
 const take = parseSignalTake({
-  format: 'ww-signal-take',
+  format: 'around-signal-take',
   formatVersion: 1,
   runtimeVersion: WORLD_RUNTIME_VERSION,
   id: 'take-motion-benchmark',

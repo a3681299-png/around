@@ -1,4 +1,5 @@
-import { centre, placementBounds } from './geometry';
+import { centre, placementBounds, type PlacementFrame } from './geometry';
+import type { LayerPlacement } from '../design/types';
 import { effectivelyLocked, groupView, parentGroup, rootLayers } from './hierarchy';
 import {
   frameFor,
@@ -8,6 +9,35 @@ import {
   type GroupEvaluation,
   type LayerEvaluation,
 } from './types';
+
+/**
+ * The placement as drawn on its frame: reduced with a part the adapter reports in its reduced form
+ * (`reducedParts`: a video player's miniplayer), otherwise the same object. The layer is drawn by
+ * the part's height against the height it last had when not reduced, so it keeps its share of the
+ * part, from the same point of it; its size in the artwork stays as authored. Only the adapter's
+ * report counts, never a size: a regular part is drawn as authored however small it is (a small
+ * player, a window shrunk at once), so there is no threshold to step over (chunk 4 fix,
+ * docs/layering-plan.md 9).
+ */
+function placedOn<T extends { placement: LayerPlacement }>(
+  layer: T,
+  frame: PlacementFrame | undefined,
+  geometry: WorldGeometry,
+): T {
+  const anchor = layer.placement.anchor;
+  const base = anchor.kind === 'surface' ? geometry.reducedParts?.[anchor.target] : undefined;
+  // A base no taller than the part would enlarge it: a reduced form never draws larger.
+  if (!frame || !base || !Number.isFinite(base) || frame.height <= 0 || frame.height >= base) return layer;
+  const scale = frame.height / base;
+  return {
+    ...layer,
+    placement: {
+      ...layer.placement,
+      widthPx: layer.placement.widthPx * scale,
+      heightPx: layer.placement.heightPx * scale,
+    },
+  };
+}
 
 /** Re-evaluate from native anchor coordinates; never accumulate viewport conversions. */
 export function evaluateLayout(scene: WorldScene, geometry: WorldGeometry): WorldLayout {
@@ -41,8 +71,9 @@ export function evaluateLayout(scene: WorldScene, geometry: WorldGeometry): Worl
     };
   });
   const layouts = new Map(compositions.map((group) => [group.layer.id, group]));
-  const layers: LayerEvaluation[] = scene.decorations.map((layer) => {
-    const frame = frameFor(layer.placement, geometry),
+  const layers: LayerEvaluation[] = scene.decorations.map((authored) => {
+    const frame = frameFor(authored.placement, geometry),
+      layer = placedOn(authored, frame, geometry),
       parent = parentGroup(groups, layer.id),
       parentLayout = parent && layouts.get(parent.id);
     const position = frame && centre(layer.placement, frame),

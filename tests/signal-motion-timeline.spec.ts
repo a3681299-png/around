@@ -1,6 +1,8 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import { mkdir } from 'node:fs/promises';
 import { test, expect } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
 
@@ -8,10 +10,8 @@ test('mouse-driven X/rotation lanes edit offsets, custom ranges and curves with 
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  await showArtwork(popup);
+  let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.timeline-toggle').click();
   await panel.getByLabel('キーの対象プロパティ').selectOption('position.x');
@@ -39,23 +39,22 @@ test('mouse-driven X/rotation lanes edit offsets, custom ranges and curves with 
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   const design = await popup.evaluate(
-    async () =>
-      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as DesignDocument,
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
   );
   expect(design.signalRules).toHaveLength(2);
   expect(design.decorations[0]!.placement.rotationDeg).toBe(0);
   await panel.locator('.take-live').click();
   await youtube.mouse.move(650, 380);
-  const image = youtube.locator('#web-world-themes-decorations .image');
+  const image = youtube.locator('#around-decorations .image');
   await expect
     .poll(() => image.evaluate((node: HTMLElement) => Number.parseFloat(node.style.left)))
     .toBeCloseTo(design.decorations[0]!.placement.x * 1100 - 200 + (650 * 500) / 1100, 3);
   await mkdir('.work/verification', { recursive: true });
   await panel.screenshot({ path: '.work/verification/signal-v2-key-editor.png' });
+  // The editor closes with the reload, as before; then it is opened again on the saved work.
+  await closeEditorPages(youtube);
   await youtube.reload();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+  ({ panel } = await openEditor(popup, youtube));
   await panel.locator('.layer [data-action="select"]').click();
   await panel.getByLabel('キーの対象プロパティ').selectOption('rotation');
   await expect(panel.getByLabel('駆動元シグナル')).toHaveValue('layer-distance');
@@ -66,10 +65,8 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  await showArtwork(popup);
+  let { panel } = await openEditor(popup, youtube);
   await panel
     .getByLabel('画像素材を追加')
     .setInputFiles(Array(2).fill(path.resolve('tests/fixtures/motion/petal.png')));
@@ -84,10 +81,7 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   const design = await popup.evaluate(
-    async () =>
-      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as DesignDocument,
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
   );
   await panel.locator('.timeline-toggle').click();
   await panel.locator('.take-record').click();
@@ -110,14 +104,15 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   await expect(panel.locator('.take-saved')).toHaveText('テイク保存済み');
   const takes = await popup.evaluate(
     async () =>
-      (await chrome.runtime.sendMessage({ type: 'web-world-themes:signal-takes', action: 'list', siteId: 'youtube' }))
-        .value as { id: string }[],
+      (await chrome.runtime.sendMessage({ type: 'around:signal-takes', action: 'list', siteId: 'youtube' })).value as {
+        id: string;
+      }[],
   );
   const take = await popup.evaluate(
     async (id) =>
       (
         await chrome.runtime.sendMessage({
-          type: 'web-world-themes:signal-takes',
+          type: 'around:signal-takes',
           action: 'get',
           siteId: 'youtube',
           id,
@@ -133,7 +128,7 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   const expected = sampler.at(at).frame.layout.groups[0]!,
     p = expected.layer.placement,
     frame = expected.frame!;
-  const composition = youtube.locator('#web-world-themes-decorations .composition');
+  const composition = youtube.locator('#around-decorations .composition');
   const position = () =>
     composition.evaluate((node: HTMLElement) => ({
       x: Number.parseFloat(node.style.left),
@@ -153,14 +148,16 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   await panel.locator('.take-position').press('Tab');
   await expect.poll(position).toEqual(paused);
   await panel.screenshot({ path: '.work/verification/signal-v2-motion-take.png' });
+  // The editor closes with the reload, as before; then it is opened again on the saved work.
+  await closeEditorPages(youtube);
   await youtube.reload();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+  ({ panel } = await openEditor(popup, youtube));
   await panel.locator('.take-library-select').selectOption(take.id);
   await expect(panel.locator('.take-source')).toHaveText('PREVIEW');
   await panel.locator('.take-position').fill(String(at / 1000));
   await panel.locator('.take-position').press('Tab');
   await expect.poll(position).toEqual(paused);
   await panel.locator('.take-live').click();
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+  await expect(youtube.locator('#around-decorations')).toHaveCount(0);
 });

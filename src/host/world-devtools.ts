@@ -21,7 +21,7 @@ export function createWorldDevtools(
   },
 ) {
   if (!WORLD_DEVTOOLS) return undefined;
-  const lifetime = globalThis as typeof globalThis & { __wwWorldRuntime?: WorldDebugApi };
+  const lifetime = globalThis as typeof globalThis & { __aroundWorldRuntime?: WorldDebugApi };
   const recorder = createWorldRecorder();
   let clicks: WorldEvent[] = [],
     closed = false,
@@ -35,7 +35,8 @@ export function createWorldDevtools(
         .some(
           (node) =>
             node instanceof Element &&
-            (node.hasAttribute('data-ww-signal-control') || node.matches('input, textarea, select, [contenteditable]')),
+            (node.hasAttribute('data-around-signal-control') ||
+              node.matches('input, textarea, select, [contenteditable]')),
         )
     )
       return;
@@ -70,7 +71,7 @@ export function createWorldDevtools(
     replay: replayWorld,
     frame: session.frame,
   };
-  lifetime.__wwWorldRuntime = api;
+  lifetime.__aroundWorldRuntime = api;
   return {
     get active() {
       return recorder.active;
@@ -94,7 +95,7 @@ export function createWorldDevtools(
       recorder.clear();
       sync();
       clicks = [];
-      if (lifetime.__wwWorldRuntime === api) delete lifetime.__wwWorldRuntime;
+      if (lifetime.__aroundWorldRuntime === api) delete lifetime.__aroundWorldRuntime;
     },
   };
 }

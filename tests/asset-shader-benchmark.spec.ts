@@ -6,11 +6,11 @@ import { launchExtension } from './fixtures';
 
 test('opt-in shader investigation compares actual program cache keys before and after the first pose', async () => {
   test.skip(
-    process.env.WW_SHADER_BENCH !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_SHADER_BENCH !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit physical-GPU and private original measurement, with the profiling build.',
   );
   test.setTimeout(300_000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-c3-shader-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-c3-shader-')), false, {
     headed: true,
     width: 1920,
     height: 1080,
@@ -20,17 +20,17 @@ test('opt-in shader investigation compares actual program cache keys before and 
   try {
     const page = await context.newPage();
     await page.goto('chrome://extensions/');
-    const item = page.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = page.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((node) => (node as HTMLElement & { data?: { id: string } }).data?.id ?? node.id);
     await page.goto(`chrome-extension://${id}/diagnostics/asset-benchmark.html`);
-    await page.locator('#file').setInputFiles(process.env.WW_VRM_FILE!);
+    await page.locator('#file').setInputFiles(process.env.AROUND_VRM_FILE!);
     await page.bringToFront();
     // Alternate ordering across rounds; each trial creates a fresh WebGL context.
     for (let round = 0; round < 5; round++)
       for (const phase of round % 2 ? ['after-pose', 'before-player'] : ['before-player', 'after-pose']) {
         const value = await page.evaluate(
-          (phase) => (globalThis as any).wwAssetBench.run('direct', 'compile', phase),
+          (phase) => (globalThis as any).aroundAssetBench.run('direct', 'compile', phase),
           phase,
         );
         expect(value.alphaPixels).toBeGreaterThan(1000);

@@ -2,6 +2,9 @@
 export const VIDEO_CARD_SELECTOR =
   'yt-lockup-view-model, ytd-rich-grid-media, ytd-grid-video-renderer, ytd-video-renderer, ytd-compact-video-renderer';
 
+// The selector above is a plain list of tag names; most elements are not one of them.
+const VIDEO_CARD_TAGS: ReadonlySet<string> = new Set(VIDEO_CARD_SELECTOR.split(',').map((tag) => tag.trim()));
+
 export function videoCardContainer(element: Element): Element | null {
   let card = element.closest(VIDEO_CARD_SELECTOR);
   let parent = card?.parentElement?.closest(VIDEO_CARD_SELECTOR);
@@ -13,6 +16,7 @@ export function videoCardContainer(element: Element): Element | null {
 }
 
 export function isYouTubeVideoCard(element: Element): boolean {
+  if (!VIDEO_CARD_TAGS.has(element.localName)) return false;
   if (!element.matches(VIDEO_CARD_SELECTOR) || element.parentElement?.closest(VIDEO_CARD_SELECTOR)) return false;
   if (
     element.closest(

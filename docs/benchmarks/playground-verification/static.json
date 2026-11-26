@@ -1,0 +1,65 @@
+{
+  "boundary": [
+    {
+      "label": "lint",
+      "status": 1,
+      "detected": true
+    },
+    {
+      "label": "unit",
+      "status": 1,
+      "detected": true
+    },
+    {
+      "source": "chrome.storage.local.get(\"x\");",
+      "problem": "src/host/future.ts: call Chrome APIs (chrome.*) only from src/browser/"
+    },
+    {
+      "source": "chrome[\"storage\"].local.get(\"x\");",
+      "problem": null
+    },
+    {
+      "source": "const c = chrome; c.storage.local.get(\"x\");",
+      "problem": null
+    }
+  ],
+  "output": [
+    {
+      "label": "clean",
+      "problems": []
+    },
+    {
+      "label": "trusie",
+      "problems": [
+        "content/trusie.vrm: forbidden name",
+        "content/trusie.vrm: a model or motion the Playground build did not make"
+      ],
+      "syntheticOnly": true,
+      "processStatus": 1
+    },
+    {
+      "label": "private",
+      "problems": [
+        "content/PochibyKT_Pochi.vrm: forbidden name",
+        "content/PochibyKT_Pochi.vrm: a model or motion the Playground build did not make"
+      ],
+      "syntheticOnly": true,
+      "processStatus": 1
+    },
+    {
+      "label": "mixamo-renamed",
+      "problems": ["content/plain.glb: contains /mixamo/i"],
+      "syntheticOnly": true,
+      "processStatus": 1
+    },
+    {
+      "label": "japanese",
+      "problems": ["credits.txt: contains /トルーシェ/"],
+      "syntheticOnly": true,
+      "processStatus": 1
+    }
+  ],
+  "manifestUnchanged": true,
+  "privateHistory": "",
+  "cleanLintStatus": 0
+}

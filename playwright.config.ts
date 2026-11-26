@@ -3,19 +3,45 @@ import { defineConfig } from '@playwright/test';
 // These specs use in-memory ports, data fixtures and document stubs only.
 // fullyParallel gives each test a worker-isolated module/global environment.
 const unitSpecs = [
+  'answer-check',
+  'unitypackage',
+  'auto-motions',
+  'check-motions',
+  'gait',
+  'space',
+  'space-data',
+  'room-life',
+  'living-room-host',
+  'camera-shots',
+  'clean-work',
   'backup-data',
+  'browser-boundary',
+  'playground-output',
+  'g11-hooks',
+  'mannequin',
+  'body-motion',
+  'character-v15',
+  'behaviour-motions',
+  'autonomy',
+  'two-bone-ik',
+  'living-body',
+  'living-life',
+  'living-desktop',
+  'living-mind',
+  'living-live',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',
   'asset-runtime',
   'asset-shared-pool',
-  'comment-timestamps',
+  'character-body',
+  'character-data',
+  'character-manifest',
   'design',
   'design-migrations',
   'editor-core',
   'editor-benchmark',
   'effect-data',
-  'features',
   'group-data',
   'host-signals',
   'image-data',
@@ -29,11 +55,21 @@ const unitSpecs = [
   'model-rig',
   'motion-data',
   'operation-data',
-  'palette',
+  'settings-data',
   'signal-motion',
   'signal-evaluation-benchmark',
   'signal-equality',
   'signal-rules',
+  'skin-contrast',
+  'ink-cache',
+  'surface-index',
+  'skin-cpu-probe',
+  'skin-frame-clock',
+  'skin-data',
+  'skin-session',
+  'skin-verification-data',
+  'studio-pen',
+  'skin-build-flags',
   'signal-registry',
   'signal-takes',
   'spatial-points',
@@ -44,6 +80,8 @@ const unitSpecs = [
   'studio-transfer-data',
   'timeline-host',
   'vrm-data',
+  'vrma-data',
+  'vrma-clip',
   'validation',
   'world-boundaries',
   'world-compatibility',
@@ -55,11 +93,23 @@ const unitSpecs = [
   'world-timeline-host',
   'youtube-details',
 ].map((name) => `**/${name}.spec.ts`);
+// The operation safety (G1) specs: what must hold whichever way the character is kept clear.
+const g1Specs = [
+  'operation-safety',
+  'operation-bands',
+  'operation-controls',
+  'operation-player-overlays',
+  'operation-editing-input',
+  'g13-fix-bound',
+  'g13-look-regression',
+  'g13-sparse-visual',
+  'g14-idle-recheck',
+].map((name) => `**/${name}.spec.ts`);
 
-export default defineConfig({
+export default defineConfig<object, { layering: boolean | undefined }>({
   testDir: './tests',
   outputDir: './.work/test-results',
-  // Removes `%TEMP%\ww-*` profiles left by tests that ended without closing their browser.
+  // Removes `%TEMP%\around-*` profiles left by tests that ended without closing their browser.
   globalSetup: './tests/temporary-profiles.ts',
   fullyParallel: false,
   workers: 4,
@@ -77,6 +127,20 @@ export default defineConfig({
       workers: 1,
       outputDir: './.work/test-results/e2e',
       use: { trace: 'retain-on-failure', screenshot: 'only-on-failure' },
+    },
+    // The G1 specs again, with the player's character kept clear of the controls the other way
+    // (docs/layering-plan.md): the earlier cut-out way, a AROUND_LAYERING=0 development build
+    // (tests/helpers/layering-build.ts). It stays as the way out where a part cannot be proven, so
+    // both ways must keep every control visible and reachable; a failure here is the product's.
+    // `npm run test:e2e` runs both projects with --workers=1: a project's own `workers` does not
+    // stop two projects running side by side, which starved timing-sensitive specs on CI (chunk 4).
+    {
+      name: 'g1-other-way',
+      testMatch: g1Specs,
+      fullyParallel: false,
+      workers: 1,
+      outputDir: './.work/test-results/g1-other-way',
+      use: { trace: 'retain-on-failure', screenshot: 'only-on-failure', layering: false },
     },
   ],
 });

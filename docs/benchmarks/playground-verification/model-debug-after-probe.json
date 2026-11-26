@@ -1,0 +1,67 @@
+{
+  "side": "after",
+  "kind": "probe",
+  "stages": [
+    {
+      "stage": "import",
+      "html": {
+        "errors": null,
+        "safety": null
+      },
+      "media": [
+        {
+          "format": "vrm",
+          "playback": "loading",
+          "visibility": "hidden"
+        }
+      ],
+      "stats": []
+    },
+    {
+      "stage": "saved",
+      "html": {
+        "errors": null,
+        "safety": null
+      },
+      "media": [
+        {
+          "format": "vrm",
+          "playback": "playing",
+          "vrmPose": "{\"head\":[0,0,0.05359960407821689,0.9985625685016193],\"eyes\":[[0,0,0,1],[0,0,0,1]],\"expressions\":{}}",
+          "modelFrame": "{\"clip\":0,\"timeMs\":1330.4000000000015,\"previousClip\":null,\"previousTimeMs\":0,\"fadeElapsedMs\":250,\"fadeDurationMs\":250,\"yawDeg\":0,\"lookYaw\":0,\"lookPitch\":0,\"suspended\":false,\"phase\":\"manual\",\"id\":\"image-2c7da1e9-9f21-43fe-bc53-5bd1930d1a36\",\"blend\":1,\"speedPx\":0}",
+          "renderer": "three",
+          "visibility": "visible"
+        }
+      ],
+      "stats": [
+        "{\"contexts\":1,\"lost\":false,\"assets\":1,\"instances\":1,\"estimatedGpuAssetBytes\":1706,\"surfaceBytes\":4,\"paints\":46,\"cpuMs\":0,\"maxCpuMs\":170.2000000011176,\"calls\":0,\"triangles\":0,\"backend\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)\",\"fps\":24.812557311613386,\"p95CpuMs\":4.799999998882413,\"geometries\":1,\"textures\":3,\"programs\":1,\"gpuMs\":1.300675}"
+      ]
+    },
+    {
+      "stage": "reload",
+      "html": {
+        "errors": null,
+        "safety": null
+      },
+      "media": [
+        {
+          "format": "vrm",
+          "playback": "playing",
+          "vrmPose": "{\"head\":[0,0,0.04909673779654694,0.9987940787111116],\"eyes\":[[0,0,0,1],[0,0,0,1]],\"expressions\":{}}",
+          "modelFrame": "{\"clip\":0,\"timeMs\":613.3000000007451,\"previousClip\":null,\"previousTimeMs\":0,\"fadeElapsedMs\":250,\"fadeDurationMs\":250,\"yawDeg\":0,\"lookYaw\":0,\"lookPitch\":0,\"suspended\":false,\"phase\":\"manual\",\"id\":\"image-2c7da1e9-9f21-43fe-bc53-5bd1930d1a36\",\"blend\":1,\"speedPx\":0}",
+          "renderer": "three",
+          "visibility": "visible"
+        }
+      ],
+      "stats": [
+        "{\"contexts\":1,\"lost\":false,\"assets\":1,\"instances\":1,\"estimatedGpuAssetBytes\":1706,\"surfaceBytes\":4,\"paints\":4,\"cpuMs\":0.10000000149011612,\"maxCpuMs\":106.09999999962747,\"calls\":0,\"triangles\":0,\"backend\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)\",\"fps\":8.228759514503183,\"p95CpuMs\":106.09999999962747,\"geometries\":1,\"textures\":3,\"programs\":1,\"gpuMs\":3.672759}"
+      ]
+    }
+  ],
+  "inputEnabled": true,
+  "completed": true,
+  "final": {
+    "errors": null,
+    "url": "https://www.youtube.com/watch?v=LC1a-DwUhls"
+  }
+}

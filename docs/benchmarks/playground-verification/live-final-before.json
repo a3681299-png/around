@@ -1,0 +1,104 @@
+{
+  "label": "final-before",
+  "states": {
+    "watch": {
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 1344,
+        "height": 756,
+        "top": 68,
+        "right": 1360,
+        "bottom": 824,
+        "left": 16
+      },
+      "character": {
+        "x": 1096.828125,
+        "y": -27,
+        "width": 150,
+        "height": 190,
+        "top": -27,
+        "right": 1246.828125,
+        "bottom": 163,
+        "left": 1096.828125
+      },
+      "normalized": {
+        "x": 0.8599911644345238,
+        "y": 0
+      },
+      "painted": 25042,
+      "safety": null,
+      "viewport": [1920, 1080],
+      "url": "https://www.youtube.com/watch?v=LC1a-DwUhls"
+    },
+    "reload": {
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 1344,
+        "height": 756,
+        "top": 68,
+        "right": 1360,
+        "bottom": 824,
+        "left": 16
+      },
+      "character": {
+        "x": 1096.828125,
+        "y": -27,
+        "width": 150,
+        "height": 190,
+        "top": -27,
+        "right": 1246.828125,
+        "bottom": 163,
+        "left": 1096.828125
+      },
+      "normalized": {
+        "x": 0.8599911644345238,
+        "y": 0
+      },
+      "painted": 0,
+      "safety": null,
+      "viewport": [1920, 1080],
+      "url": "https://www.youtube.com/watch?v=LC1a-DwUhls"
+    },
+    "visible-reference": {
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 1344,
+        "height": 756,
+        "top": 68,
+        "right": 1360,
+        "bottom": 824,
+        "left": 16
+      },
+      "character": {
+        "x": 1096.828125,
+        "y": 313.1875,
+        "width": 150,
+        "height": 190,
+        "top": 313.1875,
+        "right": 1246.828125,
+        "bottom": 503.1875,
+        "left": 1096.828125
+      },
+      "normalized": {
+        "x": 0.8599911644345238,
+        "y": 0.4499834656084656
+      },
+      "painted": 23111,
+      "safety": null,
+      "viewport": [1920, 1080],
+      "url": "https://www.youtube.com/watch?v=LC1a-DwUhls"
+    }
+  },
+  "nativeHit": true,
+  "emergency": true,
+  "nativeClick": true,
+  "video": {
+    "ready": 4,
+    "error": null,
+    "paused": true,
+    "time": 2.084666
+  }
+}

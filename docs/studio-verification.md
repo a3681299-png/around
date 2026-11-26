@@ -55,7 +55,7 @@ Ctrl/Shiftで複数選択、矢印で1px・Shiftで10px移動、Ctrl+Dで複製�
 5. 接続解除後のクリック透過と実際の動画再生操作、YouTubeロゴからHomeへのSPA遷移、再接続。
 6. テーマOFFで描画・編集属性・接続バッジを撤去し、Studioの編集を停止。
 
-実行は `WW_LIVE_STUDIO=1 npm test -- tests/studio-live.spec.ts`。確認記録は `.work/verification/studio-live.json`、画面は `studio-live-workspace.png` と `studio-live-youtube.png`。最終のfixture回帰は `.work/verification/studio-final-targeted.log`、全体は `studio-all.log` に保存した。これらは作業環境の検証成果物で、Git管理には含めない。
+実行は `AROUND_LIVE_STUDIO=1 npm test -- tests/studio-live.spec.ts`。確認記録は `.work/verification/studio-live.json`、画面は `studio-live-workspace.png` と `studio-live-youtube.png`。最終のfixture回帰は `.work/verification/studio-final-targeted.log`、全体は `studio-all.log` に保存した。これらは作業環境の検証成果物で、Git管理には含めない。
 
 実YouTubeで、独立Studioからの全アニメーション形式、32レイヤー、複数Studioの競合、シアター／全画面、ブラウザー再起動までは今回確認していない。通常表示・fixture上の既存機能の結果とは区別する。普段のChromeプロファイルやログイン済み環境も未確認。
 

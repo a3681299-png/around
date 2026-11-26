@@ -1,0 +1,1718 @@
+{
+  "baseline": "8e63f0d451eeaf7811b7e0b5b60070d10b5233a9",
+  "documents": {
+    "history-v10.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [],
+      "decorations": [
+        {
+          "id": "character",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "Rig",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 200,
+            "heightPx": 200,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "kind": "model3d",
+          "source": {
+            "format": "glb",
+            "clips": [
+              {
+                "name": "Rest / 待機",
+                "duration": 2
+              },
+              {
+                "name": "Stride",
+                "duration": 2
+              },
+              {
+                "name": "Sprint",
+                "duration": 2
+              }
+            ],
+            "bones": [
+              {
+                "node": 2,
+                "name": "Hips"
+              },
+              {
+                "node": 3,
+                "name": "Head"
+              }
+            ],
+            "vertices": 8,
+            "triangles": 12,
+            "textureBytes": 4
+          },
+          "model": {
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "clip": 0,
+            "playing": true,
+            "loop": true,
+            "speed": 1,
+            "crossFadeMs": 250,
+            "inPlace": true,
+            "locomotion": {
+              "enabled": false,
+              "idle": null,
+              "walk": null,
+              "run": null,
+              "walkSpeed": 10,
+              "runSpeed": 220,
+              "faceMovement": true,
+              "forwardDeg": 0
+            },
+            "look": {
+              "enabled": false,
+              "bone": null,
+              "yawLimit": 50,
+              "pitchLimit": 30,
+              "lagMs": 160
+            }
+          }
+        }
+      ]
+    },
+    "history-v11.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [],
+      "decorations": [
+        {
+          "id": "avatar",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "Avatar",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 256,
+            "heightPx": 256,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "kind": "model3d",
+          "source": {
+            "format": "vrm",
+            "vrm": {
+              "version": "1.0",
+              "humanoid": [
+                {
+                  "bone": "hips",
+                  "node": 2
+                },
+                {
+                  "bone": "head",
+                  "node": 3
+                },
+                {
+                  "bone": "spine",
+                  "node": 4
+                },
+                {
+                  "bone": "leftUpperArm",
+                  "node": 5
+                },
+                {
+                  "bone": "leftLowerArm",
+                  "node": 6
+                },
+                {
+                  "bone": "leftHand",
+                  "node": 7
+                },
+                {
+                  "bone": "leftUpperLeg",
+                  "node": 8
+                },
+                {
+                  "bone": "leftLowerLeg",
+                  "node": 9
+                },
+                {
+                  "bone": "leftFoot",
+                  "node": 10
+                },
+                {
+                  "bone": "leftEye",
+                  "node": 11
+                },
+                {
+                  "bone": "rightUpperArm",
+                  "node": 12
+                },
+                {
+                  "bone": "rightLowerArm",
+                  "node": 13
+                },
+                {
+                  "bone": "rightHand",
+                  "node": 14
+                },
+                {
+                  "bone": "rightUpperLeg",
+                  "node": 15
+                },
+                {
+                  "bone": "rightLowerLeg",
+                  "node": 16
+                },
+                {
+                  "bone": "rightFoot",
+                  "node": 17
+                },
+                {
+                  "bone": "rightEye",
+                  "node": 18
+                }
+              ],
+              "expressions": ["happy", "blink"],
+              "lookAt": true,
+              "springBone": true,
+              "mtoon": true
+            },
+            "clips": [
+              {
+                "name": "Rest / 待機",
+                "duration": 2
+              },
+              {
+                "name": "Stride",
+                "duration": 2
+              },
+              {
+                "name": "Sprint",
+                "duration": 2
+              }
+            ],
+            "bones": [
+              {
+                "node": 2,
+                "name": "Hips"
+              },
+              {
+                "node": 3,
+                "name": "Head"
+              },
+              {
+                "node": 4,
+                "name": "spine"
+              },
+              {
+                "node": 5,
+                "name": "leftUpperArm"
+              },
+              {
+                "node": 6,
+                "name": "leftLowerArm"
+              },
+              {
+                "node": 7,
+                "name": "leftHand"
+              },
+              {
+                "node": 8,
+                "name": "leftUpperLeg"
+              },
+              {
+                "node": 9,
+                "name": "leftLowerLeg"
+              },
+              {
+                "node": 10,
+                "name": "leftFoot"
+              },
+              {
+                "node": 11,
+                "name": "leftEye"
+              },
+              {
+                "node": 12,
+                "name": "rightUpperArm"
+              },
+              {
+                "node": 13,
+                "name": "rightLowerArm"
+              },
+              {
+                "node": 14,
+                "name": "rightHand"
+              },
+              {
+                "node": 15,
+                "name": "rightUpperLeg"
+              },
+              {
+                "node": 16,
+                "name": "rightLowerLeg"
+              },
+              {
+                "node": 17,
+                "name": "rightFoot"
+              },
+              {
+                "node": 18,
+                "name": "rightEye"
+              }
+            ],
+            "vertices": 8,
+            "triangles": 12,
+            "textureBytes": 4
+          },
+          "model": {
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "clip": 0,
+            "playing": true,
+            "loop": true,
+            "speed": 1,
+            "crossFadeMs": 250,
+            "inPlace": true,
+            "locomotion": {
+              "enabled": false,
+              "idle": null,
+              "walk": null,
+              "run": null,
+              "walkSpeed": 10,
+              "runSpeed": 220,
+              "faceMovement": true,
+              "forwardDeg": 0
+            },
+            "look": {
+              "enabled": true,
+              "bone": 3,
+              "yawLimit": 50,
+              "pitchLimit": 30,
+              "lagMs": 160
+            },
+            "vrm": {
+              "lookAt": true,
+              "headFollow": true,
+              "springBone": true,
+              "expressions": {}
+            }
+          }
+        }
+      ]
+    },
+    "history-v12.json": {
+      "schemaVersion": 13,
+      "id": "modes",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-a",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "flower.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 0.8,
+          "zIndex": 1,
+          "visible": true,
+          "locked": true,
+          "renderMode": "atmosphere",
+          "kind": "image"
+        },
+        {
+          "id": "image-b",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "flower.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 0.8,
+          "zIndex": 1,
+          "visible": true,
+          "locked": true,
+          "renderMode": "atmosphere",
+          "kind": "image"
+        }
+      ],
+      "groups": [
+        {
+          "kind": "group",
+          "id": "group-a",
+          "name": "Group",
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "children": ["image-a", "image-b"],
+          "renderMode": "atmosphere"
+        }
+      ]
+    },
+    "history-v13.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [],
+      "decorations": [
+        {
+          "id": "avatar",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "Avatar",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 256,
+            "heightPx": 256,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "kind": "model3d",
+          "source": {
+            "format": "vrm",
+            "vrm": {
+              "version": "1.0",
+              "humanoid": [
+                {
+                  "bone": "hips",
+                  "node": 2
+                },
+                {
+                  "bone": "head",
+                  "node": 3
+                },
+                {
+                  "bone": "spine",
+                  "node": 4
+                },
+                {
+                  "bone": "leftUpperArm",
+                  "node": 5
+                },
+                {
+                  "bone": "leftLowerArm",
+                  "node": 6
+                },
+                {
+                  "bone": "leftHand",
+                  "node": 7
+                },
+                {
+                  "bone": "leftUpperLeg",
+                  "node": 8
+                },
+                {
+                  "bone": "leftLowerLeg",
+                  "node": 9
+                },
+                {
+                  "bone": "leftFoot",
+                  "node": 10
+                },
+                {
+                  "bone": "leftEye",
+                  "node": 11
+                },
+                {
+                  "bone": "rightUpperArm",
+                  "node": 12
+                },
+                {
+                  "bone": "rightLowerArm",
+                  "node": 13
+                },
+                {
+                  "bone": "rightHand",
+                  "node": 14
+                },
+                {
+                  "bone": "rightUpperLeg",
+                  "node": 15
+                },
+                {
+                  "bone": "rightLowerLeg",
+                  "node": 16
+                },
+                {
+                  "bone": "rightFoot",
+                  "node": 17
+                },
+                {
+                  "bone": "rightEye",
+                  "node": 18
+                }
+              ],
+              "expressions": ["happy", "blink"],
+              "lookAt": true,
+              "springBone": true,
+              "mtoon": true
+            },
+            "clips": [
+              {
+                "name": "Rest / 待機",
+                "duration": 2
+              },
+              {
+                "name": "Stride",
+                "duration": 2
+              },
+              {
+                "name": "Sprint",
+                "duration": 2
+              }
+            ],
+            "bones": [
+              {
+                "node": 2,
+                "name": "Hips"
+              },
+              {
+                "node": 3,
+                "name": "Head"
+              },
+              {
+                "node": 4,
+                "name": "spine"
+              },
+              {
+                "node": 5,
+                "name": "leftUpperArm"
+              },
+              {
+                "node": 6,
+                "name": "leftLowerArm"
+              },
+              {
+                "node": 7,
+                "name": "leftHand"
+              },
+              {
+                "node": 8,
+                "name": "leftUpperLeg"
+              },
+              {
+                "node": 9,
+                "name": "leftLowerLeg"
+              },
+              {
+                "node": 10,
+                "name": "leftFoot"
+              },
+              {
+                "node": 11,
+                "name": "leftEye"
+              },
+              {
+                "node": 12,
+                "name": "rightUpperArm"
+              },
+              {
+                "node": 13,
+                "name": "rightLowerArm"
+              },
+              {
+                "node": 14,
+                "name": "rightHand"
+              },
+              {
+                "node": 15,
+                "name": "rightUpperLeg"
+              },
+              {
+                "node": 16,
+                "name": "rightLowerLeg"
+              },
+              {
+                "node": 17,
+                "name": "rightFoot"
+              },
+              {
+                "node": 18,
+                "name": "rightEye"
+              }
+            ],
+            "vertices": 8,
+            "triangles": 12,
+            "textureBytes": 4
+          },
+          "model": {
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "clip": 0,
+            "playing": true,
+            "loop": true,
+            "speed": 1,
+            "crossFadeMs": 250,
+            "inPlace": true,
+            "locomotion": {
+              "enabled": false,
+              "idle": null,
+              "walk": null,
+              "run": null,
+              "walkSpeed": 10,
+              "runSpeed": 220,
+              "faceMovement": true,
+              "forwardDeg": 0
+            },
+            "look": {
+              "enabled": true,
+              "bone": 3,
+              "yawLimit": 50,
+              "pitchLimit": 30,
+              "lagMs": 160
+            },
+            "vrm": {
+              "lookAt": true,
+              "headFollow": true,
+              "springBone": true,
+              "expressions": {}
+            }
+          }
+        }
+      ]
+    },
+    "history-v7.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-0",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "world-0.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.1,
+            "y": 0.25,
+            "widthPx": 90,
+            "heightPx": 70,
+            "rotationDeg": 0
+          },
+          "opacity": 0,
+          "zIndex": 0,
+          "visible": false,
+          "locked": true,
+          "effects": [
+            {
+              "kind": "mask",
+              "shape": "circle",
+              "enabled": true,
+              "center": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "radiusPx": 160,
+              "featherPx": 40,
+              "intensity": 1,
+              "bindings": [
+                {
+                  "source": "pointer.position",
+                  "transform": {
+                    "kind": "layer-local"
+                  },
+                  "target": "mask.center"
+                },
+                {
+                  "source": "video.playing",
+                  "transform": {
+                    "kind": "boolean-gate",
+                    "fadeMs": 350
+                  },
+                  "target": "mask.intensity"
+                }
+              ]
+            }
+          ],
+          "kind": "animation",
+          "format": "apng",
+          "playback": {
+            "playing": true,
+            "loop": true,
+            "speed": 2,
+            "mode": "auto"
+          }
+        }
+      ]
+    },
+    "history-v8.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-0",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "world-0.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.1,
+            "y": 0.25,
+            "widthPx": 90,
+            "heightPx": 70,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "effects": [
+            {
+              "kind": "mask",
+              "shape": "circle",
+              "enabled": true,
+              "center": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "radiusPx": 160,
+              "featherPx": 40,
+              "intensity": 1,
+              "bindings": [
+                {
+                  "source": "pointer.position",
+                  "transform": {
+                    "kind": "layer-local"
+                  },
+                  "target": "mask.center"
+                },
+                {
+                  "source": "video.playing",
+                  "transform": {
+                    "kind": "boolean-gate",
+                    "fadeMs": 350
+                  },
+                  "target": "mask.intensity"
+                }
+              ]
+            }
+          ],
+          "kind": "image"
+        },
+        {
+          "id": "image-1",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "world-1.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.2,
+            "y": 0.25,
+            "widthPx": 91,
+            "heightPx": 70,
+            "rotationDeg": 5
+          },
+          "opacity": 1,
+          "zIndex": 1,
+          "visible": true,
+          "locked": false,
+          "effects": [
+            {
+              "kind": "mask",
+              "shape": "circle",
+              "enabled": true,
+              "center": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "radiusPx": 160,
+              "featherPx": 40,
+              "intensity": 1,
+              "bindings": [
+                {
+                  "source": "pointer.position",
+                  "transform": {
+                    "kind": "layer-local"
+                  },
+                  "target": "mask.center"
+                },
+                {
+                  "source": "video.playing",
+                  "transform": {
+                    "kind": "boolean-gate",
+                    "fadeMs": 350
+                  },
+                  "target": "mask.intensity"
+                }
+              ]
+            }
+          ],
+          "kind": "image"
+        }
+      ],
+      "groups": [
+        {
+          "kind": "group",
+          "id": "group-0",
+          "name": "World 0",
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "children": ["image-0", "image-1"],
+          "effects": [
+            {
+              "kind": "mask",
+              "shape": "circle",
+              "enabled": true,
+              "center": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "radiusPx": 160,
+              "featherPx": 40,
+              "intensity": 1,
+              "bindings": [
+                {
+                  "source": "pointer.position",
+                  "transform": {
+                    "kind": "layer-local"
+                  },
+                  "target": "mask.center"
+                },
+                {
+                  "source": "video.playing",
+                  "transform": {
+                    "kind": "boolean-gate",
+                    "fadeMs": 350
+                  },
+                  "target": "mask.intensity"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "signalRules": [
+        {
+          "id": "scroll-image-0",
+          "enabled": true,
+          "source": {
+            "signal": "page.scroll.progress",
+            "axis": "y",
+            "space": "page",
+            "inputRange": [0, 1]
+          },
+          "target": {
+            "layerId": "image-0",
+            "property": "opacity"
+          },
+          "keyframes": [
+            {
+              "id": "key-start",
+              "input": 0,
+              "value": 0,
+              "easing": "linear"
+            },
+            {
+              "id": "key-middle",
+              "input": 0.5,
+              "value": 1,
+              "easing": "linear"
+            },
+            {
+              "id": "key-end",
+              "input": 1,
+              "value": 0,
+              "easing": "linear"
+            }
+          ],
+          "evaluation": {
+            "mode": "follow",
+            "smoothing": {
+              "kind": "none"
+            }
+          },
+          "blend": {
+            "mode": "replace",
+            "priority": 0
+          }
+        }
+      ]
+    },
+    "history-v9.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-0",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "world-0.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.25,
+            "y": 0.5,
+            "widthPx": 90,
+            "heightPx": 70,
+            "rotationDeg": 20
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "effects": [],
+          "kind": "image"
+        },
+        {
+          "id": "image-1",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "world-1.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.35,
+            "y": 0.5,
+            "widthPx": 91,
+            "heightPx": 70,
+            "rotationDeg": 20
+          },
+          "opacity": 1,
+          "zIndex": 1,
+          "visible": true,
+          "locked": false,
+          "effects": [],
+          "kind": "image"
+        }
+      ],
+      "signalRules": [
+        {
+          "id": "position-x-image-0",
+          "enabled": true,
+          "source": {
+            "signal": "pointer.x",
+            "axis": "x",
+            "space": "viewport",
+            "inputRange": [0, 1]
+          },
+          "target": {
+            "layerId": "image-0",
+            "property": "position.x"
+          },
+          "keyframes": [
+            {
+              "id": "key-start",
+              "input": 0,
+              "value": 100,
+              "easing": "linear"
+            },
+            {
+              "id": "key-end",
+              "input": 1,
+              "value": 100,
+              "easing": "linear"
+            }
+          ],
+          "evaluation": {
+            "mode": "follow",
+            "smoothing": {
+              "kind": "none"
+            }
+          },
+          "blend": {
+            "mode": "add",
+            "priority": 0
+          }
+        },
+        {
+          "id": "position-y-image-0",
+          "enabled": true,
+          "source": {
+            "signal": "pointer.x",
+            "axis": "x",
+            "space": "viewport",
+            "inputRange": [0, 1]
+          },
+          "target": {
+            "layerId": "image-0",
+            "property": "position.y"
+          },
+          "keyframes": [
+            {
+              "id": "key-start",
+              "input": 0,
+              "value": -50,
+              "easing": "linear"
+            },
+            {
+              "id": "key-end",
+              "input": 1,
+              "value": -50,
+              "easing": "linear"
+            }
+          ],
+          "evaluation": {
+            "mode": "follow",
+            "smoothing": {
+              "kind": "none"
+            }
+          },
+          "blend": {
+            "mode": "add",
+            "priority": 0
+          }
+        },
+        {
+          "id": "rotation-image-0",
+          "enabled": true,
+          "source": {
+            "signal": "pointer.x",
+            "axis": "x",
+            "space": "viewport",
+            "inputRange": [0, 1]
+          },
+          "target": {
+            "layerId": "image-0",
+            "property": "rotation"
+          },
+          "keyframes": [
+            {
+              "id": "key-start",
+              "input": 0,
+              "value": 45,
+              "easing": "linear"
+            },
+            {
+              "id": "key-end",
+              "input": 1,
+              "value": 45,
+              "easing": "linear"
+            }
+          ],
+          "evaluation": {
+            "mode": "follow",
+            "smoothing": {
+              "kind": "none"
+            }
+          },
+          "blend": {
+            "mode": "add",
+            "priority": 0
+          }
+        },
+        {
+          "id": "opacity-image-0",
+          "enabled": true,
+          "source": {
+            "signal": "pointer.x",
+            "axis": "x",
+            "space": "viewport",
+            "inputRange": [0, 1]
+          },
+          "target": {
+            "layerId": "image-0",
+            "property": "opacity"
+          },
+          "keyframes": [
+            {
+              "id": "key-start",
+              "input": 0,
+              "value": 0.7,
+              "easing": "linear"
+            },
+            {
+              "id": "key-middle",
+              "input": 0.5,
+              "value": 0.7,
+              "easing": "linear"
+            },
+            {
+              "id": "key-end",
+              "input": 1,
+              "value": 0.7,
+              "easing": "linear"
+            }
+          ],
+          "evaluation": {
+            "mode": "follow",
+            "smoothing": {
+              "kind": "none"
+            }
+          },
+          "blend": {
+            "mode": "replace",
+            "priority": 0
+          }
+        }
+      ]
+    },
+    "v1.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [
+        {
+          "kind": "surface-style",
+          "target": "video-card",
+          "style": {
+            "backgroundColor": "#abcdef",
+            "border": {
+              "color": "#443366",
+              "widthPx": 4
+            },
+            "borderRadiusPx": 12
+          }
+        }
+      ],
+      "decorations": []
+    },
+    "v2.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-example",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "flower.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 0.8,
+          "zIndex": 1,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        }
+      ]
+    },
+    "v3.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-example",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "flower.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 0.8,
+          "zIndex": 1,
+          "visible": true,
+          "locked": true,
+          "kind": "image"
+        }
+      ]
+    },
+    "v4.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [],
+      "decorations": [
+        {
+          "id": "animation-test",
+          "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000000",
+          "name": "petal.gif",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 64,
+            "heightPx": 48,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "kind": "animation",
+          "format": "gif",
+          "playback": {
+            "playing": true,
+            "loop": true,
+            "speed": 1
+          }
+        }
+      ]
+    },
+    "v5.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-world",
+          "assetId": "asset-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "name": "world.png",
+          "placement": {
+            "anchor": {
+              "kind": "surface",
+              "target": "video-player"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 400,
+            "heightPx": 300,
+            "rotationDeg": 90
+          },
+          "opacity": 0.7,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "effects": [
+            {
+              "kind": "mask",
+              "shape": "circle",
+              "enabled": true,
+              "center": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "radiusPx": 160,
+              "featherPx": 40,
+              "intensity": 1,
+              "bindings": [
+                {
+                  "source": "pointer.position",
+                  "transform": {
+                    "kind": "layer-local"
+                  },
+                  "target": "mask.center"
+                },
+                {
+                  "source": "video.playing",
+                  "transform": {
+                    "kind": "boolean-gate",
+                    "fadeMs": 400
+                  },
+                  "target": "mask.intensity"
+                }
+              ]
+            }
+          ],
+          "kind": "image"
+        }
+      ]
+    },
+    "v6.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-0",
+          "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000000",
+          "name": "world-0.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.3,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        },
+        {
+          "id": "image-1",
+          "assetId": "asset-1111111111111111111111111111111111111111111111111111111111111111",
+          "name": "world-1.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 1,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        },
+        {
+          "id": "image-2",
+          "assetId": "asset-2222222222222222222222222222222222222222222222222222222222222222",
+          "name": "world-2.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.7,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 2,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        }
+      ],
+      "groups": [
+        {
+          "kind": "group",
+          "id": "group-world",
+          "name": "世界",
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "children": ["image-0", "image-1", "image-2"]
+        }
+      ]
+    },
+    "v7.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-0",
+          "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000000",
+          "name": "world-0.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.3,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "kind": "animation",
+          "format": "webm",
+          "playback": {
+            "playing": true,
+            "loop": true,
+            "speed": 1,
+            "mode": "auto"
+          }
+        },
+        {
+          "id": "image-1",
+          "assetId": "asset-1111111111111111111111111111111111111111111111111111111111111111",
+          "name": "world-1.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 1,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        },
+        {
+          "id": "image-2",
+          "assetId": "asset-2222222222222222222222222222222222222222222222222222222222222222",
+          "name": "world-2.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.7,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 2,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        }
+      ],
+      "groups": [
+        {
+          "kind": "group",
+          "id": "group-world",
+          "name": "世界",
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "children": ["image-0", "image-1", "image-2"]
+        }
+      ]
+    },
+    "v8.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-0",
+          "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000000",
+          "name": "world-0.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.3,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "kind": "animation",
+          "format": "webm",
+          "playback": {
+            "playing": true,
+            "loop": true,
+            "speed": 1,
+            "mode": "auto"
+          }
+        },
+        {
+          "id": "image-1",
+          "assetId": "asset-1111111111111111111111111111111111111111111111111111111111111111",
+          "name": "world-1.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 1,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        },
+        {
+          "id": "image-2",
+          "assetId": "asset-2222222222222222222222222222222222222222222222222222222222222222",
+          "name": "world-2.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.7,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 2,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        }
+      ],
+      "groups": [
+        {
+          "kind": "group",
+          "id": "group-world",
+          "name": "世界",
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "children": ["image-0", "image-1", "image-2"]
+        }
+      ],
+      "signalRules": [
+        {
+          "id": "scroll-image-0",
+          "enabled": true,
+          "source": {
+            "signal": "page.scroll.progress",
+            "axis": "y",
+            "space": "page",
+            "inputRange": [0, 1]
+          },
+          "target": {
+            "layerId": "image-0",
+            "property": "opacity"
+          },
+          "keyframes": [
+            {
+              "id": "key-start",
+              "input": 0,
+              "value": 0,
+              "easing": "linear"
+            },
+            {
+              "id": "key-middle",
+              "input": 0.5,
+              "value": 1,
+              "easing": "linear"
+            },
+            {
+              "id": "key-end",
+              "input": 1,
+              "value": 0,
+              "easing": "linear"
+            }
+          ],
+          "evaluation": {
+            "mode": "follow",
+            "smoothing": {
+              "kind": "none"
+            }
+          },
+          "blend": {
+            "mode": "replace",
+            "priority": 0
+          }
+        }
+      ]
+    },
+    "v9.json": {
+      "schemaVersion": 13,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": "retro",
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-0",
+          "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000000",
+          "name": "world-0.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.3,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "motion": {
+            "kind": "pointer-follow",
+            "enabled": false,
+            "mode": "pursuit",
+            "lagMs": 180,
+            "maxSpeed": 400,
+            "acceleration": 1200,
+            "deceleration": 1600,
+            "stopRadius": 48,
+            "orientToMovement": true,
+            "rotationOffsetDeg": 0
+          },
+          "kind": "animation",
+          "format": "webm",
+          "playback": {
+            "playing": true,
+            "loop": true,
+            "speed": 1,
+            "mode": "auto"
+          }
+        },
+        {
+          "id": "image-1",
+          "assetId": "asset-1111111111111111111111111111111111111111111111111111111111111111",
+          "name": "world-1.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 1,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        },
+        {
+          "id": "image-2",
+          "assetId": "asset-2222222222222222222222222222222222222222222222222222222222222222",
+          "name": "world-2.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.7,
+            "y": 0.4,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 2,
+          "visible": true,
+          "locked": false,
+          "kind": "image"
+        }
+      ],
+      "groups": [
+        {
+          "kind": "group",
+          "id": "group-world",
+          "name": "世界",
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "children": ["image-0", "image-1", "image-2"]
+        }
+      ],
+      "signalRules": [
+        {
+          "id": "scroll-image-0",
+          "enabled": true,
+          "source": {
+            "signal": "page.scroll.progress",
+            "axis": "y",
+            "space": "page",
+            "inputRange": [0, 1]
+          },
+          "target": {
+            "layerId": "image-0",
+            "property": "opacity"
+          },
+          "keyframes": [
+            {
+              "id": "key-start",
+              "input": 0,
+              "value": 0,
+              "easing": "linear"
+            },
+            {
+              "id": "key-middle",
+              "input": 0.5,
+              "value": 1,
+              "easing": "linear"
+            },
+            {
+              "id": "key-end",
+              "input": 1,
+              "value": 0,
+              "easing": "linear"
+            }
+          ],
+          "evaluation": {
+            "mode": "follow",
+            "smoothing": {
+              "kind": "none"
+            }
+          },
+          "blend": {
+            "mode": "replace",
+            "priority": 0
+          }
+        }
+      ]
+    }
+  }
+}

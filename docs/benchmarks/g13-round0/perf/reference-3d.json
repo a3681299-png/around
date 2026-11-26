@@ -1,0 +1,168 @@
+{
+  "date": "2026-11-03T08:26:45.099Z",
+  "builds": {
+    "before": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-before\\.work\\g13-perf",
+    "g12head": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-g12head\\.work\\g13-perf"
+  },
+  "pairs": [],
+  "reference3d": [
+    {
+      "label": "before",
+      "build": {
+        "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-before",
+        "revision": "557b9788eaf719a724c9f7f78be54735fe947b38",
+        "dirtySource": false,
+        "probe": "isolated-world-v3",
+        "asyncContinuations": "lowered-promises",
+        "busyMs": 0,
+        "busyAfterAwait": false,
+        "disableInk": false
+      },
+      "browser": "143.0.7499.4",
+      "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "model": true,
+      "phases": {
+        "scroll3d": {
+          "cpuMs": {
+            "n": 350,
+            "median": 0,
+            "p95": 2.399999998509884,
+            "max": 9.300000000745058
+          },
+          "intervalMs": {
+            "n": 350,
+            "median": 7,
+            "p95": 13.5,
+            "max": 21.600000001490116
+          },
+          "callbacks": 630,
+          "kinds": {
+            "MutationObserver": 157,
+            "raf": 145,
+            "microtask": 85,
+            "event": 160,
+            "setTimeout": 21,
+            "promise": 62
+          },
+          "point": {
+            "x": 1880,
+            "y": 737.5
+          },
+          "visibility": {
+            "frames": 354,
+            "shown": 1,
+            "approachFrames": 323
+          },
+          "invalid": "the approach rule held a layer at the far point"
+        }
+      },
+      "networkErrors": [
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://csp.withgoogle.com/csp/youtube_main/image",
+          "error": "net::ERR_BLOCKED_BY_ORB"
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.youtube.com/ptracking",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.youtube.com/ptracking",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "rest": {
+        "x": 116,
+        "y": 431
+      },
+      "approachAtRest": 0
+    },
+    {
+      "label": "g12head",
+      "build": {
+        "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-g12head",
+        "revision": "4d3f39b8707db63de81466d7cba4f833dde979d9",
+        "dirtySource": false,
+        "probe": "isolated-world-v3",
+        "asyncContinuations": "lowered-promises",
+        "busyMs": 0,
+        "busyAfterAwait": false,
+        "disableInk": false
+      },
+      "browser": "143.0.7499.4",
+      "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "model": true,
+      "phases": {
+        "scroll3d": {
+          "cpuMs": {
+            "n": 353,
+            "median": 0.8000000007450581,
+            "p95": 2.699999999254942,
+            "max": 10.600000001490116
+          },
+          "intervalMs": {
+            "n": 353,
+            "median": 7,
+            "p95": 13.600000001490116,
+            "max": 19
+          },
+          "callbacks": 1193,
+          "kinds": {
+            "raf": 465,
+            "microtask": 398,
+            "event": 160,
+            "MutationObserver": 150,
+            "setTimeout": 20
+          },
+          "point": {
+            "x": 1880,
+            "y": 606.25
+          },
+          "visibility": {
+            "frames": 352,
+            "shown": 2,
+            "approachFrames": 0
+          }
+        }
+      },
+      "networkErrors": [
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "rest": {
+        "x": 116,
+        "y": 431
+      },
+      "approachAtRest": 0
+    }
+  ]
+}

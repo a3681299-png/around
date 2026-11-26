@@ -1,10 +1,11 @@
+/* The Studio page around the editor. Colours and faces are the Around Studio tokens, which the page's
+   script declares on :root from editor/studio-tokens.css; Payne's grey or Gesso by the system
+   scheme, like the editor. Nothing is set below 12px. */
 :root {
-  color-scheme: dark;
-  font:
-    12px/1.4 system-ui,
-    sans-serif;
-  color: #e3e4e8;
-  background: #202123;
+  color-scheme: light dark;
+  font: 13px/20px var(--font-ui);
+  color: var(--ink);
+  background: var(--surface-sunk);
 }
 * {
   box-sizing: border-box;
@@ -23,31 +24,31 @@ body,
 .connection-bar {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   padding: 0;
   margin: 0;
   background: transparent;
   border: 0;
   min-width: 0;
-  font-size: 11px;
-  height: 26px;
+  font-size: 12px;
+  height: var(--control);
 }
 .connection-bar label {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  color: #a5a7af;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--ink-muted);
 }
 button,
 select {
   font: inherit;
-  color: #e3e4e8;
+  color: var(--ink);
   background: transparent;
   border: 0;
-  border-radius: 2px;
-  height: 24px;
-  padding: 3px 5px;
+  border-radius: var(--radius-control);
+  height: 28px;
+  padding: var(--space-4);
 }
 button {
   cursor: pointer;
@@ -56,11 +57,11 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  min-width: 26px;
+  width: 28px;
+  min-width: 28px;
 }
 button:hover:not(:disabled) {
-  background: #414248;
+  background: var(--cobalt-wash);
 }
 button:disabled {
   opacity: 0.4;
@@ -70,25 +71,38 @@ select {
   min-width: 130px;
   max-width: 290px;
   width: min(24vw, 290px);
-  background: #242528;
-  border: 1px solid #484950;
+  background: var(--surface-sunk);
+  border: 1px solid var(--line-control);
 }
 button:focus-visible,
 select:focus-visible {
-  outline: 2px solid #b6a4e5;
-  outline-offset: -2px;
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
 }
 .connection-status {
   display: block;
   max-width: 350px;
-  font-size: 10px;
-  color: #d0b387;
+  font-size: 12px;
+  color: var(--ink-muted);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 .connection-status[data-connected='true'] {
-  color: #b3c7b7;
+  color: var(--ink-muted);
+}
+/* In the editor's status bar the line may shrink; one that would be cut moves into the ⓘ tooltip. */
+.connection-status[slot] {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-overflow: clip;
+}
+.connection-status[data-tip] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 .studio-mount {
   flex: 1;
@@ -97,22 +111,36 @@ select:focus-visible {
   display: flex;
 }
 .connection-empty {
-  padding: 28px;
-  max-width: 550px;
+  padding: var(--space-32);
+  max-width: 552px;
   margin: auto;
-  color: #a5a7af;
+  color: var(--ink-muted);
 }
 .connection-empty h1 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #e3e4e8;
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 700;
+  color: var(--ink);
 }
 .recovery-status {
   margin: 0;
-  padding: 0 8px;
-  font-size: 11px;
-  color: #dfb87a;
-  background: #202123;
+  padding: 0 var(--space-8);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface-sunk);
+}
+.recovery-choice {
+  padding: var(--space-8);
+  color: var(--ink);
+  background: var(--surface-sunk);
+  border-bottom: 1px solid var(--line);
+}
+.recovery-choice p {
+  margin: 0 0 var(--space-8);
+}
+.recovery-choice button {
+  margin: 0 var(--space-8) var(--space-4) 0;
+  border: 1px solid var(--line-control);
 }
 
 body[data-sidepanel] .connection-bar label,
@@ -123,9 +151,89 @@ body[data-sidepanel] .disconnect-target {
 }
 body[data-sidepanel] .connection-bar {
   height: auto;
-  min-height: 28px;
-  padding: 3px 8px;
+  min-height: var(--control);
+  padding: var(--space-4) var(--space-8);
 }
 body[data-sidepanel] .connection-status {
   max-width: 100%;
+}
+/* Fullscreen hides Chrome's own close button with its toolbar: the panel's stays in view, first on
+   the status line (chunk 4 follow-up). A status that no longer fits moves into the ⓘ tooltip. */
+body[data-sidepanel] .close-panel {
+  flex: none;
+  border: 1px solid var(--line-control);
+}
+
+/* The editor header's safety: 緊急OFF is one ruled word button; 操作チェック joins it only while
+   something is restricted (the 45° diamond: 制限中), and opens a floating panel below. Vermilion is
+   protection: it marks the restriction, never a decoration. */
+.around-editor-safety {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  white-space: nowrap;
+}
+.around-editor-safety > button {
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--line-control);
+  font-size: 12px;
+}
+.around-editor-safety .safety-state {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.safety-check > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-control);
+  font-size: 12px;
+  list-style: none;
+  cursor: pointer;
+}
+.safety-check > summary::-webkit-details-marker {
+  display: none;
+}
+.safety-check[data-restricted] > summary {
+  border-color: var(--vermilion);
+  color: var(--vermilion);
+}
+.safety-check[data-restricted] > summary::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+.safety-popover {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-4));
+  z-index: 30;
+  width: min(320px, calc(100vw - 2 * var(--space-8)));
+  max-height: 60vh;
+  overflow: auto;
+  padding: var(--space-8) var(--space-12);
+  background: var(--surface-raised);
+  border-radius: var(--radius-float);
+  box-shadow: var(--shadow-float);
+  white-space: normal;
+  font-size: 12px;
+}
+.safety-popover label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.safety-popover ul {
+  margin: var(--space-8) 0 0;
+  padding-left: var(--space-20);
 }

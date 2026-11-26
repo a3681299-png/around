@@ -5,6 +5,8 @@ import { emptyDesign, parseDesign } from '../src/design/schema';
 import { defaultModelSettings } from '../src/models/types';
 import { validateDesignAssets } from '../src/assets/design-assets';
 import { modelFixture } from './helpers/model-fixture';
+import { vrmFixture } from './helpers/vrm-fixture';
+import type { ModelInfo } from '../src/models/types';
 
 test('bounded original GLB rig exposes arbitrary clips/bones; metadata and asset IDs roundtrip', () => {
   const bytes = modelFixture(),
@@ -69,6 +71,58 @@ test('external URIs, custom extensions, cycles, broken buffers and decompression
     expect(() => inspectGlb(modelFixture(mutate))).toThrow();
   const truncated = modelFixture().subarray(0, -4);
   expect(() => inspectAsset(truncated)).toThrow();
+});
+
+test('legacy VRM sources omit only body: supplied body and every other model fact still match exactly', () => {
+  const bytes = vrmFixture(),
+    info = inspectAsset(bytes),
+    measured = info.model!,
+    source = structuredClone(measured);
+  delete source.vrm!.body;
+  const doc = emptyDesign('youtube', null),
+    assetId = `asset-${'b'.repeat(64)}`;
+  doc.decorations.push({
+    kind: 'model3d',
+    id: 'legacy-vrm',
+    assetId,
+    name: 'Legacy VRM',
+    opacity: 1,
+    visible: true,
+    locked: false,
+    zIndex: 0,
+    source,
+    model: defaultModelSettings(source),
+    placement: { anchor: { kind: 'viewport' }, x: 0.5, y: 0.5, widthPx: 200, heightPx: 200, rotationDeg: 0 },
+  });
+  const stored = { ...info, id: assetId, name: 'Original.vrm', byteLength: bytes.length },
+    validate = (model: ModelInfo) => validateDesignAssets(doc.decorations, new Map([[assetId, { ...stored, model }]]));
+  expect(() => validate(measured)).not.toThrow();
+  // Ignoring a missing historical body must not hide a change in any other fact.
+  for (const mutate of [
+    (m: ModelInfo) => (m.clips[0]!.duration += 1),
+    (m: ModelInfo) => (m.bones[0]!.node += 1),
+    (m: ModelInfo) => (m.vertices += 1),
+    (m: ModelInfo) => (m.triangles += 1),
+    (m: ModelInfo) => (m.textureBytes += 1),
+    (m: ModelInfo) => (m.vrm!.version = '0.x'),
+    (m: ModelInfo) => (m.vrm!.humanoid[0]!.node += 1),
+    (m: ModelInfo) => m.vrm!.expressions.pop(),
+    (m: ModelInfo) => (m.vrm!.lookAt = !m.vrm!.lookAt),
+    (m: ModelInfo) => (m.vrm!.springBone = !m.vrm!.springBone),
+    (m: ModelInfo) => (m.vrm!.mtoon = !m.vrm!.mtoon),
+  ]) {
+    const changed = structuredClone(measured);
+    mutate(changed);
+    expect(() => validate(changed)).toThrow('一致');
+  }
+  source.vrm!.body = structuredClone(measured.vrm!.body!);
+  expect(() => validate(measured)).not.toThrow();
+  source.vrm!.body.height += 0.01;
+  expect(() => validate(measured)).toThrow('一致');
+  const withoutBody = structuredClone(measured);
+  delete withoutBody.vrm!.body;
+  expect(() => validate(withoutBody)).toThrow('一致');
+  expect(info.model).toEqual(measured);
 });
 
 test('shared morph accessors cannot amplify a small file into an unbounded GPU texture', () => {
