@@ -1,0 +1,36 @@
+project:
+  name: Around
+  core_value: 作者が作った世界をデスクトップ版 YouTube に重ね、再生ボタンや検索欄をそのまま使える Chrome 拡張機能。
+
+principles:
+  品質保証: 正常系に加え、異常系と境界値で期待どおりに動くかを確かめる。
+  定量的評価: ページ上の処理を変えたら、FPS、描画時間、メモリ使用量、起動・読込時間を同じ条件で変更前後に記録する。
+  設計の説明責任: 後から変えにくい判断は、採用理由、捨てた案、受け入れた制約を decisions に残す。
+  保守性: モジュールの責務を守り、既存機能と過去の作品を壊さずに改善できる構造を保つ。
+  過剰設計の防止: 今の要件を満たす最小の変更を選ぶ。抽象化や分割を増やすなら、何が改善するかを示す。
+
+non_goals:
+  - YouTube の埋め込みプレイヤーとライブチャット専用ページへの作品の表示。
+  - 作品データからの JS、任意の CSS 文字列、シェーダー、DOM セレクターの実行。
+  - 私用 VRM や Mixamo 素材のリポジトリへの収録や配布物への同梱。
+
+boundaries:
+  src/content/: 設定の変更を受け取り、ページの制御を開始する。
+  src/sites/: サイト固有のセレクター、DOM 監視、SPA 遷移を扱い、他の層に共通の部品を渡す。
+  src/design/: 作品データの形式と版ごとの移行を管理し、過去の作品を読み込めるようにする。
+  src/world/: DOM や Chrome API に依存せず、配置、動き、再生時刻を計算する。
+  src/host/: ページの入力と作品の描画をつなぎ、サイト本来の操作部品を守る。
+  src/renderers/: 作品の評価結果を画面に描く。
+
+decisions:
+  - id: 'TODO: 人間が記入'
+    decision: 'TODO: 人間が記入'
+    why: 'TODO: 人間が記入'
+    rejected_alternatives: ['TODO: 人間が記入']
+    accepted_tradeoff: 'TODO: 人間が記入'
+
+performance_targets:
+  fps: 'TODO: 人間が記入'
+  render_time_ms_per_frame: 'TODO: 人間が記入'
+  memory_mib: 'TODO: 人間が記入'
+  startup_load_time_ms: 'TODO: 人間が記入'
